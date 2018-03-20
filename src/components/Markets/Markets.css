@@ -1,0 +1,179 @@
+/* This one is the semi transparent box from Token Trader */
+/* .Container {
+    box-sizing: border-box;
+    z-index: 10;
+    width: 1000px;
+    padding: 40px;
+    text-align: center;
+    font-family: sans-serif;
+    background-color: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    position: relative;
+} */
+
+/* This is a larger and slightly different version of the one above */
+/*.Container {
+    background-color:
+    rgba(0, 0, 0, 0.2)
+    ;
+    border-bottom-color:
+    rgb(0, 0, 0)
+    ;
+    border-bottom-left-radius:
+    8px
+    ;
+    border-bottom-right-radius:
+    8px
+    ;
+    border-bottom-style:
+    none
+    ;
+    border-bottom-width:
+    0px
+    ;
+    border-image-outset:
+    0px
+    ;
+    border-image-repeat:
+    stretch
+    ;
+    border-image-slice:
+    100%
+    ;
+    border-image-source:
+    none
+    ;
+    border-image-width:
+    1
+    ;
+    border-left-color:
+    rgb(0, 0, 0)
+    ;
+    border-left-style:
+    none
+    ;
+    border-left-width:
+    0px
+    ;
+    border-right-color:
+    rgb(0, 0, 0)
+    ;
+    border-right-style:
+    none
+    ;
+    border-right-width:
+    0px
+    ;
+    border-top-color:
+    rgb(0, 0, 0)
+    ;
+    border-top-left-radius:
+    8px
+    ;
+    border-top-right-radius:
+    8px
+    ;
+    border-top-style:
+    none
+    ;
+    border-top-width:
+    0px
+    ;
+    box-sizing:
+    border-box
+    ;
+    display:
+    block
+    ;
+    font-family:
+    sans-serif
+    ;
+    font-size:
+    16px
+    ;
+    font-stretch:
+    100%
+    ;
+    font-style:
+    normal
+    ;
+    font-variant-caps:
+    normal
+    ;
+    font-variant-east-asian:
+    normal
+    ;
+    font-variant-ligatures:
+    normal
+    ;
+    font-variant-numeric:
+    normal
+    ;
+    font-weight:
+    400
+    ;
+    height:
+    571px
+    ;
+    line-height:
+    16px
+    ;
+    margin-bottom:
+    0px
+    ;
+    margin-left:
+    0px
+    ;
+    margin-right:
+    0px
+    ;
+    margin-top:
+    0px
+    ;
+    padding-bottom:
+    40px
+    ;
+    padding-left:
+    40px
+    ;
+    padding-right:
+    40px
+    ;
+    padding-top:
+    40px
+    ;
+    position:
+    relative
+    ;
+    text-align:
+    center
+    ;
+    vertical-align:
+    baseline
+    ;
+    width:
+    1000px
+    ;
+    z-index: 10;
+} 
+*/
+
+.Outer {
+    width: 1000px;
+    margin: 40px auto;
+    height: 70%;
+}
+
+/* This is a white box panel with drop shadow */
+.Container {
+    background: #f5f5f5;
+    height: 100%;
+    padding: 50px;
+    border-radius: 5px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.Container > p {
+    color: black;
+    text-shadow: 1px 1px 0px white;
+}

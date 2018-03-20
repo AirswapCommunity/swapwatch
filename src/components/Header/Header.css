@@ -1,0 +1,46 @@
+.Header {
+    padding: 15px 20px;
+    height: 50px;
+    background-color: white;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+.LogoImage {
+    float: left;
+    margin-right: 20px;
+}
+
+.LogoText {
+    display: inline;
+    float: left;
+    color: #005E9B;
+    font-weight: bold;
+    font-size: 1.25em;
+    letter-spacing: 5px;
+    line-height: 50px;
+    margin-top: 0;
+}
+
+.SemiTransparent {
+    opacity: 0.5;
+}
+
+.MarginLeft5 {
+    margin-left: 5px;
+}
+
+.MarginLeft10 {
+    margin-left: 10px;
+}
+
+.Link {
+    display: inline;
+    float: right;
+    color: #008eff;
+    font-size: 0.75em;
+    letter-spacing: 2px;
+    line-height: 50px;
+    margin-top: 0;
+    font-weight: bold;
+    text-decoration: none;
+}
