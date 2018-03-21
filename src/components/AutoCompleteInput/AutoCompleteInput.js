@@ -7,10 +7,18 @@ import { MenuItem, MenuList } from "material-ui/Menu";
 
 const styles = theme => ({
     input: {
-        margin: theme.spacing.unit,
+        // margin: theme.spacing.unit,
+        marginTop: theme.spacing.unit,
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        marginBottom: 0,
     },
     paper: {
-        margin: theme.spacing.unit,
+        // margin: theme.spacing.unit,
+        marginTop: 0,
+        marginLeft: theme.spacing.unit,
+        marginRight: theme.spacing.unit,
+        marginBottom: theme.spacing.unit,
         width: '100%',
     },
 });
