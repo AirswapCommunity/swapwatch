@@ -4,7 +4,7 @@ import { withStyles } from 'material-ui/styles';
 import Input, { InputAdornment } from 'material-ui/Input';
 import Paper from "material-ui/Paper";
 import { MenuItem, MenuList } from "material-ui/Menu";
-import cssStyles from './AutoCompleteInput.css';
+import './AutoCompleteInput.css';
 
 const styles = theme => ({
     input: {

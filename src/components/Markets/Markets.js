@@ -14,7 +14,7 @@ const Markets = props => {
     return (
         <Auxilary>
             <div className={styles.Outer}>
-                <div className={styles.Container}>
+                <div className={styles.PageContainer}>
                     <div style={{ float: 'left', width: '40%' }}>
                         <AutoCompleteInput placeholder="Token 1"
                             displayField='name'
