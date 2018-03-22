@@ -19,6 +19,7 @@ const Markets = props => {
                         <AutoCompleteInput placeholder="Token 1"
                             displayField='name'
                             imageField='logo'
+                            secondaryField='symbol'
                             itemSelected={(i) => console.log(i)}
                             cleared={() => console.log('Token 1 cleared')}>
                             {EthereumTokens.AllTokens}
