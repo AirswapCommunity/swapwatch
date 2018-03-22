@@ -8,7 +8,6 @@ import cssStyles from './AutoCompleteInput.css';
 
 const styles = theme => ({
     input: {
-        // margin: theme.spacing.unit,
         marginTop: theme.spacing.unit,
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
@@ -32,7 +31,6 @@ const styles = theme => ({
         }
     },
     paper: {
-        // margin: theme.spacing.unit,
         marginTop: 0,
         marginLeft: theme.spacing.unit,
         marginRight: theme.spacing.unit,
@@ -71,7 +69,9 @@ class AutoCompleteInput extends Component {
     };
 
     handleInputChanged = (e) => {
-        this.setState({ inputValue: e.target.value, selectedItem: null });
+        var value = this.state.inputValue.length === 0 ? e.target.value.toUpperCase() : e.target.value;
+
+        this.setState({ inputValue: value, selectedItem: null, popupVisible: true });
 
         if (!e.target.value) {
 
@@ -84,7 +84,7 @@ class AutoCompleteInput extends Component {
     handleItemSelected = (item) => {
         this.setState({
             popupVisible: false,
-            inputValue: this.state.displayProperty ? item[this.state.displayProperty] : item,
+            inputValue: this.getDisplayValue(item),
             selectedItem: item
         });
 
@@ -93,25 +93,54 @@ class AutoCompleteInput extends Component {
         }
     }
 
+    handleKeyDown = (event) => {
+        if (event.key === 'Tab' || event.key === 'Enter') {
+            var match = this.findMatch();
+
+            if (match) {
+                this.handleItemSelected(match);
+            }
+        }
+    }
+
+    findMatch = () => {
+        return this.props.children.find((item) => {
+            if (!this.state.inputValue) {
+                return false;
+            }
+
+            return this.getDisplayValue(item).toLowerCase().startsWith(this.state.inputValue.toLowerCase());
+        });
+    }
+
+    getDisplayValue = (item) => {
+        return this.state.displayProperty ? item[this.state.displayProperty] : item;
+    }
+
     render() {
         var popup = null;
         var error = false;
-        var displayProperty = this.state.displayProperty;
+        var suggestedValue = '';
 
-        if (this.state.popupVisible && this.state.inputValue) {
+        if (this.state.popupVisible) {
             var data = this.props.children
                 .filter((item) => {
-                    var value = displayProperty ? item[displayProperty].toLowerCase() : item.toLowerCase();
-                    return (!this.state.inputValue || value.includes(this.state.inputValue.toLowerCase()));
+                    return (!this.state.inputValue || this.getDisplayValue(item).toLowerCase().includes(this.state.inputValue.toLowerCase()));
+                })
+                .sort((a, b) => {
+                    var aVal = this.getDisplayValue(a);
+                    var bVal = this.getDisplayValue(b);
+
+                    return aVal.localeCompare(bVal);
                 })
                 .map((item, i) => {
-                    var displayValue = displayProperty ? item[displayProperty] : item;
+                    var displayValue = this.getDisplayValue(item);
 
                     var element = displayValue;
 
                     if (this.props.imageField) {
                         var path = `/tokens/${item[this.props.imageField]}`;
-                        element = <div style={{display: 'flex', alignItems: 'center'}}><img src={path} alt='token logo' style={{ width: '24px', marginRight: '10px' }}/>{displayValue}</div>;
+                        element = <div style={{ display: 'flex', alignItems: 'center' }}><img src={path} alt='token logo' style={{ width: '24px', marginRight: '10px' }} />{displayValue}</div>;
                     }
 
                     return <MenuItem key={i}
@@ -121,6 +150,14 @@ class AutoCompleteInput extends Component {
                 });
 
             error = data.length === 0;
+
+            if (!error) {
+               var match = this.findMatch();
+
+                if (match) {
+                    suggestedValue = this.getDisplayValue(match).slice(this.state.inputValue.length);
+                }
+            }
 
             popup = error ? null : <Paper className={this.props.classes.paper}>
                 <MenuList className={this.props.classes.menu}>{data}</MenuList>
@@ -133,13 +170,20 @@ class AutoCompleteInput extends Component {
             var path = `/tokens/${this.state.selectedItem[this.props.imageField]}`;
 
             adorner = <InputAdornment position="start">
-                <img src={path} alt='token logo' style={{ width: '24px' }}/>
+                <img src={path} alt='token logo' style={{ width: '24px' }} />
             </InputAdornment>;
+        }
+
+        var suggestedElement = null;
+
+        if (!this.state.selectedItem) {
+            suggestedElement = <span style={{ position: 'absolute', top: 12, left: 8 }}>{this.state.inputValue}<span style={{ color: '#00000060' }}>{suggestedValue}</span></span>
         }
 
         return (
             <Auxilary>
                 <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                    {suggestedElement}
                     <Input
                         placeholder={this.props.placeholder}
                         className={this.props.classes.input}
@@ -149,12 +193,12 @@ class AutoCompleteInput extends Component {
                         onFocus={this.handleGotFocus}
                         onBlur={this.handleLostFocus}
                         onChange={this.handleInputChanged}
+                        onKeyDown={this.handleKeyDown}
                         inputProps={{ 'aria-label': 'Description' }}
                         value={this.state.inputValue}
                         type='search'
                         startAdornment={adorner}>
                     </Input>
-
                     {popup}
                 </div>
             </Auxilary>
