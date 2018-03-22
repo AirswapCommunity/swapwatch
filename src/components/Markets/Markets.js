@@ -3,12 +3,13 @@ import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
 
-// import { AirSwap } from '../../services/AirSwap/AirSwap';
+import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 const Markets = props => {
     const data = ['AirSwap', 'Wrapped Eth'];
-    const dataObj = [{ id: 123, name: 'AirSwap' }, { id: 456, name: 'Wrapped Eth' }];
+
+    AirSwap.getLogs().then(x => console.log('Result in Markets', x));
 
     return (
         <Auxilary>
