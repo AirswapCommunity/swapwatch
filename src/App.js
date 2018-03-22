@@ -7,6 +7,8 @@ import MyTrades from './components/MyTrades/MyTrades';
 import About from './components/About/About';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 
+import PageShell from './hoc/PageShell/PageShell';
+
 class App extends Component {
   render() {
     return (
@@ -17,8 +19,8 @@ class App extends Component {
             <div className={styles.Container}>
               <Navbar></Navbar>
               <div style={{display: 'flex', height: '100vh'}}>
-                <Route exact path="/" component={Markets} />
-                <Route path="/MyTrades" component={MyTrades} />
+                <Route exact path="/" component={PageShell(Markets)} />
+                <Route path="/MyTrades" component={PageShell(MyTrades, true)} />
                 <Route path="/About" component={About} />
               </div>
             </div>
