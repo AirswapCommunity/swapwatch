@@ -1,0 +1,38 @@
+::-webkit-scrollbar {
+    width: 5px;
+}
+ 
+::-webkit-scrollbar-track {
+    background-color: gainsboro;
+}
+ 
+::-webkit-scrollbar-thumb {
+    background-color: #008eff;
+}
+
+.ComplexItemWrapper {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    width: 100%;
+    align-items: center;
+    /* display: flex */
+}
+
+.ItemImageField {
+    width: 24px;
+    margin-right: 10px;
+    float: left;
+}
+
+.ItemDisplayField {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    display: inline;
+}
+
+.ItemSecondaryField {
+    float: right;
+    font-weight: bold;
+}

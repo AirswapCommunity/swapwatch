@@ -1,0 +1,8 @@
+
+:local(.Outer) {
+    composes: PageFrame from global;
+}
+
+:local(.PageContainer) {
+    composes: Container from global;
+}
