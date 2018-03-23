@@ -210,7 +210,7 @@ class AutoCompleteInput extends Component {
 
         return (
             <Auxilary>
-                <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                <div style={{ position: 'relative', display: 'inline-block', width: '100%', zIndex:1 }}>
                     {suggestedElement}
                     <Input
                         placeholder={this.props.placeholder}
