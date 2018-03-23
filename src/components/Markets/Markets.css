@@ -1,3 +1,17 @@
+:local(.Outer) {
+    composes: PageFrame from global;
+}
+
+:local(.PageContainer) {
+    composes: Container from global;
+}
+
+.TableMessageContainer {
+    text-align: center;
+    /* font-weight: semi-bold; */
+    font-size: 1.5em;
+}
+
 /* This one is the semi transparent box from Token Trader */
 /* .Container {
     box-sizing: border-box;
@@ -157,14 +171,6 @@
     z-index: 10;
 } 
 */
-
-:local(.Outer) {
-    composes: PageFrame from global;
-}
-
-:local(.PageContainer) {
-    composes: Container from global;
-}
 
 /* This is a white box panel with drop shadow */
 /* .Container {

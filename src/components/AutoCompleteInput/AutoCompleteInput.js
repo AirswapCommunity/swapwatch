@@ -9,8 +9,8 @@ import cssStyles from './AutoCompleteInput.css';
 const styles = theme => ({
     input: {
         marginTop: theme.spacing.unit,
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
+        marginLeft: 0,
+        marginRight: 0,
         marginBottom: 0,
         fontFamily: 'Open Sans'
     },
@@ -32,8 +32,8 @@ const styles = theme => ({
     },
     paper: {
         marginTop: 0,
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
+        marginLeft: 0,
+        marginRight: 0,
         marginBottom: theme.spacing.unit,
         minWidth: '100%',
         position: 'absolute',
@@ -205,12 +205,12 @@ class AutoCompleteInput extends Component {
         var suggestedElement = null;
 
         if (!this.state.selectedItem) {
-            suggestedElement = <span style={{ position: 'absolute', top: 12, left: 8 }}>{this.state.inputValue}<span style={{ color: '#00000060' }}>{suggestedValue}</span></span>
+            suggestedElement = <span style={{ position: 'absolute', top: 12, left: 0 }}>{this.state.inputValue}<span style={{ color: '#00000060' }}>{suggestedValue}</span></span>
         }
 
         return (
             <Auxilary>
-                <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+                <div style={{ position: 'relative', display: 'inline-block', width: '100%', zIndex:1 }}>
                     {suggestedElement}
                     <Input
                         placeholder={this.props.placeholder}
