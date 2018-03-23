@@ -5,9 +5,9 @@ import styles from './App.css';
 import Markets from './components/Markets/Markets';
 import MyTrades from './components/MyTrades/MyTrades';
 import About from './components/About/About';
-import { BrowserRouter as Router, Route } from "react-router-dom";
-
+import Donate from './components/Donate/Donate';
 import PageShell from './hoc/PageShell/PageShell';
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 class App extends Component {
   render() {
@@ -21,7 +21,8 @@ class App extends Component {
               <div style={{display: 'flex', height: '100vh'}}>
                 <Route exact path="/" component={PageShell(Markets)} />
                 <Route path="/MyTrades" component={PageShell(MyTrades, true)} />
-                <Route path="/About" component={About} />
+                <Route path="/About" component={PageShell(About,true)} />
+                <Route path="/Donate" component={PageShell(Donate,true)} />
               </div>
             </div>
             <footer className={styles.Footer}>This site is not affiliated with AirSwap</footer>
