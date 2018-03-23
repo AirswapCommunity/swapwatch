@@ -13,7 +13,9 @@ class Markets extends React.Component {
     super(props);
     this.state = {
       'txList': null,
-      'pairedTX': null,
+      'pairedTx': null,
+      'selectedToken1': null,
+      'selectedToken2': null,
     }
   }
 
@@ -24,7 +26,7 @@ class Markets extends React.Component {
   }
 
   evalAirSwapDEXFilledEventLogs = (rawTxList) => {
-    let newPairedTx = this.state.pairedTX ? this.state.pairedTX : {};
+    let newPairedTx = this.state.pairedTx ? this.state.pairedTx : {};
     for(let txData of rawTxList) {
       // from AirSwapDEX contract:
       // event Filled(address indexed makerAddress,
@@ -71,35 +73,59 @@ class Markets extends React.Component {
       newPairedTx[trade.makerToken][trade.takerToken].push(trade);
     }
     this.setState({
-      txList: this.state.txList,
-      pairedTx: newPairedTx,
+      pairedTx: newPairedTx
     })
   }
 
-  getTokenPairTxList = (tokenAddress1, tokenAddress2) => {
-    let loadedTxList = [];
-    if(this.state.pairedTx && this.state.pairedTx[tokenAddress1]
-       && this.state.pairedTx[tokenAddress1][tokenAddress2]) {
+  getTokenPairTxList = () => {
+    let token1address = this.state.selectedToken1.address;
+    let token2address = this.state.selectedToken2.address;
+    if(this.state.pairedTx && this.state.pairedTx[token1address]
+       && this.state.pairedTx[token1address][token2address]) {
       this.setState({
-        txList: this.state.pairedTx[tokenAddress1][tokenAddress2],
-        pairedTx: this.state.pairedTx,
+        txList: this.state.pairedTx[token1address][token2address],
       })
     }
   }
+    
+  handleToken1Selected = (selectedToken) => {
+    this.setState({'selectedToken1': selectedToken}, 
+      () => {
+        if(this.state.selectedToken1 && this.state.selectedToken2) {
+          this.getTokenPairTxList();
+        }
+      }
+    )
+  }
   
+  handleToken2Selected = (selectedToken) => {
+    this.setState({'selectedToken2': selectedToken}, 
+      () => {
+        if(this.state.selectedToken1 && this.state.selectedToken2) {
+          this.getTokenPairTxList();
+        }
+      }
+    )
+  }
+
   render() {
     console.log('Rendering Market.')
-    const data = ['AirSwap', 'Wrapped Eth'];
+    const data = [EthereumTokens.getTokenByName('AirSwap'),
+                  EthereumTokens.getTokenByName('Wrapped Ether'),
+                  ]
+    // EthereumTokens.AllTokens//['AirSwap', 'Wrapped Eth'];
     
     if(!this.state.pairedTx) {
       AirSwap.getLogs()
       .then(x => {
-        this.evalAirSwapDEXFilledEventLogs(x);
-        this.getTokenPairTxList(
-          EthereumTokens.getTokenByName('AirSwap').address,
-          EthereumTokens.getTokenByName('Wrapped Ether').address)
+        this.evalAirSwapDEXFilledEventLogs(x)
+        this.setState({
+          'selectedToken1': data[0],
+          'selectedToken2': data[1],
+        }, this.getTokenPairTxList)
       });
     }
+
     return (
       <Auxilary>
         <div className={styles.Outer}>
@@ -109,13 +135,20 @@ class Markets extends React.Component {
                 displayField='name'
                 imageField='logo'
                 secondaryField='symbol'
-                itemSelected={(i) => console.log(i)}
+                itemSelected={this.handleToken1Selected}
                 cleared={() => console.log('Token 1 cleared')}>
-                {EthereumTokens.AllTokens}
+                {data}
               </AutoCompleteInput>
             </div>
             <div style={{ float: 'right', width: '40%' }}>
-              <AutoCompleteInput placeholder="Token 2">{data}</AutoCompleteInput>
+              <AutoCompleteInput placeholder="Token 2"
+                displayField='name'
+                imageField='logo'
+                secondaryField='symbol'
+                itemSelected={this.handleToken2Selected}
+                cleared={() => console.log('Token 2 cleared')}>
+                {data}
+              </AutoCompleteInput>
             </div>
             <div>
               <CandlestickChart />
