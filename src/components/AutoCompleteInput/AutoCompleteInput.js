@@ -9,8 +9,8 @@ import cssStyles from './AutoCompleteInput.css';
 const styles = theme => ({
     input: {
         marginTop: theme.spacing.unit,
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
+        marginLeft: 0,
+        marginRight: 0,
         marginBottom: 0,
         fontFamily: 'Open Sans'
     },
@@ -32,8 +32,8 @@ const styles = theme => ({
     },
     paper: {
         marginTop: 0,
-        marginLeft: theme.spacing.unit,
-        marginRight: theme.spacing.unit,
+        marginLeft: 0,
+        marginRight: 0,
         marginBottom: theme.spacing.unit,
         minWidth: '100%',
         position: 'absolute',

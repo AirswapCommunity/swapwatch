@@ -1,61 +1,58 @@
 import React, { Component } from "react";
 import { withStyles } from 'material-ui/styles';
-import Auxilary from "../../hoc/Auxilary";
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
-import Paper from 'material-ui/Paper';
-
+import ReactTable from 'react-table';
+import './TradingDataTable.css';
 
 const styles = theme => ({
-  root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
-    height: '30vh',
-    overflowX: 'auto',
-  },
-  table: {
-    height: '100%'
-  },
 });
 
 class TradingDataTable extends Component {
-  getTable = () => {return(
-      <Table className={this.props.classes.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Maker gives</TableCell>
-            <TableCell>Taker gives</TableCell>
-            <TableCell>Price</TableCell>
-            <TableCell>Gas Cost</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {this.props.txList.map(tx => {
-            return (
-              <TableRow key={tx.hash}>
-                <TableCell>{tx.timestamp}</TableCell>
-                <TableCell>{tx.makerAmount} {tx.makerSymbol}</TableCell>
-                <TableCell>{tx.takerAmount} {tx.takerSymbol}</TableCell>
-                <TableCell>{tx.price}</TableCell>
-                <TableCell>{tx.gasCost}</TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
-    )}
+  getTable = () => {
+    return (
+      <ReactTable
+        data={this.props.txList}
+        columns={[
+          {
+            Header: "Date",
+            id: "date",
+            accessor: d => new Date(d.timestamp).toLocaleTimeString()
+          },
+          {
+            Header: "Maker Gives",
+            id: "maker",
+            accessor: d => { return `${d.makerAmount} ${d.makerSymbol}`; }
+          },
+          {
+            Header: "Taker Gives",
+            id: "taker",
+            accessor: d => { return `${d.takerAmount} ${d.takerSymbol}`; }
+          },
+          {
+            Header: "Price",
+            accessor: "price"
+          },
+          {
+            Header: "Gas Cost",
+            accessor: "gasCost"
+          },
+        ]
+        }
+        defaultPageSize={10}
+        showPageSizeOptions={false}
+        className="-highlight -striped"
+      />
+    )
+  }
 
   render() {
     console.log('Rendering TradingDataTable');
-    var table = (this.props.txList && this.props.txList.length>0) ? (
+    var table = (this.props.txList && this.props.txList.length > 0) ? (
       this.getTable()) : null;
 
     return (
-      <Auxilary>
-        <Paper className={this.props.classes.root}>
-          {table}
-        </Paper>
-      </Auxilary>
+      <div>
+        {table}
+      </div>
     );
   }
 }
