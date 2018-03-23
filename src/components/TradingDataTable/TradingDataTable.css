@@ -1,4 +1,5 @@
 :global(.-header) {
     background-color: #008eff;
     color: white;   
+    /* font-weight: bold; */
 }

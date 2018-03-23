@@ -205,7 +205,7 @@ class AutoCompleteInput extends Component {
         var suggestedElement = null;
 
         if (!this.state.selectedItem) {
-            suggestedElement = <span style={{ position: 'absolute', top: 12, left: 8 }}>{this.state.inputValue}<span style={{ color: '#00000060' }}>{suggestedValue}</span></span>
+            suggestedElement = <span style={{ position: 'absolute', top: 12, left: 0 }}>{this.state.inputValue}<span style={{ color: '#00000060' }}>{suggestedValue}</span></span>
         }
 
         return (

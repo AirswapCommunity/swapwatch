@@ -15,28 +15,49 @@ class TradingDataTable extends Component {
           {
             Header: "Date",
             id: "date",
-            accessor: d => new Date(d.timestamp).toLocaleTimeString()
+            accessor: d => {
+              var timestamp = new Date(d.timestamp * 1000);
+              return <div><span style={{ float: 'left', marginLeft: '5px' }}>{timestamp.toLocaleDateString()}</span><span style={{ float: 'right', marginRight: '5px' }}>{timestamp.toLocaleTimeString()}</span></div>
+            }
           },
           {
             Header: "Maker Gives",
             id: "maker",
-            accessor: d => { return `${d.makerAmount} ${d.makerSymbol}`; }
+            accessor: d => { return `${d.makerAmount.toPrecision(8)} ${d.makerSymbol}`; },
+            style: {
+              textAlign: 'right'
+            }
           },
           {
             Header: "Taker Gives",
             id: "taker",
-            accessor: d => { return `${d.takerAmount} ${d.takerSymbol}`; }
+            accessor: d => { return `${d.takerAmount.toPrecision(8)} ${d.takerSymbol}`; },
+            style: {
+              textAlign: 'right'
+            }
           },
           {
-            Header: "Price",
-            accessor: "price"
+            Header: "Price Per",
+            id: "price",
+            accessor: d => d.price.toFixed(8),
+            style: {
+              textAlign: 'right'
+            }
           },
           {
             Header: "Gas Cost",
-            accessor: "gasCost"
+            id: "gas",
+            accessor: d => d.gasCost.toFixed(8),
+            style: {
+              textAlign: 'right'
+            }
           },
         ]
         }
+        sorted={[{
+          id: 'date',
+          desc: true
+        }]}
         defaultPageSize={10}
         showPageSizeOptions={false}
         className="-highlight -striped"
