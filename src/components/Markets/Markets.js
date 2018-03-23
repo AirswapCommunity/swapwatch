@@ -1,4 +1,5 @@
 import React from "react";
+import * as d3 from "d3";
 import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
@@ -13,6 +14,7 @@ class Markets extends React.Component {
     super(props);
     this.state = {
       'txList': null,
+      'ohlcData': null,
       'pairedTx': null,
       'selectedToken1': null,
       'selectedToken2': null,
@@ -82,10 +84,14 @@ class Markets extends React.Component {
     let selectedMarket = this.state.pairedTx[token1address][token2address];
     let oppositeMarket = this.state.pairedTx[token2address][token1address];
     
+    for(let tx of selectedMarket) {
+      tx['volume'] = tx.makerAmount;
+    }
     if (oppositeMarket && oppositeMarket.length > 0) {
       let copyOppositeMarket = oppositeMarket.map(x => Object.assign({}, x));
       for(let tx of copyOppositeMarket) {
         tx.price = 1/tx.price;
+        tx['volume'] = tx.takerAmount;
       }
       selectedMarket = selectedMarket.concat(copyOppositeMarket);
     }  
@@ -102,11 +108,37 @@ class Markets extends React.Component {
     let token2address = this.state.selectedToken2.address;
     if (this.state.pairedTx && this.state.pairedTx[token1address]
       && this.state.pairedTx[token1address][token2address]) {
+      let combinedMarket = this.combineMarkets(token1address, token2address);
+      let ohlcData = this.convertToOHLC(combinedMarket);
       this.setState({
-        txList: this.combineMarkets(token1address, token2address),
+        txList: combinedMarket,
+        ohlcData: ohlcData,
       })
     }
   }
+
+  convertToOHLC(data) {
+    let copyData = data.map(x => Object.assign({}, x));
+    copyData.sort((a, b) => d3.ascending(a.timestamp, b.timestamp));
+    let result = [];
+    let format = d3.timeFormat("%Y-%m-%d");
+    copyData.forEach(d => d.timestamp = format(new Date(d.timestamp * 1000)));
+    let allDates = [...Array.from(new Set(copyData.map(d => d.timestamp)))];
+    allDates.forEach(d => {
+        let tempObject = {};
+        let filteredData = copyData.filter(e => e.timestamp === d);
+
+        tempObject['timestamp'] = d;
+        tempObject['volume'] = d3.sum(filteredData, e=> e.volume);
+        tempObject['open'] = filteredData[0].price;
+        tempObject['close'] = filteredData[filteredData.length - 1].price;
+        tempObject['high'] = d3.max(filteredData, e => e.price);
+        tempObject['low'] = d3.min(filteredData, e => e.price);
+        result.push(tempObject);
+    });
+    return result;
+  };
+
 
   handleToken1Selected = (selectedToken) => {
     if (!selectedToken) {
@@ -141,17 +173,9 @@ class Markets extends React.Component {
     const data = [EthereumTokens.getTokenByName('AirSwap'),
     EthereumTokens.getTokenByName('Wrapped Ether'),
     ]
-    // EthereumTokens.AllTokens//['AirSwap', 'Wrapped Eth'];
-
     if (!this.state.pairedTx) {
       AirSwap.getLogs()
-        .then(x => {
-          this.evalAirSwapDEXFilledEventLogs(x)
-          // this.setState({
-          //   'selectedToken1': data[0],
-          //   'selectedToken2': data[1],
-          // }, this.getTokenPairTxList)
-        });
+        .then(x => this.evalAirSwapDEXFilledEventLogs(x));
     }
 
     var txElement = (<div className={styles.TableContainer}>
