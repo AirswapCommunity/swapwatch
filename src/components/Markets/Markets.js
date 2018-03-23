@@ -5,6 +5,7 @@ import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
 import CandlestickChart from "../CandlestickChart/CandlestickChart";
 import TradingDataTable from "../TradingDataTable/TradingDataTable";
+import { timeParse } from "d3-time-format";
 
 import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
@@ -122,20 +123,24 @@ class Markets extends React.Component {
     copyData.sort((a, b) => d3.ascending(a.timestamp, b.timestamp));
     let result = [];
     let format = d3.timeFormat("%Y-%m-%d");
+    let parseDate = timeParse("%Y-%m-%d");
     copyData.forEach(d => d.timestamp = format(new Date(d.timestamp * 1000)));
     let allDates = [...Array.from(new Set(copyData.map(d => d.timestamp)))];
+    let runningIdx = 0;
     allDates.forEach(d => {
         let tempObject = {};
         let filteredData = copyData.filter(e => e.timestamp === d);
-
-        tempObject['timestamp'] = d;
+        tempObject['idx'] = runningIdx;
+        tempObject['date'] = parseDate(d);
         tempObject['volume'] = d3.sum(filteredData, e=> e.volume);
         tempObject['open'] = filteredData[0].price;
         tempObject['close'] = filteredData[filteredData.length - 1].price;
         tempObject['high'] = d3.max(filteredData, e => e.price);
         tempObject['low'] = d3.min(filteredData, e => e.price);
         result.push(tempObject);
+        runningIdx++;
     });
+    result['columns'] = ['idx', 'date', 'volume', 'open', 'close', 'high', 'low']
     return result;
   };
 
@@ -217,7 +222,7 @@ class Markets extends React.Component {
               </AutoCompleteInput>
             </div>
             <div>
-              <CandlestickChart />
+              <CandlestickChart ohlcData={this.state.ohlcData} />
             </div>
             {txElement}
           </div>
