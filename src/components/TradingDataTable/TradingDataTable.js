@@ -1,13 +1,25 @@
 import React, { Component } from "react";
 import { withStyles } from 'material-ui/styles';
 import Auxilary from "../../hoc/Auxilary";
-import cssStyles from './TradingDataTable.css';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
 
+
+const styles = theme => ({
+  root: {
+    width: '100%',
+    marginTop: theme.spacing.unit * 3,
+    height: '30vh',
+    overflowX: 'auto',
+  },
+  table: {
+    height: '100%'
+  },
+});
+
 class TradingDataTable extends Component {
   getTable = () => {return(
-      <Table>
+      <Table className={this.props.classes.table}>
         <TableHead>
           <TableRow>
             <TableCell>Date</TableCell>
@@ -17,7 +29,7 @@ class TradingDataTable extends Component {
             <TableCell>Gas Cost</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody width='100px'>
+        <TableBody>
           {this.props.txList.map(tx => {
             return (
               <TableRow key={tx.hash}>
@@ -40,7 +52,7 @@ class TradingDataTable extends Component {
 
     return (
       <Auxilary>
-        <Paper>
+        <Paper className={this.props.classes.root}>
           {table}
         </Paper>
       </Auxilary>
@@ -49,4 +61,4 @@ class TradingDataTable extends Component {
 }
 
 
-export default withStyles(cssStyles)(TradingDataTable);
+export default withStyles(styles)(TradingDataTable);
