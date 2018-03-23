@@ -134,7 +134,7 @@ class Markets extends React.Component {
         });
     }
 
-    var txElement = <TradingDataTable txList={this.state.txList} />;
+    var txElement = <TradingDataTable txList={this.state.txList } />;
 
     if (!this.state.txList) {
       var msg = 'Please select a token pair';

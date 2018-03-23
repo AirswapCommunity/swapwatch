@@ -7,6 +7,21 @@ const styles = theme => ({
 });
 
 class TradingDataTable extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      sort: [{
+        id: 'date',
+        desc: true
+      }],
+    };
+  }
+
+  handleSortChanged = (newSort, column, shiftKey) => {
+    this.setState({ sort: newSort });
+  };
+
   getTable = () => {
     return (
       <ReactTable
@@ -54,12 +69,10 @@ class TradingDataTable extends Component {
           },
         ]
         }
-        sorted={[{
-          id: 'date',
-          desc: true
-        }]}
+        sorted={this.state.sort}
         defaultPageSize={10}
         showPageSizeOptions={false}
+        onSortedChange={this.handleSortChanged}
         className="-highlight -striped"
       />
     )
