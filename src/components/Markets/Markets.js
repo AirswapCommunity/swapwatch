@@ -77,13 +77,33 @@ class Markets extends React.Component {
     })
   }
 
+  combineMarkets = (token1address, token2address) => { 
+    let combinedMarket = [];
+    let selectedMarket = this.state.pairedTx[token1address][token2address];
+    let oppositeMarket = this.state.pairedTx[token2address][token1address];
+    
+    if (oppositeMarket && oppositeMarket.length > 0) {
+      let copyOppositeMarket = oppositeMarket.map(x => Object.assign({}, x));
+      for(let tx of copyOppositeMarket) {
+        tx.price = 1/tx.price;
+      }
+      selectedMarket = selectedMarket.concat(copyOppositeMarket);
+    }  
+    let sortedCombinedMarkets = selectedMarket.sort((obj1, obj2) => {
+      if(obj1.timestamp > obj2.timestamp) return 1;
+      if(obj1.timestamp < obj2.timestamp) return -1;
+      return 0;
+    })
+    return sortedCombinedMarkets;
+  }
+
   getTokenPairTxList = () => {
     let token1address = this.state.selectedToken1.address;
     let token2address = this.state.selectedToken2.address;
     if (this.state.pairedTx && this.state.pairedTx[token1address]
       && this.state.pairedTx[token1address][token2address]) {
       this.setState({
-        txList: this.state.pairedTx[token1address][token2address],
+        txList: this.combineMarkets(token1address, token2address),
       })
     }
   }
