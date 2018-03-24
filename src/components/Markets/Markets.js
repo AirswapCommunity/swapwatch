@@ -134,7 +134,9 @@ class Markets extends React.Component {
         });
     }
 
-    var txElement = <TradingDataTable txList={this.state.txList } />;
+    var txElement = (<div className={styles.TableContainer}>
+      <TradingDataTable txList={this.state.txList} />
+    </div>);
 
     if (!this.state.txList) {
       var msg = 'Please select a token pair';
@@ -151,7 +153,7 @@ class Markets extends React.Component {
         <div className={styles.Outer}>
           <div className={styles.PageContainer}>
             <div style={{ float: 'left', width: '40%' }}>
-              <AutoCompleteInput placeholder="Token 1"
+              <AutoCompleteInput placeholder="Maker Token"
                 displayField='name'
                 imageField='logo'
                 secondaryField='symbol'
@@ -161,7 +163,7 @@ class Markets extends React.Component {
               </AutoCompleteInput>
             </div>
             <div style={{ float: 'right', width: '40%' }}>
-              <AutoCompleteInput placeholder="Token 2"
+              <AutoCompleteInput placeholder="Taker Token"
                 displayField='name'
                 imageField='logo'
                 secondaryField='symbol'
@@ -173,9 +175,7 @@ class Markets extends React.Component {
             <div>
               <CandlestickChart />
             </div>
-            <div>
-              {txElement}
-            </div>
+            {txElement}
           </div>
         </div>
       </Auxilary>
