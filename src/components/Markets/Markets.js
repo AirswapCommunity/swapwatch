@@ -10,6 +10,9 @@ import { timeParse } from "d3-time-format";
 import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
+import Switch from 'material-ui/Switch';
+import FormControlLabel from 'material-ui/Form';
+
 class Markets extends React.Component {
   constructor(props) {
     super(props);
@@ -19,7 +22,7 @@ class Markets extends React.Component {
       'pairedTx': null,
       'selectedToken1': null,
       'selectedToken2': null,
-      'view': null
+      'viewCandlestick': true
     }
   }
 
@@ -115,7 +118,7 @@ class Markets extends React.Component {
         txList: combinedMarket,
         ohlcData: ohlcData,
       }, () => {
-        if(!this.state.view) this.setState({view:'candlestick'})
+        // if(!this.state.view) this.setState({view:'candlestick'})
       })
     }
   }
@@ -175,6 +178,12 @@ class Markets extends React.Component {
     )
   }
 
+  handleViewChange = name => event => {
+    this.setState({ [name]: event.target.checked });
+  };
+
+
+
   render() {
     console.log('Rendering Market.')
     const data = [EthereumTokens.getTokenByName('AirSwap'),
@@ -205,18 +214,17 @@ class Markets extends React.Component {
                               className={styles.TableMessageContainer}
                               data={this.state.ohlcData} />;
     
-    var viewElement;
-    switch(this.state.view) {
-      case 'candlestick':
-        viewElement = candlestickElement;
-        break;
-      case 'table':
-        viewElement = txElement;
-        break;
-      default:
-        viewElement = txElement;
-    }
-
+    var viewElement = this.state.viewCandlestick ? candlestickElement : txElement
+    var switchElement = this.state.txList ? <FormControlLabel
+                                              control={
+                                                <Switch
+                                                  checked={this.state.viewCandlestick}
+                                                  onChange={this.handleViewChange('viewCandlestick')}
+                                                  value="viewCandlestick"
+                                                />
+                                              }
+                                              label="Show transactions as candlesticks"
+                                            /> : null;
     return (
       <Auxilary>
         <div className={styles.Outer}>
@@ -243,10 +251,13 @@ class Markets extends React.Component {
                 </AutoCompleteInput>
               </div>
             </div>
-            <div>
+            <div style={{ position: 'relative',
+                          display: 'inline-block',
+                          width: '100%',
+                          marginTop: '10px'}}>
               {viewElement}
             </div>
-
+            <div style={{float: 'right'}}> {switchElement}</div>
           </div>
         </div>
       </Auxilary>
