@@ -19,6 +19,7 @@ class Markets extends React.Component {
       'pairedTx': null,
       'selectedToken1': null,
       'selectedToken2': null,
+      'view': null
     }
   }
 
@@ -81,7 +82,6 @@ class Markets extends React.Component {
   }
 
   combineMarkets = (token1address, token2address) => { 
-    let combinedMarket = [];
     let selectedMarket = this.state.pairedTx[token1address][token2address];
     let oppositeMarket = this.state.pairedTx[token2address][token1address];
     
@@ -114,6 +114,8 @@ class Markets extends React.Component {
       this.setState({
         txList: combinedMarket,
         ohlcData: ohlcData,
+      }, () => {
+        if(!this.state.view) this.setState({view:'candlestick'})
       })
     }
   }
@@ -180,12 +182,14 @@ class Markets extends React.Component {
     ]
     if (!this.state.pairedTx) {
       AirSwap.getLogs()
-        .then(x => this.evalAirSwapDEXFilledEventLogs(x));
+        .then(x => {
+          this.evalAirSwapDEXFilledEventLogs(x);
+          // this.handleToken1Selected(data[0]);
+          // this.handleToken2Selected(data[1]);
+        });
     }
 
-    var txElement = (<div className={styles.TableContainer}>
-      <TradingDataTable txList={this.state.txList} />
-    </div>);
+    var txElement = <TradingDataTable txList={this.state.txList } />;
 
     if (!this.state.txList) {
       var msg = 'Please select a token pair';
@@ -197,34 +201,52 @@ class Markets extends React.Component {
       txElement = <div className={styles.TableMessageContainer}>{msg}</div>
     }
 
+    var candlestickElement = <CandlestickChart 
+                              className={styles.TableMessageContainer}
+                              data={this.state.ohlcData} />;
+    
+    var viewElement;
+    switch(this.state.view) {
+      case 'candlestick':
+        viewElement = candlestickElement;
+        break;
+      case 'table':
+        viewElement = txElement;
+        break;
+      default:
+        viewElement = txElement;
+    }
+
     return (
       <Auxilary>
         <div className={styles.Outer}>
           <div className={styles.PageContainer}>
-            <div style={{ float: 'left', width: '40%' }}>
-              <AutoCompleteInput placeholder="Maker Token"
-                displayField='name'
-                imageField='logo'
-                secondaryField='symbol'
-                itemSelected={this.handleToken1Selected}
-                cleared={this.handleToken1Selected}>
-                {data}
-              </AutoCompleteInput>
-            </div>
-            <div style={{ float: 'right', width: '40%' }}>
-              <AutoCompleteInput placeholder="Taker Token"
-                displayField='name'
-                imageField='logo'
-                secondaryField='symbol'
-                itemSelected={this.handleToken2Selected}
-                cleared={this.handleToken2Selected}>
-                {data}
-              </AutoCompleteInput>
+            <div>
+              <div style={{ float: 'left', width: '40%' }}>
+                <AutoCompleteInput placeholder="Token 1"
+                  displayField='name'
+                  imageField='logo'
+                  secondaryField='symbol'
+                  itemSelected={this.handleToken1Selected}
+                  cleared={this.handleToken1Selected}>
+                  {data}
+                </AutoCompleteInput>
+              </div>
+              <div style={{ float: 'right', width: '40%' }}>
+                <AutoCompleteInput placeholder="Token 2"
+                  displayField='name'
+                  imageField='logo'
+                  secondaryField='symbol'
+                  itemSelected={this.handleToken2Selected}
+                  cleared={this.handleToken2Selected}>
+                  {data}
+                </AutoCompleteInput>
+              </div>
             </div>
             <div>
-              <CandlestickChart ohlcData={this.state.ohlcData} />
+              {viewElement}
             </div>
-            {txElement}
+
           </div>
         </div>
       </Auxilary>
