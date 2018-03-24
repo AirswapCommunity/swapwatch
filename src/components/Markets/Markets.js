@@ -11,7 +11,7 @@ import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 import Switch from 'material-ui/Switch';
-import FormControlLabel from 'material-ui/Form';
+import { FormGroup, FormControlLabel } from 'material-ui/Form';
 
 class Markets extends React.Component {
   constructor(props) {
