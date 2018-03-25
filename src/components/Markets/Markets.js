@@ -84,7 +84,7 @@ class Markets extends React.Component {
     this.setState({
       pairedTx: newPairedTx,
       statusMessage: null
-    })
+    }, this.checkStatus)
   }
 
   combineMarkets = (token1address, token2address) => { 
@@ -116,9 +116,8 @@ class Markets extends React.Component {
       let ohlcData = this.convertToOHLC(combinedMarket);
       this.setState({
         txList: combinedMarket,
-        ohlcData: ohlcData,
-        statusMessage: null
-      })
+        ohlcData: ohlcData
+      }, this.checkStatus)
     }
   }
 
@@ -156,10 +155,10 @@ class Markets extends React.Component {
 
     this.setState({
       txList: null,
-      selectedToken1: selectedToken,
-      statusMessage: null
+      selectedToken1: selectedToken
     }, () => {
       if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
+      this.checkStatus();
     })
   }
 
@@ -170,10 +169,10 @@ class Markets extends React.Component {
 
     this.setState({
       txList: null, 
-      selectedToken2: selectedToken,
-      statusMessage: null
+      selectedToken2: selectedToken
     }, () => {
       if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
+      this.checkStatus();
     })
   }
 
@@ -182,35 +181,37 @@ class Markets extends React.Component {
   };
 
 
+  componentWillMount() {
+    AirSwap.getLogs()
+        .then(x => {
+          this.evalAirSwapDEXFilledEventLogs(x);
+          // this.handleToken1Selected(data[0]);
+          // this.handleToken2Selected(data[1]);
+        });
+    this.checkStatus();
+  }
+
+  checkStatus() {
+    let statusMsg;
+    if(!this.state.pairedTx) {
+      statusMsg = 'Standby. Fetching transactions on AirSwapDEX from Etherscan.';
+    } else if(!this.state.txList) {
+      if (this.state.selectedToken1 && this.state.selectedToken2) {
+        statusMsg = 'No data found for the selected token pair';
+      } else {
+        statusMsg = 'Please select a token pair';
+      }
+    }
+    this.setState({statusMessage: statusMsg});
+  }
 
   render() {
     const data = [
       EthereumTokens.getTokenByName('AirSwap'),
       EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
 
-    if (!this.state.pairedTx) {
-      AirSwap.getLogs()
-        .then(x => {
-          this.evalAirSwapDEXFilledEventLogs(x);
-          // this.handleToken1Selected(data[0]);
-          // this.handleToken2Selected(data[1]);
-        });
-    }
-
     var txTableElement = <TradingDataTable txList={this.state.txList } />;
     var candlestickElement = <CandlestickChart data={this.state.ohlcData} />;
-
-    if(!this.state.statusMessage){
-      if(!this.state.pairedTx) {
-        this.setState({statusMessage:'Standby. Fetching transactions on AirSwapDEX from Etherscan.'});
-      } else if(!this.state.txList) {
-        if (this.state.selectedToken1 && this.state.selectedToken2) {
-          this.setState({statusMessage:'No data found for the selected token pair'});
-        } else {
-          this.setState({statusMessage:'Please select a token pair'});
-        }
-      }
-    }
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
    
