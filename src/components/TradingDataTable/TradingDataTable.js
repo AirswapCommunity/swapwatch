@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { withStyles } from 'material-ui/styles';
 import ReactTable from 'react-table';
-import './TradingDataTable.css';
+import cssStyles from './TradingDataTable.css';
 
 const styles = theme => ({
 });
@@ -70,11 +70,11 @@ class TradingDataTable extends Component {
         ]
         }
         sorted={this.state.sort}
-        defaultPageSize={10}
+        defaultPageSize={25}
         showPageSizeOptions={false}
         onSortedChange={this.handleSortChanged}
-        className="-highlight -striped"
-      />
+        className={[cssStyles.Table, '-highlight', '-striped'].join(' ')}>
+      </ReactTable>
     )
   }
 
@@ -84,7 +84,7 @@ class TradingDataTable extends Component {
       this.getTable()) : null;
 
     return (
-      <div>
+      <div className={cssStyles.TableContainer}>
         {table}
       </div>
     );

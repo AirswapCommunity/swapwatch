@@ -12,6 +12,11 @@
     font-size: 1.5em;
 }
 
+.TableContainer {
+    display: flex;
+    height: 100%;
+}
+
 /* This one is the semi transparent box from Token Trader */
 /* .Container {
     box-sizing: border-box;
