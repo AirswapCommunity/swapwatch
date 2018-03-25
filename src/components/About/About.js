@@ -41,10 +41,10 @@ const About = props => (
                     <div>
                         <Avatar className={props.classes.avatar}>
                             <Avatar className={props.classes.avatarInternal}>
-                                <img src={require('../../assets/images/homiedomi.png')} className={cssStyles.Photo} alt="homidomi" />
+                                <img src={require('../../assets/images/homiedomi.png')} className={cssStyles.Photo} alt="homiedomi" />
                             </Avatar>
                         </Avatar>
-                        <span className={cssStyles.ContributorName}>homidomi</span>
+                        <span className={cssStyles.ContributorName}>homiedomi</span>
                     </div>
                 </div>
             </div>
