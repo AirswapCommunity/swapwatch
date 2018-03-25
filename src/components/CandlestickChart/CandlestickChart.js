@@ -92,7 +92,7 @@ class CandlestickChart extends Component {
     const calculatedData = ema20(sma20(ema50(smaVolume50(bb(this.props.data)))));
     
     return (
-      <ChartCanvas height={450}
+      <ChartCanvas height={420}
           ratio={this.props.ratio}
           width={this.props.width}
           margin={{ left: 80, right: 80, top: 10, bottom: 40 }}

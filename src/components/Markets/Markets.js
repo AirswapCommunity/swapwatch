@@ -14,15 +14,17 @@ import Switch from 'material-ui/Switch';
 import { FormGroup, FormControlLabel } from 'material-ui/Form';
 
 class Markets extends React.Component {
+  
   constructor(props) {
     super(props);
     this.state = {
-      'txList': null,
-      'ohlcData': null,
-      'pairedTx': null,
-      'selectedToken1': null,
-      'selectedToken2': null,
-      'viewCandlestick': true
+      'pairedTx': null, // loaded TX of AirSwapDEX sorted as [makerAddress][takerAddress]
+      'txList': null, // List containing selected transactions for display
+      'ohlcData': null, // Data transformed to OHLC format
+      'selectedToken1': null, // currently selected token 1
+      'selectedToken2': null, // currently selected token 2
+      'viewCandlestick': true, // Display Candlestick or Display Table
+      'statusMessage': null // status message shown at top
     }
   }
 
@@ -80,7 +82,8 @@ class Markets extends React.Component {
       newPairedTx[trade.makerToken][trade.takerToken].push(trade);
     }
     this.setState({
-      pairedTx: newPairedTx
+      pairedTx: newPairedTx,
+      statusMessage: null
     })
   }
 
@@ -99,11 +102,8 @@ class Markets extends React.Component {
       }
       selectedMarket = selectedMarket.concat(copyOppositeMarket);
     }  
-    let sortedCombinedMarkets = selectedMarket.sort((obj1, obj2) => {
-      if(obj1.timestamp > obj2.timestamp) return 1;
-      if(obj1.timestamp < obj2.timestamp) return -1;
-      return 0;
-    })
+    let sortedCombinedMarkets = 
+      selectedMarket.sort((a, b) => d3.ascending(a.timestamp, b.timestamp));
     return sortedCombinedMarkets;
   }
 
@@ -117,8 +117,7 @@ class Markets extends React.Component {
       this.setState({
         txList: combinedMarket,
         ohlcData: ohlcData,
-      }, () => {
-        // if(!this.state.view) this.setState({view:'candlestick'})
+        statusMessage: null
       })
     }
   }
@@ -155,13 +154,13 @@ class Markets extends React.Component {
       this.setState({ txList: null });
     }
 
-    this.setState({ 'selectedToken1': selectedToken },
-      () => {
-        if (this.state.selectedToken1 && this.state.selectedToken2) {
-          this.getTokenPairTxList();
-        }
-      }
-    )
+    this.setState({
+      txList: null,
+      selectedToken1: selectedToken,
+      statusMessage: null
+    }, () => {
+      if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
+    })
   }
 
   handleToken2Selected = (selectedToken) => {
@@ -169,13 +168,13 @@ class Markets extends React.Component {
       this.setState({ txList: null });
     }
 
-    this.setState({ 'selectedToken2': selectedToken },
-      () => {
-        if (this.state.selectedToken1 && this.state.selectedToken2) {
-          this.getTokenPairTxList();
-        }
-      }
-    )
+    this.setState({
+      txList: null, 
+      selectedToken2: selectedToken,
+      statusMessage: null
+    }, () => {
+      if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
+    })
   }
 
   handleViewChange = name => event => {
@@ -185,10 +184,10 @@ class Markets extends React.Component {
 
 
   render() {
-    console.log('Rendering Market.')
-    const data = [EthereumTokens.getTokenByName('AirSwap'),
-    EthereumTokens.getTokenByName('Wrapped Ether'),
-    ]
+    const data = [
+      EthereumTokens.getTokenByName('AirSwap'),
+      EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
+
     if (!this.state.pairedTx) {
       AirSwap.getLogs()
         .then(x => {
@@ -198,29 +197,34 @@ class Markets extends React.Component {
         });
     }
 
-    var txElement = <TradingDataTable txList={this.state.txList } />;
+    var txTableElement = <TradingDataTable txList={this.state.txList } />;
+    var candlestickElement = <CandlestickChart data={this.state.ohlcData} />;
 
-    if (!this.state.txList) {
-      var msg = 'Please select a token pair';
-
-      if (this.state.selectedToken1 && this.state.selectedToken2) {
-        msg = 'No data found for the selected token pair';
+    if(!this.state.statusMessage){
+      if(!this.state.pairedTx) {
+        this.setState({statusMessage:'Standby. Fetching transactions on AirSwapDEX from Etherscan.'});
+      } else if(!this.state.txList) {
+        if (this.state.selectedToken1 && this.state.selectedToken2) {
+          this.setState({statusMessage:'No data found for the selected token pair'});
+        } else {
+          this.setState({statusMessage:'Please select a token pair'});
+        }
       }
-
-      txElement = <div className={styles.TableMessageContainer}>{msg}</div>
     }
 
-    var candlestickElement = <CandlestickChart 
-                              className={styles.TableMessageContainer}
-                              data={this.state.ohlcData} />;
-    
-    var viewElement = this.state.viewCandlestick ? candlestickElement : txElement
+    var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
+   
+    var viewElement;
+    if(!this.state.txList) viewElement = null;
+    else viewElement = this.state.viewCandlestick ? candlestickElement : txTableElement;
+
     var switchElement = this.state.txList ? <FormControlLabel
                                               control={
                                                 <Switch
                                                   checked={this.state.viewCandlestick}
                                                   onChange={this.handleViewChange('viewCandlestick')}
                                                   value="viewCandlestick"
+                                                  color="primary"
                                                 />
                                               }
                                               label="Show transactions as candlesticks"
@@ -255,9 +259,17 @@ class Markets extends React.Component {
                           display: 'inline-block',
                           width: '100%',
                           marginTop: '10px'}}>
+              {statusMessageElement}
+            </div>
+            <div style={{ position: 'relative',
+                          display: 'inline-block',
+                          width: '100%',
+                          marginTop: '10px'}}>
               {viewElement}
             </div>
-            <div style={{float: 'right'}}> {switchElement}</div>
+            <div style={{float: 'right'}}> 
+              {switchElement}
+            </div>
           </div>
         </div>
       </Auxilary>
