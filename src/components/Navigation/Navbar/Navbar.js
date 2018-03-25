@@ -1,12 +1,16 @@
 import React from "react";
 import styles from "./Navbar.css";
 import NavigationItem from "../NavigationItem/NavigationItem";
+import { withRouter } from 'react-router'
 
-const Navbar = props => (
-  <ul className={styles.Navbar}>
-    <NavigationItem link="/" active>Markets</NavigationItem>
-    <NavigationItem link="/MyTrades">My Trades</NavigationItem>
-  </ul>
-);
+const Navbar = props => {
+  console.log(props.location);
+  return (
+    <ul className={styles.Navbar}>
+      <NavigationItem link="/" active={props.location.pathname === '/'}>Markets</NavigationItem>
+      <NavigationItem link="/MyTrades" active={props.location.pathname === '/MyTrades'}>My Trades</NavigationItem>
+    </ul>
+  );
+};
 
-export default Navbar;
+export default withRouter(Navbar);

@@ -3,8 +3,9 @@ import styles from "./NavigationItem.css";
 
 const navigationItem = props => (
   <li className={styles.NavigationItem}>
-    <a href={props.link} className={props.active ? styles.active : null}>
+    <a href={props.link} className={props.active ? styles.active : null}>    
       {props.children}
+      <span />
     </a>
   </li>
 );

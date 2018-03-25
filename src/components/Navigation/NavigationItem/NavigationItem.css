@@ -20,27 +20,32 @@
   } */
   
   
-  @media (min-width: 500px) {
+  /* @media (min-width: 500px) { */
     .NavigationItem {
       margin: 0;
       display: inline;
       align-items: center;
-      line-height: 30px;
+      line-height: 40px;
+      /* padding: 5px 20px; */
     }
     
     .NavigationItem a {
       color: white;
       height: 100%;
-      padding: 0px 10px;
-      /* border-bottom: 2px solid transparent; */
+      /* padding: 0px 10px; */
+      border-bottom: 5px solid transparent;
       text-decoration: none;
+      display: inline-block;
+      /* line-height: 50px; */
+      padding: 0px 20px;
     }
     
     .NavigationItem a:active,
     .NavigationItem a.active,
     .NavigationItem a:hover {
-      /* border-bottom: 2px solid #008eff; */
+      border-bottom: 5px solid #008eff;
+      /* background-color: #008eff; */
       color: white;
-      font-weight: bold;
+      font-weight: 600;
     }
-  }
+  /* } */
