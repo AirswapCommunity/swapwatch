@@ -14,7 +14,7 @@ import Switch from 'material-ui/Switch';
 import { FormGroup, FormControlLabel } from 'material-ui/Form';
 
 class Markets extends React.Component {
-  
+
   constructor(props) {
     super(props);
     this.state = {
@@ -87,22 +87,22 @@ class Markets extends React.Component {
     }, this.checkStatus)
   }
 
-  combineMarkets = (token1address, token2address) => { 
+  combineMarkets = (token1address, token2address) => {
     let selectedMarket = this.state.pairedTx[token1address][token2address];
     let oppositeMarket = this.state.pairedTx[token2address][token1address];
-    
-    for(let tx of selectedMarket) {
+
+    for (let tx of selectedMarket) {
       tx['volume'] = tx.makerAmount;
     }
     if (oppositeMarket && oppositeMarket.length > 0) {
       let copyOppositeMarket = oppositeMarket.map(x => Object.assign({}, x));
-      for(let tx of copyOppositeMarket) {
-        tx.price = 1/tx.price;
+      for (let tx of copyOppositeMarket) {
+        tx.price = 1 / tx.price;
         tx['volume'] = tx.takerAmount;
       }
       selectedMarket = selectedMarket.concat(copyOppositeMarket);
-    }  
-    let sortedCombinedMarkets = 
+    }
+    let sortedCombinedMarkets =
       selectedMarket.sort((a, b) => d3.ascending(a.timestamp, b.timestamp));
     return sortedCombinedMarkets;
   }
@@ -131,17 +131,17 @@ class Markets extends React.Component {
     let allDates = [...Array.from(new Set(copyData.map(d => d.timestamp)))];
     let runningIdx = 0;
     allDates.forEach(d => {
-        let tempObject = {};
-        let filteredData = copyData.filter(e => e.timestamp === d);
-        tempObject['idx'] = runningIdx;
-        tempObject['date'] = parseDate(d);
-        tempObject['volume'] = d3.sum(filteredData, e=> e.volume);
-        tempObject['open'] = filteredData[0].price;
-        tempObject['close'] = filteredData[filteredData.length - 1].price;
-        tempObject['high'] = d3.max(filteredData, e => e.price);
-        tempObject['low'] = d3.min(filteredData, e => e.price);
-        result.push(tempObject);
-        runningIdx++;
+      let tempObject = {};
+      let filteredData = copyData.filter(e => e.timestamp === d);
+      tempObject['idx'] = runningIdx;
+      tempObject['date'] = parseDate(d);
+      tempObject['volume'] = d3.sum(filteredData, e => e.volume);
+      tempObject['open'] = filteredData[0].price;
+      tempObject['close'] = filteredData[filteredData.length - 1].price;
+      tempObject['high'] = d3.max(filteredData, e => e.price);
+      tempObject['low'] = d3.min(filteredData, e => e.price);
+      result.push(tempObject);
+      runningIdx++;
     });
     result['columns'] = ['idx', 'date', 'volume', 'open', 'close', 'high', 'low']
     return result;
@@ -168,7 +168,7 @@ class Markets extends React.Component {
     }
 
     this.setState({
-      txList: null, 
+      txList: null,
       selectedToken2: selectedToken
     }, () => {
       if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
@@ -183,26 +183,26 @@ class Markets extends React.Component {
 
   componentWillMount() {
     AirSwap.getLogs()
-        .then(x => {
-          this.evalAirSwapDEXFilledEventLogs(x);
-          // this.handleToken1Selected(data[0]);
-          // this.handleToken2Selected(data[1]);
-        });
+      .then(x => {
+        this.evalAirSwapDEXFilledEventLogs(x);
+        // this.handleToken1Selected(data[0]);
+        // this.handleToken2Selected(data[1]);
+      });
     this.checkStatus();
   }
 
   checkStatus() {
     let statusMsg;
-    if(!this.state.pairedTx) {
+    if (!this.state.pairedTx) {
       statusMsg = 'Standby. Fetching transactions on AirSwapDEX from Etherscan.';
-    } else if(!this.state.txList) {
+    } else if (!this.state.txList) {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
         statusMsg = 'No data found for the selected token pair';
       } else {
         statusMsg = 'Please select a token pair';
       }
     }
-    this.setState({statusMessage: statusMsg});
+    this.setState({ statusMessage: statusMsg });
   }
 
   render() {
@@ -210,33 +210,34 @@ class Markets extends React.Component {
       EthereumTokens.getTokenByName('AirSwap'),
       EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
 
-    var txTableElement = <TradingDataTable txList={this.state.txList } />;
+    var txTableElement = <TradingDataTable txList={this.state.txList} />;
     var candlestickElement = <CandlestickChart data={this.state.ohlcData} />;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-   
+
     var viewElement;
-    if(!this.state.txList) viewElement = null;
+    if (!this.state.txList) viewElement = null;
     else viewElement = this.state.viewCandlestick ? candlestickElement : txTableElement;
 
     var switchElement = this.state.txList ? <FormControlLabel
-                                              control={
-                                                <Switch
-                                                  checked={this.state.viewCandlestick}
-                                                  onChange={this.handleViewChange('viewCandlestick')}
-                                                  value="viewCandlestick"
-                                                  color="primary"
-                                                />
-                                              }
-                                              label="Show transactions as candlesticks"
-                                            /> : null;
+      control={
+        <Switch
+          checked={this.state.viewCandlestick}
+          onChange={this.handleViewChange('viewCandlestick')}
+          value="viewCandlestick"
+          color="primary"
+        />
+      }
+      label="Show transactions as candlesticks"
+    /> : null;
+
     return (
       <Auxilary>
         <div className={styles.Outer}>
           <div className={styles.PageContainer}>
             <div>
               <div style={{ float: 'left', width: '40%' }}>
-                <AutoCompleteInput placeholder="Token 1"
+                <AutoCompleteInput placeholder="Maker Token"
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
@@ -246,7 +247,7 @@ class Markets extends React.Component {
                 </AutoCompleteInput>
               </div>
               <div style={{ float: 'right', width: '40%' }}>
-                <AutoCompleteInput placeholder="Token 2"
+                <AutoCompleteInput placeholder="Taker Token"
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
@@ -256,20 +257,12 @@ class Markets extends React.Component {
                 </AutoCompleteInput>
               </div>
             </div>
-            <div style={{ position: 'relative',
-                          display: 'inline-block',
-                          width: '100%',
-                          marginTop: '10px'}}>
-              {statusMessageElement}
-            </div>
-            <div style={{ position: 'relative',
-                          display: 'inline-block',
-                          width: '100%',
-                          marginTop: '10px'}}>
-              {viewElement}
-            </div>
-            <div style={{float: 'right'}}> 
+            <div className={styles.SwitchContainer}>
               {switchElement}
+            </div>
+            {statusMessageElement}
+            <div className={styles.TableContainer}>
+              {viewElement}
             </div>
           </div>
         </div>

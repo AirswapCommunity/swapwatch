@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 
 import { withStyles } from 'material-ui/styles';
-// import cssStyles from './CandlestickChart.css';
+import cssStyles from './CandlestickChart.css';
 
 
 import { format } from "d3-format";
@@ -53,6 +53,10 @@ class CandlestickChart extends Component {
   }
 
   getCandlestickChart = () => {
+    if (!this.props.data) {
+      return null;
+    }
+
     const xAccessor = (d) => d.date;
     const xExtents = [
       xAccessor(last(this.props.data)),
@@ -93,6 +97,7 @@ class CandlestickChart extends Component {
     
     return (
       <ChartCanvas height={420}
+          resize={true}
           ratio={this.props.ratio}
           width={this.props.width}
           margin={{ left: 80, right: 80, top: 10, bottom: 40 }}
@@ -169,7 +174,7 @@ class CandlestickChart extends Component {
       this.getCandlestickChart()) : null;
 
     return (
-      <div style={{ position: 'relative', display: 'inline-block', width: '100%' }}>
+      <div className={cssStyles.ChartContainer}>
         {chart}
       </div>
     );

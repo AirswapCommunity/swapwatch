@@ -40,9 +40,14 @@
       padding: 0px 20px;
     }
     
-    .NavigationItem a:active,
-    .NavigationItem a.active,
     .NavigationItem a:hover {
+      border-bottom: 5px solid #008eff;
+      background-color: #008eff;
+      color: white;
+    }
+
+    .NavigationItem a:active,
+    .NavigationItem a.active {
       border-bottom: 5px solid #008eff;
       /* background-color: #008eff; */
       color: white;
