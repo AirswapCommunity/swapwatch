@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactDOM from 'react-dom';
 import PropTypes from "prop-types";
 
 import { withStyles } from 'material-ui/styles';
@@ -47,9 +48,21 @@ class CandlestickChart extends Component {
 
   constructor(props) {
     super(props);
+    this.container = null;
     this.state = {
-
+      containerHeight: 100
     }
+  }
+
+  componentDidMount() {
+    var height = ReactDOM.findDOMNode(this.container).clientHeight;
+
+    if (height > 0)
+      this.setState({containerHeight: height})
+  }
+
+  setRef = (el) => {
+    this.container = el;
   }
 
   getCandlestickChart = () => {
@@ -96,8 +109,7 @@ class CandlestickChart extends Component {
     const calculatedData = ema20(sma20(ema50(smaVolume50(bb(this.props.data)))));
     
     return (
-      <ChartCanvas height={420}
-          resize={true}
+      <ChartCanvas height={this.state.containerHeight}
           ratio={this.props.ratio}
           width={this.props.width}
           margin={{ left: 80, right: 80, top: 10, bottom: 40 }}
@@ -174,7 +186,7 @@ class CandlestickChart extends Component {
       this.getCandlestickChart()) : null;
 
     return (
-      <div className={cssStyles.ChartContainer}>
+      <div className={cssStyles.ChartContainer} ref={this.setRef}>
         {chart}
       </div>
     );
