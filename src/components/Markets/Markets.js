@@ -194,7 +194,7 @@ class Markets extends React.Component {
   checkStatus() {
     let statusMsg;
     if (!this.state.pairedTx) {
-      statusMsg = 'Standby. Fetching transactions on AirSwapDEX from Etherscan.';
+      statusMsg = 'Standby. Fetching AirSwap transactions from Etherscan.';
     } else if (!this.state.txList) {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
         statusMsg = 'No data found for the selected token pair';
