@@ -58,8 +58,9 @@ class CandlestickChart extends Component {
   componentDidMount() {
     var height = ReactDOM.findDOMNode(this.container).clientHeight;
 
-    if (height > 0)
-      this.setState({ containerHeight: height })
+    if (height > 0) {
+      this.setState({ containerHeight: height - 10 })
+    }
   }
 
   setRef = (el) => {
