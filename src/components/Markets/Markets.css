@@ -10,11 +10,21 @@
     text-align: center;
     /* font-weight: semi-bold; */
     font-size: 1.5em;
+    margin-top: 100px;
 }
 
 .TableContainer {
     display: flex;
-    height: 100%;
+    height: 95%;
+    width: 100%;
+    /* margin-top: 10px; */
+}
+
+.SwitchContainer {
+    display: flex;
+    width: 100%;
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 /* This one is the semi transparent box from Token Trader */

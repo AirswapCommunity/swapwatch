@@ -5,17 +5,17 @@ const AirSwapFilledEvent = '0xe59c5e56d85b2124f5e7f82cb5fcc6d28a4a241a9bdd732704
 const EtherscanAPIKey = 'VR4UPKI119TYM93ZV47GXTTGFSMRRDEVGZ';
 
 const cacheDelay = 60000;
-const blockHistory = 5838 * 14; // 14 days
+const blockHistory = 5838 * 100; // 28 days
 
 const TokenList = {
     tokens: [],
     timestamp: null
 }
 
-const TokenPairStatistics = {
-    statistics: {},
-    timestamp: null
-}
+// const TokenPairStatistics = {
+//     statistics: {},
+//     timestamp: null
+// }
 
 const Logs = {
     entries: null,

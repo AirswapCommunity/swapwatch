@@ -36,7 +36,7 @@ const About = props => (
                                 <img src={require('../../assets/images/codeNinja.png')} className={cssStyles.Photo} alt="evolve" />
                             </Avatar>
                         </Avatar>
-                        <span className={cssStyles.ContributorName}>evolve</span>
+                        <span className={cssStyles.ContributorName}>evolve (aka: Cryptonious)</span>
                     </div>
                     <div>
                         <Avatar className={props.classes.avatar}>
