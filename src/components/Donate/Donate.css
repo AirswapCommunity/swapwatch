@@ -5,4 +5,46 @@
 
 :local(.PageContainer) {
     composes: Container from global;
+    text-align: center;
+    overflow: hidden;
+}
+
+.p {
+    color: black;
+    text-shadow: 1px 1px 0px white;
+}
+
+.Heading {
+    text-align: center;
+    font-size: 2em;
+}
+
+.a {
+    color: #008eff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.a:visited {
+    color: #008eff;
+}
+
+.Guestbook {
+    overflow: auto;
+    width: 100%;
+    max-height: 100%;
+}
+
+.GuestbookEnterMessage {
+    width: 49%;
+    float: left;
+    max-height: inherit;
+    overflow: hidden;
+}
+
+.GuestbookReadMessages {
+    width: 49%;
+    float: right;
+    display: flex;
+    overflow: auto;
 }
