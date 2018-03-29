@@ -263,6 +263,10 @@ class Donate extends React.Component {
             </Card>
           </div>
         )
+      } else {
+        guestbookMessagesElement = (
+          <div style={{marginTop:'100px'}}>Loading Guestbook...</div>
+        )
       }
       return (
         <div className={cssStyles.Guestbook}>
