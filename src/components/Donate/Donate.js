@@ -4,11 +4,9 @@ import { withStyles } from 'material-ui/styles';
 import cssStyles from "./Donate.css";
 
 import TextField from 'material-ui/TextField';
-import List, {
-  ListItem,
-  ListItemText,
-} from 'material-ui/List';
 import Button from 'material-ui/Button';
+
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 
 import * as Web3 from 'web3';
 import * as d3 from "d3";
@@ -31,10 +29,12 @@ class Donate extends React.Component {
       'alias': "Anonymous",
       'message': "",
       'donation': "0.05",
+      'idxMessage': null,
     }
 
     this.donate = this.donate.bind(this);
     this.refreshData = this.refreshData.bind(this);
+    this.changeMessageIdx = this.changeMessageIdx.bind(this);
   }
 
   componentWillMount() {
@@ -122,7 +122,8 @@ class Donate extends React.Component {
     Promise.all(promiseList).then((messages) => {
       messages = messages.sort((a, b) => d3.descending(a.timestamp, b.timestamp));
       this.setState({
-        guestbookMessages: messages.concat(this.state.guestbookMessages)
+        guestbookMessages: messages.concat(this.state.guestbookMessages),
+        idxMessage: 0,
       })
     })
   }
@@ -153,6 +154,14 @@ class Donate extends React.Component {
                gasPrice: 4e9})
     );
     
+  }
+
+  changeMessageIdx(changeBy) {
+    let newIdx = (this.state.idxMessage + changeBy) % this.state.guestbookMessages.length;
+    if (newIdx<0) newIdx += this.state.guestbookMessages.length;
+    this.setState({
+      idxMessage: newIdx
+    })
   }
 
   getGuestbook() {
@@ -233,24 +242,25 @@ class Donate extends React.Component {
 
 
       let guestbookMessagesElement;
-      if(this.state.guestbookMessages) {
-        let listElems = [];
-        for(let message of this.state.guestbookMessages) {
-          var timestamp = new Date(message.timestamp * 1000);
-          listElems.push((
-            <ListItem key={message.id}>
-              <ListItemText 
-                primary={message.alias+" donated "+message.donation/1e18+" Ξ on "+ timestamp.toLocaleDateString()}
-                secondary={message.message}
-                    />
-            </ListItem>
-        ))}
+      if(this.state.guestbookMessages && this.state.guestbookMessages.length>0) {
+        let guestbookEntry = this.state.guestbookMessages[this.state.idxMessage];
+        let timestamp = new Date(guestbookEntry.timestamp * 1000);
+        let msg = guestbookEntry.message ? guestbookEntry.message : '-'; 
         guestbookMessagesElement = (
           <div>
             <p className={cssStyles.p}>Received Donations</p> 
-            <List>
-              {listElems}
-            </List>
+            <Card className={this.props.card} style={{height:'100%'}}>
+              <CardContent>
+                <p>{guestbookEntry.alias} donated {guestbookEntry.donation/1e18} Ξ</p>
+                <p style={{fontStyle:'italic'}}>{msg}</p>
+                <p>{timestamp.toLocaleDateString()}</p>
+              </CardContent>
+              <CardActions style={{ marginLeft:'auto'}}>
+                <i onClick={()=>this.changeMessageIdx(-1)} className="fa fa-chevron-left"></i>
+                <i onClick={()=>this.changeMessageIdx(+1)} className="fa fa-chevron-right"></i>
+                <span>{this.state.idxMessage+1} / {this.state.guestbookMessages.length}</span>
+              </CardActions>
+            </Card>
           </div>
         )
       }
@@ -278,7 +288,6 @@ class Donate extends React.Component {
             <p className={cssStyles.p}>If you want to contribute feel free to donate ether or tokens to <a className={cssStyles.a} href="https://etherscan.io/address/0x63c477114690b31a90715e34416819ab860bf0a0">SwapWatch.eth</a>.</p>
             <div>{guestbook}</div>
           </div>
-
         </div>
       </Auxilary>
     );
