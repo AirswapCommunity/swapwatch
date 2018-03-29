@@ -27,13 +27,14 @@ class Donate extends React.Component {
       'connectedAccount': null,
       'accountBalance': null,
       'guestbookContract': null,
-      'guestbookMessages': null,
+      'guestbookMessages': [],
       'alias': "Anonymous",
       'message': "",
       'donation': "0.05",
     }
 
     this.donate = this.donate.bind(this);
+    this.refreshData = this.refreshData.bind(this);
   }
 
   componentWillMount() {
@@ -42,13 +43,17 @@ class Donate extends React.Component {
       web3 = new Web3(window.web3.currentProvider);
       web3.eth.getAccounts()
       .then(accs => {
-        this.setState({connectedAccount: accs[0]});
+        let account = accs[0] ? accs[0] : null;
+        this.setState({connectedAccount: account});
         return accs[0];
       }).then(connectedAccount => {
-        return web3.eth.getBalance(connectedAccount)
-      }).then(balance => 
-        this.setState({accountBalance: web3.utils.fromWei(balance, 'ether')})
-      )
+        let balance = connectedAccount ? web3.eth.getBalance(connectedAccount) : null
+        return balance
+      }).then(balance => {
+        if(balance) {
+          this.setState({accountBalance: web3.utils.fromWei(balance, 'ether')})
+        }
+      })
     } else { // Infura
       web3 = new Web3('https://ropsten.infura.io/506w9CbDQR8fULSDR7H0');
     }
@@ -70,10 +75,24 @@ class Donate extends React.Component {
           this.setState({Network: connectedToNetwork})
           if(connectedToNetwork === 'Ropsten') {
             this.loadGuestbookContract();
+            this.interval = setInterval(this.refreshData, 5000);
           }
         })
       }
     })  
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  refreshData() {
+    this.state.guestbookContract.methods.running_id().call()
+    .then(numEntries => {
+      if(numEntries > this.state.guestbookMessages.length) {
+        this.loadGuestbookEntries(numEntries);
+      }
+    })
   }
 
   handleChange = name => event => {
@@ -82,33 +101,40 @@ class Donate extends React.Component {
     });
   };
   
-  loadGuestbookContract() {
-    let guestbookContract = new this.state.web3.eth.Contract(guestbookABI, guestbookAddress);
-    this.setState({guestbookContract: guestbookContract})
-
-    guestbookContract.methods.running_id().call()
-    .then(numEntries => {
-      let promiseList = [];      
-      for(let i=0; i<numEntries; i++) {
-        promiseList.push(
-          guestbookContract.methods.getEntry(i).call()
-          .then(entry => {
-            return {
-              id: i,
-              address: entry[0],
-              alias: entry[1],
-              blocknumber: entry[2],
-              timestamp: entry[3],
-              donation: entry[4],
-              message: entry[5]
-            }
-          })
-        )
-      }
-      Promise.all(promiseList).then((messages) => {
-        messages = messages.sort((a, b) => d3.descending(a.timestamp, b.timestamp));
-        this.setState({guestbookMessages: messages})
+  loadGuestbookEntries(numEntries) {
+    let promiseList = [];
+    for(let i=this.state.guestbookMessages.length; i<numEntries; i++) {
+      promiseList.push(
+        this.state.guestbookContract.methods.getEntry(i).call()
+        .then(entry => {
+          return {
+            id: i,
+            address: entry[0],
+            alias: entry[1],
+            blocknumber: entry[2],
+            timestamp: entry[3],
+            donation: entry[4],
+            message: entry[5]
+          }
+        })
+      )
+    }
+    Promise.all(promiseList).then((messages) => {
+      messages = messages.sort((a, b) => d3.descending(a.timestamp, b.timestamp));
+      this.setState({
+        guestbookMessages: messages.concat(this.state.guestbookMessages)
       })
+    })
+  }
+
+  loadGuestbookContract() { 
+  // fresh load of the guestbook
+    let guestbookContract = new this.state.web3.eth.Contract(guestbookABI, guestbookAddress);
+    this.setState({guestbookContract: guestbookContract,
+                   guestbookMessages: []},
+    () => {
+      guestbookContract.methods.running_id().call()
+      .then(numEntries => this.loadGuestbookEntries(numEntries))
     })
   }
 
