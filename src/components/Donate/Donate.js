@@ -4,11 +4,9 @@ import { withStyles } from 'material-ui/styles';
 import cssStyles from "./Donate.css";
 
 import TextField from 'material-ui/TextField';
-import List, {
-  ListItem,
-  ListItemText,
-} from 'material-ui/List';
 import Button from 'material-ui/Button';
+
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 
 import * as Web3 from 'web3';
 import * as d3 from "d3";
@@ -27,13 +25,16 @@ class Donate extends React.Component {
       'connectedAccount': null,
       'accountBalance': null,
       'guestbookContract': null,
-      'guestbookMessages': null,
+      'guestbookMessages': [],
       'alias': "Anonymous",
       'message': "",
       'donation': "0.05",
+      'idxMessage': null,
     }
 
     this.donate = this.donate.bind(this);
+    this.refreshData = this.refreshData.bind(this);
+    this.changeMessageIdx = this.changeMessageIdx.bind(this);
   }
 
   componentWillMount() {
@@ -42,13 +43,17 @@ class Donate extends React.Component {
       web3 = new Web3(window.web3.currentProvider);
       web3.eth.getAccounts()
       .then(accs => {
-        this.setState({connectedAccount: accs[0]});
+        let account = accs[0] ? accs[0] : null;
+        this.setState({connectedAccount: account});
         return accs[0];
       }).then(connectedAccount => {
-        return web3.eth.getBalance(connectedAccount)
-      }).then(balance => 
-        this.setState({accountBalance: web3.utils.fromWei(balance, 'ether')})
-      )
+        let balance = connectedAccount ? web3.eth.getBalance(connectedAccount) : null
+        return balance
+      }).then(balance => {
+        if(balance) {
+          this.setState({accountBalance: web3.utils.fromWei(balance, 'ether')})
+        }
+      })
     } else { // Infura
       web3 = new Web3('https://ropsten.infura.io/506w9CbDQR8fULSDR7H0');
     }
@@ -70,10 +75,24 @@ class Donate extends React.Component {
           this.setState({Network: connectedToNetwork})
           if(connectedToNetwork === 'Ropsten') {
             this.loadGuestbookContract();
+            this.interval = setInterval(this.refreshData, 5000);
           }
         })
       }
     })  
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  refreshData() {
+    this.state.guestbookContract.methods.running_id().call()
+    .then(numEntries => {
+      if(numEntries > this.state.guestbookMessages.length) {
+        this.loadGuestbookEntries(numEntries);
+      }
+    })
   }
 
   handleChange = name => event => {
@@ -82,33 +101,41 @@ class Donate extends React.Component {
     });
   };
   
-  loadGuestbookContract() {
-    let guestbookContract = new this.state.web3.eth.Contract(guestbookABI, guestbookAddress);
-    this.setState({guestbookContract: guestbookContract})
-
-    guestbookContract.methods.running_id().call()
-    .then(numEntries => {
-      let promiseList = [];      
-      for(let i=0; i<numEntries; i++) {
-        promiseList.push(
-          guestbookContract.methods.getEntry(i).call()
-          .then(entry => {
-            return {
-              id: i,
-              address: entry[0],
-              alias: entry[1],
-              blocknumber: entry[2],
-              timestamp: entry[3],
-              donation: entry[4],
-              message: entry[5]
-            }
-          })
-        )
-      }
-      Promise.all(promiseList).then((messages) => {
-        messages = messages.sort((a, b) => d3.descending(a.timestamp, b.timestamp));
-        this.setState({guestbookMessages: messages})
+  loadGuestbookEntries(numEntries) {
+    let promiseList = [];
+    for(let i=this.state.guestbookMessages.length; i<numEntries; i++) {
+      promiseList.push(
+        this.state.guestbookContract.methods.getEntry(i).call()
+        .then(entry => {
+          return {
+            id: i,
+            address: entry[0],
+            alias: entry[1],
+            blocknumber: entry[2],
+            timestamp: entry[3],
+            donation: entry[4],
+            message: entry[5]
+          }
+        })
+      )
+    }
+    Promise.all(promiseList).then((messages) => {
+      messages = messages.sort((a, b) => d3.descending(a.timestamp, b.timestamp));
+      this.setState({
+        guestbookMessages: messages.concat(this.state.guestbookMessages),
+        idxMessage: 0,
       })
+    })
+  }
+
+  loadGuestbookContract() { 
+  // fresh load of the guestbook
+    let guestbookContract = new this.state.web3.eth.Contract(guestbookABI, guestbookAddress);
+    this.setState({guestbookContract: guestbookContract,
+                   guestbookMessages: []},
+    () => {
+      guestbookContract.methods.running_id().call()
+      .then(numEntries => this.loadGuestbookEntries(numEntries))
     })
   }
 
@@ -127,6 +154,14 @@ class Donate extends React.Component {
                gasPrice: 4e9})
     );
     
+  }
+
+  changeMessageIdx(changeBy) {
+    let newIdx = (this.state.idxMessage + changeBy) % this.state.guestbookMessages.length;
+    if (newIdx<0) newIdx += this.state.guestbookMessages.length;
+    this.setState({
+      idxMessage: newIdx
+    })
   }
 
   getGuestbook() {
@@ -207,25 +242,30 @@ class Donate extends React.Component {
 
 
       let guestbookMessagesElement;
-      if(this.state.guestbookMessages) {
-        let listElems = [];
-        for(let message of this.state.guestbookMessages) {
-          var timestamp = new Date(message.timestamp * 1000);
-          listElems.push((
-            <ListItem key={message.id}>
-              <ListItemText 
-                primary={message.alias+" donated "+message.donation/1e18+" Ξ on "+ timestamp.toLocaleDateString()}
-                secondary={message.message}
-                    />
-            </ListItem>
-        ))}
+      if(this.state.guestbookMessages && this.state.guestbookMessages.length>0) {
+        let guestbookEntry = this.state.guestbookMessages[this.state.idxMessage];
+        let timestamp = new Date(guestbookEntry.timestamp * 1000);
+        let msg = guestbookEntry.message ? guestbookEntry.message : '-'; 
         guestbookMessagesElement = (
           <div>
             <p className={cssStyles.p}>Received Donations</p> 
-            <List>
-              {listElems}
-            </List>
+            <Card className={this.props.card} style={{height:'100%'}}>
+              <CardContent>
+                <p>{guestbookEntry.alias} donated {guestbookEntry.donation/1e18} Ξ</p>
+                <p style={{fontStyle:'italic'}}>{msg}</p>
+                <p>{timestamp.toLocaleDateString()}</p>
+              </CardContent>
+              <CardActions style={{ marginLeft:'auto'}}>
+                <i onClick={()=>this.changeMessageIdx(-1)} className="fa fa-chevron-left"></i>
+                <i onClick={()=>this.changeMessageIdx(+1)} className="fa fa-chevron-right"></i>
+                <span>{this.state.idxMessage+1} / {this.state.guestbookMessages.length}</span>
+              </CardActions>
+            </Card>
           </div>
+        )
+      } else {
+        guestbookMessagesElement = (
+          <div style={{marginTop:'100px'}}>Loading Guestbook...</div>
         )
       }
       return (
@@ -252,7 +292,6 @@ class Donate extends React.Component {
             <p className={cssStyles.p}>If you want to contribute feel free to donate ether or tokens to <a className={cssStyles.a} href="https://etherscan.io/address/0x63c477114690b31a90715e34416819ab860bf0a0">SwapWatch.eth</a>.</p>
             <div>{guestbook}</div>
           </div>
-
         </div>
       </Auxilary>
     );
