@@ -170,7 +170,7 @@ class Donate extends React.Component {
     }
     else {
       let guestbookWriteElement;
-      if(!window.web3) {
+      if(!window.web3) { // in Infura
         guestbookWriteElement = (
           <div>
             <a className={cssStyles.a} href='http://metamask.io' target="_blank" rel="noopener noreferrer">
@@ -232,8 +232,8 @@ class Donate extends React.Component {
         } else {
           guestbookWriteElement = (
             <div>
-              <p className={cssStyles.p}>
-                You are not connected in Metamask. Please log in if you want to donate.
+              <p style={{marginTop:'70px'}}>
+                You are not logged in on Metamask. Please log in and refresh if you want to donate.
               </p>
             </div>
           )
@@ -264,9 +264,21 @@ class Donate extends React.Component {
           </div>
         )
       } else {
-        guestbookMessagesElement = (
-          <div style={{marginTop:'100px'}}>Loading Guestbook...</div>
-        )
+        if(!this.state.isConnected) {
+          guestbookMessagesElement = (
+            <div style={{marginTop:'100px'}}>No connection to Ethereum. Can't show guestbook.</div>
+          )
+        } else {
+          if(window.web3 && this.state.Network !== "Ropsten") {
+            guestbookMessagesElement = (
+             <div style={{marginTop:'100px'}}>The guestbook lives on Ropsten at the moment. Set Metamask to Ropsten to see it.</div>
+            )
+          } else {
+            guestbookMessagesElement = (
+              <div style={{marginTop:'100px'}}>Loading Guestbook...</div>
+            )
+          }
+        }
       }
       return (
         <div className={cssStyles.Guestbook}>
