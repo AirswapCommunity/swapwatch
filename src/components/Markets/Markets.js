@@ -130,11 +130,9 @@ class Markets extends React.Component {
     let parseDate = timeParse("%Y-%m-%d");
     copyData.forEach(d => d.timestamp = format(new Date(d.timestamp * 1000)));
     let allDates = [...Array.from(new Set(copyData.map(d => d.timestamp)))];
-    let runningIdx = 0;
     allDates.forEach(d => {
       let tempObject = {};
       let filteredData = copyData.filter(e => e.timestamp === d);
-      tempObject['idx'] = runningIdx;
       tempObject['date'] = parseDate(d);
       tempObject['volume'] = d3.sum(filteredData, e => e.volume);
       tempObject['open'] = filteredData[0].price;
@@ -142,9 +140,8 @@ class Markets extends React.Component {
       tempObject['high'] = d3.max(filteredData, e => e.price);
       tempObject['low'] = d3.min(filteredData, e => e.price);
       result.push(tempObject);
-      runningIdx++;
     });
-    result['columns'] = ['idx', 'date', 'volume', 'open', 'close', 'high', 'low']
+    result['columns'] = ['date', 'volume', 'open', 'close', 'high', 'low']
     return result;
   };
 
