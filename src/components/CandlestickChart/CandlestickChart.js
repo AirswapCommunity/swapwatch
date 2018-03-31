@@ -28,8 +28,7 @@ import {
   MouseCoordinateY
 } from "react-stockcharts/lib/coordinates";
 
-import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
-import { OHLCTooltip, MovingAverageTooltip, BollingerBandTooltip } from "react-stockcharts/lib/tooltip";
+import { OHLCTooltip } from "react-stockcharts/lib/tooltip";
 import { ema, sma, bollingerBand } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last, timeIntervalBarWidth } from "react-stockcharts/lib/utils";
@@ -110,8 +109,6 @@ class CandlestickChart extends Component {
 
     const calculatedData = ema20(sma20(ema50(smaVolume50(bb(this.props.data)))));
 
-    console.log(this.props.data);
-
     return (
       <ChartCanvas height={this.state.containerHeight}
         ratio={this.props.ratio}
@@ -121,6 +118,7 @@ class CandlestickChart extends Component {
         seriesName="AirSwapDEXCandlestick"
         data={this.props.data}
         xAccessor={xAccessor}
+        displayXAccessor={xAccessor}
         xScale={scaleTime()}
         xExtents={xExtents}
       >
@@ -184,8 +182,6 @@ class CandlestickChart extends Component {
   }
 
   render() {
-    console.log('Rendering CandlestickChart');
-
     var chart = (this.props.data && this.props.data.length > 0) ? (
       this.getCandlestickChart()) : null;
 
