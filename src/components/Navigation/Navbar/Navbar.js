@@ -4,7 +4,6 @@ import NavigationItem from "../NavigationItem/NavigationItem";
 import { withRouter } from 'react-router'
 
 const Navbar = props => {
-  console.log(props.location);
   return (
     <ul className={styles.Navbar}>
       <NavigationItem link="/" active={props.location.pathname === '/'}>Markets</NavigationItem>
