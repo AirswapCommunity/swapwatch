@@ -18,6 +18,7 @@ class Markets extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      'hasLoadedData': false,
       'pairedTx': null, // loaded TX of AirSwapDEX sorted as [makerAddress][takerAddress]
       'txList': null, // List containing selected transactions for display
       'ohlcData': null, // Data transformed to OHLC format
@@ -193,8 +194,10 @@ class Markets extends React.Component {
 
   checkStatus() {
     let statusMsg;
+    let hasLoadedData=true;
     if (!this.state.pairedTx) {
       statusMsg = 'Standby. Fetching AirSwap transactions from Etherscan.';
+      hasLoadedData = false;
     } else if (!this.state.txList) {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
         statusMsg = 'No data found for the selected token pair';
@@ -202,7 +205,8 @@ class Markets extends React.Component {
         statusMsg = 'Please select a token pair';
       }
     }
-    this.setState({ statusMessage: statusMsg });
+    this.setState({ hasLoadedData: hasLoadedData,
+                    statusMessage: statusMsg });
   }
 
   render() {
@@ -230,7 +234,6 @@ class Markets extends React.Component {
       }
       label="Show transactions as candlesticks"
     /> : null;
-
     return (
       <Auxilary>
         <div className={styles.Outer}>
@@ -241,6 +244,7 @@ class Markets extends React.Component {
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
+                  disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken1Selected}
                   cleared={this.handleToken1Selected}>
                   {data}
@@ -251,6 +255,7 @@ class Markets extends React.Component {
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
+                  disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken2Selected}
                   cleared={this.handleToken2Selected}>
                   {data}
