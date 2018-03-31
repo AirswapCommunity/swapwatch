@@ -225,6 +225,7 @@ class AutoCompleteInput extends Component {
                         inputProps={{ 'aria-label': 'Description' }}
                         value={this.state.inputValue}
                         type='search'
+                        disabled={this.props.disabled}
                         startAdornment={adorner}>
                     </Input>
                     {popup}

@@ -9,9 +9,6 @@ import cssStyles from './CandlestickChart.css';
 import { format } from "d3-format";
 import { timeFormat } from "d3-time-format";
 
-import { scaleTime } from "d3-scale";
-import { utcDay } from "d3-time";
-
 import { ChartCanvas, Chart } from "react-stockcharts";
 import {
   BarSeries,
@@ -29,10 +26,10 @@ import {
 } from "react-stockcharts/lib/coordinates";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
-import { OHLCTooltip, MovingAverageTooltip, BollingerBandTooltip } from "react-stockcharts/lib/tooltip";
+import { OHLCTooltip } from "react-stockcharts/lib/tooltip";
 import { ema, sma, bollingerBand } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
-import { last, timeIntervalBarWidth } from "react-stockcharts/lib/utils";
+import { last } from "react-stockcharts/lib/utils";
 
 const styles = theme => ({
 });
@@ -72,11 +69,6 @@ class CandlestickChart extends Component {
       return null;
     }
 
-    const xAccessor = (d) => d.date;
-    const xExtents = [
-      xAccessor(last(this.props.data)),
-      xAccessor(this.props.data[20])
-    ];
     const ema20 = ema()
       .options({
         windowSize: 20, // optional will default to 10
@@ -109,8 +101,18 @@ class CandlestickChart extends Component {
       .accessor(d => d.bb);
 
     const calculatedData = ema20(sma20(ema50(smaVolume50(bb(this.props.data)))));
-
-    console.log(this.props.data);
+    const xScaleProvider = discontinuousTimeScaleProvider
+      .inputDateAccessor(d => d.date);
+    const {
+      data,
+      xScale,
+      xAccessor,
+      displayXAccessor,
+    } = xScaleProvider(calculatedData);
+    
+    const start = xAccessor(last(data));
+    const end = xAccessor(data[Math.max(0, data.length - 150)]);
+    const xExtents = [start, end];
 
     return (
       <ChartCanvas height={this.state.containerHeight}
@@ -119,9 +121,10 @@ class CandlestickChart extends Component {
         margin={{ left: 80, right: 80, top: 10, bottom: 40 }}
         type={this.props.type}
         seriesName="AirSwapDEXCandlestick"
-        data={this.props.data}
+        data={data}
+        xScale={xScale}
         xAccessor={xAccessor}
-        xScale={scaleTime()}
+        displayXAccessor={displayXAccessor}
         xExtents={xExtents}
       >
         <Chart id={1}
@@ -139,7 +142,7 @@ class CandlestickChart extends Component {
             orient="right"
             displayFormat={format(".5f")}
           />
-          <CandlestickSeries width={timeIntervalBarWidth(utcDay)} />
+          <CandlestickSeries />
           <BollingerSeries yAccessor={d => d.bb}
             stroke={bbStroke}
             fill={bbFill} />
@@ -184,8 +187,6 @@ class CandlestickChart extends Component {
   }
 
   render() {
-    console.log('Rendering CandlestickChart');
-
     var chart = (this.props.data && this.props.data.length > 0) ? (
       this.getCandlestickChart()) : null;
 

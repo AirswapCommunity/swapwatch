@@ -46,7 +46,6 @@ var getLogs = () => {
     return fetch(`https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${EtherscanAPIKey}`)
         .then(res => res.json())
         .then(response => {
-            console.log(response.result);
             return parseInt(response.result, 16);
         }).then(latestBlock => {
             if (Logs.startBlock === 0) {

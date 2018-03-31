@@ -11,13 +11,14 @@ import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 import Switch from 'material-ui/Switch';
-import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import { FormControlLabel } from 'material-ui/Form';
 
 class Markets extends React.Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      'hasLoadedData': false,
       'pairedTx': null, // loaded TX of AirSwapDEX sorted as [makerAddress][takerAddress]
       'txList': null, // List containing selected transactions for display
       'ohlcData': null, // Data transformed to OHLC format
@@ -129,11 +130,9 @@ class Markets extends React.Component {
     let parseDate = timeParse("%Y-%m-%d");
     copyData.forEach(d => d.timestamp = format(new Date(d.timestamp * 1000)));
     let allDates = [...Array.from(new Set(copyData.map(d => d.timestamp)))];
-    let runningIdx = 0;
     allDates.forEach(d => {
       let tempObject = {};
       let filteredData = copyData.filter(e => e.timestamp === d);
-      tempObject['idx'] = runningIdx;
       tempObject['date'] = parseDate(d);
       tempObject['volume'] = d3.sum(filteredData, e => e.volume);
       tempObject['open'] = filteredData[0].price;
@@ -141,9 +140,8 @@ class Markets extends React.Component {
       tempObject['high'] = d3.max(filteredData, e => e.price);
       tempObject['low'] = d3.min(filteredData, e => e.price);
       result.push(tempObject);
-      runningIdx++;
     });
-    result['columns'] = ['idx', 'date', 'volume', 'open', 'close', 'high', 'low']
+    result['columns'] = ['date', 'volume', 'open', 'close', 'high', 'low']
     return result;
   };
 
@@ -193,8 +191,10 @@ class Markets extends React.Component {
 
   checkStatus() {
     let statusMsg;
+    let hasLoadedData=true;
     if (!this.state.pairedTx) {
       statusMsg = 'Standby. Fetching AirSwap transactions from Etherscan.';
+      hasLoadedData = false;
     } else if (!this.state.txList) {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
         statusMsg = 'No data found for the selected token pair';
@@ -202,7 +202,8 @@ class Markets extends React.Component {
         statusMsg = 'Please select a token pair';
       }
     }
-    this.setState({ statusMessage: statusMsg });
+    this.setState({ hasLoadedData: hasLoadedData,
+                    statusMessage: statusMsg });
   }
 
   render() {
@@ -230,7 +231,6 @@ class Markets extends React.Component {
       }
       label="Show transactions as candlesticks"
     /> : null;
-
     return (
       <Auxilary>
         <div className={styles.Outer}>
@@ -241,6 +241,7 @@ class Markets extends React.Component {
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
+                  disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken1Selected}
                   cleared={this.handleToken1Selected}>
                   {data}
@@ -251,6 +252,7 @@ class Markets extends React.Component {
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
+                  disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken2Selected}
                   cleared={this.handleToken2Selected}>
                   {data}
