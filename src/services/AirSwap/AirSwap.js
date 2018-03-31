@@ -8,68 +8,73 @@ const cacheDelay = 60000;
 const blockHistory = 5838 * 100; // 28 days
 
 const TokenList = {
-    tokens: [],
-    timestamp: null
+  tokens: [],
+  timestamp: null
 }
 
 // const TokenPairStatistics = {
-//     statistics: {},
-//     timestamp: null
+//   statistics: {},
+//   timestamp: null
 // }
 
 const Logs = {
-    entries: null,
-    timestamp: null,
-    startBlock: 0,
-    latestBlock: 0
+  entries: null,
+  timestamp: null,
+  startBlock: 0,
+  latestBlock: 0
 }
 
 var getTokenList = () => {
-    if (TokenList.timestamp && Date.now() - TokenList.timestamp <= cacheDelay) {
-        console.log('getting cached version');
-        return;
-    }
+  if (TokenList.timestamp && Date.now() - TokenList.timestamp <= cacheDelay) {
+    console.log('getting cached version');
+    return;
+  }
 
-    TokenList.timestamp = Date.now();
+  TokenList.timestamp = Date.now();
 
-    console.log('hitting webservice to get tokens');
+  console.log('hitting webservice to get tokens');
 }
 
-var getLogs = () => {
-    // if (Logs.timestamp && Date.now() - Logs.timestamp <= cacheDelay) {
-    //     console.log('getting cached version');
-    //     return;
-    // }
+var getLogs = (startBlock) => {
+  // if (Logs.timestamp && Date.now() - Logs.timestamp <= cacheDelay) {
+  //   console.log('getting cached version');
+  //   return;
+  // }
 
-    // Logs.timestamp = Date.now();
+  // Logs.timestamp = Date.now();
 
-    return fetch(`https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${EtherscanAPIKey}`)
+  return fetch(`https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${EtherscanAPIKey}`)
+    .then(res => res.json())
+    .then(response => {
+      return parseInt(response.result, 16);
+    }).then(latestBlock => {
+      
+      if (Logs.startBlock === 0) {
+        Logs.startBlock = latestBlock - blockHistory;
+      }
+      
+      var fromBlock;
+      if(startBlock === 0) {
+        fromBlock = Logs.startBlock;
+      } else {
+        fromBlock = Logs.latestBlock ? Logs.latestBlock + 1 : Logs.startBlock;
+      }
+      Logs.latestBlock = latestBlock;
+
+      return fetch(`https://api.etherscan.io/api?module=logs&action=getLogs&address=${AirSwapDEX}` +
+        `&fromBlock=${fromBlock}` +
+        `&toBlock=${latestBlock}` +
+        `&topic0=${AirSwapFilledEvent}` +
+        `&apikey=etherscan_token`)
         .then(res => res.json())
         .then(response => {
-            return parseInt(response.result, 16);
-        }).then(latestBlock => {
-            if (Logs.startBlock === 0) {
-                Logs.startBlock = latestBlock - blockHistory;
-            }
-
-            var fromBlock = Logs.latestBlock ? Logs.latestBlock + 1 : Logs.startBlock;
-
-            Logs.latestBlock = latestBlock;
-
-            return fetch(`https://api.etherscan.io/api?module=logs&action=getLogs&address=${AirSwapDEX}` +
-                `&fromBlock=${fromBlock}` +
-                `&toBlock=${latestBlock}` +
-                `&topic0=${AirSwapFilledEvent}` +
-                `&apikey=etherscan_token`)
-                .then(res => res.json())
-                .then(response => {
-                    Logs.entries = response.result;
-                    return response.result;
-                });
+          Logs.entries = response.result;
+          return response.result;
         });
+    });
 }
 
 module.exports.AirSwap = {
-    getTokenList,
-    getLogs
+  getTokenList,
+  getLogs
 }
