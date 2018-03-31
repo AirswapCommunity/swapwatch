@@ -48,7 +48,7 @@
     max-height: inherit;
     overflow: hidden;
     margin: auto;
-    padding: 20px;
+    /* padding: 20px; */
     box-sizing: border-box;
 }
 

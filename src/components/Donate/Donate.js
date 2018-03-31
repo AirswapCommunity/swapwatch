@@ -266,16 +266,16 @@ class Donate extends React.Component {
       } else {
         if(!this.state.isConnected) {
           guestbookMessagesElement = (
-            <div style={{marginTop:'100px'}}>No connection to Ethereum. Can't show guestbook.</div>
+            <div style={{marginTop:'70px'}}>No connection to Ethereum. Can't show guestbook.</div>
           )
         } else {
           if(window.web3 && this.state.Network !== "Ropsten") {
             guestbookMessagesElement = (
-             <div style={{marginTop:'100px'}}>The guestbook lives on Ropsten at the moment. Set Metamask to Ropsten to see it.</div>
+             <div style={{marginTop:'70px'}}>The guestbook lives on Ropsten at the moment. Set Metamask to Ropsten to see it.</div>
             )
           } else {
             guestbookMessagesElement = (
-              <div style={{marginTop:'100px'}}>Loading Guestbook...</div>
+              <div style={{marginTop:'70px'}}>Loading Guestbook...</div>
             )
           }
         }
