@@ -26,24 +26,60 @@ class About extends Component {
     super(props);
     this.container = null;
     this.state = {
+      containerWidth: 100,
       containerHeight: 100
     }
   }
 
-  componentDidMount() {
-    var height = ReactDOM.findDOMNode(this.container).clientHeight;
-
-    if (height > 0) {
-      this.setState({ containerHeight: height - 10 })
-    }
+  componentWillMount() {
+    window.addEventListener('resize', this.handleWindowSizeChange);
   }
+
+  componentDidMount() {
+    this.handleWindowSizeChange();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
+  }
+
 
   setRef = (el) => {
     this.container = el;
   }
 
+  handleWindowSizeChange = () => {
+    var width = ReactDOM.findDOMNode(this.container).clientWidth;
+    if (width > 0) {
+      this.setState({ containerWidth: width })
+    }
+  };
 
   render() {
+    let isMobile = this.state.containerWidth <= 600;
+
+    let photoElementStyle;
+    let avatarStyle;
+    let avatarInternalStyle;
+    let evolveSubtext;
+    if (isMobile) {
+      photoElementStyle = {width: '60px',
+                           height: '60px'}
+      avatarStyle = {width: '70px',
+                     height: '70px'}
+      avatarInternalStyle = {width: '60px',
+                             height: '60px'}
+      evolveSubtext = 'evolve';
+    } else {
+      photoElementStyle = {width: '180px',
+                           height: '180px'}
+      avatarStyle = {width: '200px',
+                     height: '200px'}
+      avatarInternalStyle = {width: '180px',
+                             height: '180px'}
+      evolveSubtext = 'evolve (aka: Cryptonious)';
+    }
+
     return (
       <Auxilary>
         <div className={cssStyles.Outer}>
@@ -55,17 +91,27 @@ class About extends Component {
             <p className={[cssStyles.SubHeading, cssStyles.p].join(' ')}>Main Contributors</p>
             <div className={cssStyles.ContributorContainer}>
               <div>
-                <Avatar className={this.props.classes.avatar}>
-                  <Avatar className={this.props.classes.avatarInternal}>
-                    <img src={require('../../assets/images/codeNinja.png')} className={cssStyles.Photo} alt="evolve" />
+                <Avatar className={this.props.classes.avatar}
+                        style={avatarStyle}>
+                  <Avatar className={this.props.classes.avatarInternal}
+                          style={avatarInternalStyle}>
+                    <img src={require('../../assets/images/codeNinja.png')} 
+                         style={photoElementStyle}
+                         className={cssStyles.Photo}
+                         alt="evolve" />
                   </Avatar>
                 </Avatar>
-                <span className={cssStyles.ContributorName}>evolve (aka: Cryptonious)</span>
+                <span className={cssStyles.ContributorName}>{evolveSubtext}</span>
               </div>
               <div>
-                <Avatar className={this.props.classes.avatar}>
-                  <Avatar className={this.props.classes.avatarInternal}>
-                    <img src={require('../../assets/images/homiedomi.png')} className={cssStyles.Photo} alt="homiedomi" />
+                <Avatar className={this.props.classes.avatar}
+                        style={avatarStyle}>
+                  <Avatar className={this.props.classes.avatarInternal}
+                          style={avatarInternalStyle}>
+                    <img src={require('../../assets/images/homiedomi.png')} 
+                         style={photoElementStyle}
+                         className={cssStyles.Photo} 
+                         alt="homiedomi" />
                   </Avatar>
                 </Avatar>
                 <span className={cssStyles.ContributorName}>homiedomi</span>

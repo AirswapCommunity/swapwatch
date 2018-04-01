@@ -88,26 +88,23 @@ class Donate extends React.Component {
   }
 
   componentDidMount() {
-    var width = ReactDOM.findDOMNode(this.container).clientWidth;
-    console.log('width:', width);
-    if (width > 0) {
-      this.setState({ containerWidth: width - 10 })
-    }
+    this.handleWindowSizeChange();
   }
 
-  setRef = (el) => {
-    this.container = el;
-  }
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleWindowSizeChange);
     clearInterval(this.interval);
   }
 
+  setRef = (el) => {
+    this.container = el;
+  }
+
   handleWindowSizeChange = () => {
     var width = ReactDOM.findDOMNode(this.container).clientWidth;
     if (width > 0) {
-      this.setState({ containerWidth: width - 10 })
+      this.setState({ containerWidth: width })
     }
   };
 
