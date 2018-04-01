@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from 'react-dom';
 import Auxilary from "../../hoc/Auxilary";
 import { withStyles } from 'material-ui/styles';
 import cssStyles from "./Donate.css";
@@ -19,6 +20,7 @@ class Donate extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      'containerWidth': 100,
       'web3': null,
       'isConnected': false,
       'Network': null,
@@ -38,6 +40,9 @@ class Donate extends React.Component {
   }
 
   componentWillMount() {
+    window.addEventListener('resize', this.handleWindowSizeChange);
+
+    //connect to web3
     let web3;
     if(window.web3) { // Metamask
       web3 = new Web3(window.web3.currentProvider);
@@ -82,9 +87,29 @@ class Donate extends React.Component {
     })  
   }
 
+  componentDidMount() {
+    var width = ReactDOM.findDOMNode(this.container).clientWidth;
+    console.log('width:', width);
+    if (width > 0) {
+      this.setState({ containerWidth: width - 10 })
+    }
+  }
+
+  setRef = (el) => {
+    this.container = el;
+  }
+
   componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
     clearInterval(this.interval);
   }
+
+  handleWindowSizeChange = () => {
+    var width = ReactDOM.findDOMNode(this.container).clientWidth;
+    if (width > 0) {
+      this.setState({ containerWidth: width - 10 })
+    }
+  };
 
   refreshData() {
     this.state.guestbookContract.methods.running_id().call()
@@ -165,12 +190,17 @@ class Donate extends React.Component {
   }
 
   getGuestbook() {
+    const isMobile = this.state.containerWidth <= 500;
+    var guestbookReadElementStyle = isMobile ? {width:'100%'} : {width:'49%'};
+
     if(!this.state.isConnected){
       return (<p className={cssStyles.failedMessage}>Connecting to Ethereum via Infura seems to have failed. You're supposed to see our guestbook here. Check if your internet provider is blocking or come into contact with us, so we can trace this down.</p>)
     }
     else {
       let guestbookWriteElement;
-      if(!window.web3) { // in Infura
+      if(isMobile) { // window width too small, drop it
+        guestbookWriteElement = null;
+      } else if (!window.web3) { // in Infura
         guestbookWriteElement = (
           <div>
             <a className={cssStyles.a} href='http://metamask.io' target="_blank" rel="noopener noreferrer">
@@ -285,7 +315,7 @@ class Donate extends React.Component {
           <div className={cssStyles.GuestbookEnterMessage}>
             {guestbookWriteElement}
           </div>
-          <div className={cssStyles.GuestbookReadMessages}>
+          <div className={cssStyles.GuestbookReadMessages} style={guestbookReadElementStyle}>
             {guestbookMessagesElement}
           </div>
         </div>
@@ -298,7 +328,7 @@ class Donate extends React.Component {
     return (
       <Auxilary>
         <div className={cssStyles.Outer}>
-          <div className={cssStyles.PageContainer}>
+          <div className={cssStyles.PageContainer} ref={this.setRef}>
             <p className={[cssStyles.Heading, cssStyles.p].join(' ')}>Donate</p>
             <p className={cssStyles.p}>This project is community driven and is financed purely by ourselves & donations.</p>
             <p className={cssStyles.p}>If you want to contribute feel free to donate ether or tokens to <a className={cssStyles.a} href="https://etherscan.io/address/0x63c477114690b31a90715e34416819ab860bf0a0">SwapWatch.eth</a>.</p>
