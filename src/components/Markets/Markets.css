@@ -4,6 +4,7 @@
 
 :local(.PageContainer) {
     composes: Container from global;
+    overflow: hidden;
 }
 
 .TableMessageContainer {
