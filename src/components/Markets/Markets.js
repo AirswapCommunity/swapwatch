@@ -28,7 +28,7 @@ class Markets extends React.Component {
       'statusMessage': null // status message shown at top
     }
   }
-
+  
   removeLeadingZeros = (data) => {
     let cleaned_string = data.replace(/0x0*/, '0x');
     while (cleaned_string.length < 42) cleaned_string = cleaned_string.replace('0x', '0x0')
@@ -231,6 +231,7 @@ class Markets extends React.Component {
       }
       label="Show transactions as candlesticks"
     /> : null;
+
     return (
       <Auxilary>
         <div className={styles.Outer}>
