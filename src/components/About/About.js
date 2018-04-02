@@ -63,16 +63,14 @@ class About extends Component {
     let avatarInternalStyle;
     let evolveSubtext;
     if (isMobile) {
-      photoElementStyle = {width: '60px',
-                           height: '60px'}
+      photoElementStyle = {width: '60px'}
       avatarStyle = {width: '70px',
                      height: '70px'}
       avatarInternalStyle = {width: '60px',
                              height: '60px'}
       evolveSubtext = 'evolve';
     } else {
-      photoElementStyle = {width: '180px',
-                           height: '180px'}
+      photoElementStyle = {width: '180px'}
       avatarStyle = {width: '200px',
                      height: '200px'}
       avatarInternalStyle = {width: '180px',
