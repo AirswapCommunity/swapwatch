@@ -130,8 +130,14 @@ class CandlestickChart extends Component {
     const end = xAccessor(data[Math.max(0, data.length - 150)]);
     const xExtents = [start, end];
 
+    var bottomOffset = 55;
+
+    if (this.state.containerWidth > 600) {
+      bottomOffset = 30;
+    }
+
     return (
-      <ChartCanvas height={this.state.containerHeight - 30}
+      <ChartCanvas height={this.state.containerHeight - bottomOffset}
         ratio={this.props.ratio}
         width={this.props.width}
         margin={{ left: 50, right: 50, top: 10, bottom: 50 }}

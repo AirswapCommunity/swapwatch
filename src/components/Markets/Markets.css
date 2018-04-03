@@ -24,9 +24,26 @@
 .SwitchContainer {
     display: flex;
     width: 100%;
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding-top: 5px;
 }
+
+@media only screen and (min-width: 600px) {
+    .AutoCompleteContainer {
+        float: left;
+        width: 40%;
+    }
+    
+    .AutoCompleteContainerRight {
+        float: right;
+        width: 40%;
+    }
+
+    .SwitchContainer {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+}
+
 
 /* This one is the semi transparent box from Token Trader */
 /* .Container {
