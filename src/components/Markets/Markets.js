@@ -180,7 +180,7 @@ class Markets extends React.Component {
 
 
   componentWillMount() {
-    AirSwap.getLogs(0)
+    AirSwap.getLogs()
       .then(x => {
         this.evalAirSwapDEXFilledEventLogs(x);
         // this.handleToken1Selected(data[0]);
