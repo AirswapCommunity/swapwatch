@@ -1,21 +1,11 @@
+const fetch = require('node-fetch')
 
-// const AirSwapTokenAddress = '0x27054b13b1b798b345b591a4d22e6562d47ea75a';
 const AirSwapDEX = '0x8fd3121013a07c57f0d69646e86e7a4880b467b7';
 const AirSwapFilledEvent = '0xe59c5e56d85b2124f5e7f82cb5fcc6d28a4a241a9bdd732704ac9d3b6bfc98ab';
 const EtherscanAPIKey = 'VR4UPKI119TYM93ZV47GXTTGFSMRRDEVGZ';
 
 const cacheDelay = 60000;
-const blockHistory = 5838 * 100; // 28 days
-
-const TokenList = {
-  tokens: [],
-  timestamp: null
-}
-
-// const TokenPairStatistics = {
-//   statistics: {},
-//   timestamp: null
-// }
+const blockHistory = 5838 * 300; // 28 days
 
 const Logs = {
   entries: [],
@@ -24,35 +14,23 @@ const Logs = {
   latestBlock: 0
 }
 
-var getTokenList = () => {
-  if (TokenList.timestamp && Date.now() - TokenList.timestamp <= cacheDelay) {
-    console.log('getting cached version');
-    return;
-  }
-
-  TokenList.timestamp = Date.now();
-
-  console.log('hitting webservice to get tokens');
+var resetLogs = () => {
+  Logs.entries = [];
+  Logs.timestamp = null;
+  Logs.startBlock = 0;
+  Logs.latestBlock = 0;
 }
-
-// var resetLogs = () => {
-//   Logs.entries = [];
-//   Logs.timestamp = null;
-//   Logs.startBlock = 0;
-//   Logs.latestBlock = 0;
-// }
 
 var getLogs = (startBlock, endBlock) => {
   if (Logs.timestamp && Date.now() - Logs.timestamp <= cacheDelay) {
     console.log('getting cached version');
-    return new Promise((resolve, reject) => resolve(Logs.entries));
+    return;
   }
 
   var fromBlock;
   var toBlock;
   
   return new Promise((resolve, reject) => {
-    // first determine block range to fetch 
     if (endBlock > 0) {
       resolve(endBlock);
     } else {
@@ -75,21 +53,22 @@ var getLogs = (startBlock, endBlock) => {
     }
 
     if(fromBlock < Logs.startBlock) Logs.startBlock = fromBlock;
-    if(endBlock > Logs.latestBlock) Logs.latestBlock = toBlock;
+    if(endBlock > Logs.endBlock) Logs.endBlock = toBlock;
 
-    // console.log('getting tx between blocks: ', fromBlock, toBlock)
+    console.log('getting: ', fromBlock, toBlock)
     return fetch(`https://api.etherscan.io/api?module=logs`+
       `&action=getLogs`+
-      `&address=${AirSwapDEX}`+
-      `&fromBlock=${fromBlock}`+
-      `&toBlock=${toBlock}`+
-      `&topic0=${AirSwapFilledEvent}`+
+      `&address=${AirSwapDEX}` +
+      `&fromBlock=${fromBlock}` +
+      `&toBlock=${toBlock}` +
+      `&topic0=${AirSwapFilledEvent}` +
       `&apikey=etherscan_token`)
       
   }).then(res => res.json())
   .then(response => {
-    if (response.status === '0') {
-      // response is empty or something went wrong... try again from latest fetched Block just in case
+    if response.status === '0' {
+      // something went wrong
+      console.log('Error at fetching Etherscan Data. Retrying...')
       let lastLogsEntry;
       let lastLoadedBlocknumber;
       if(Logs.entries && Logs.entries.length > 0) {
@@ -133,7 +112,5 @@ var getLogs = (startBlock, endBlock) => {
   });
 }
 
-module.exports.AirSwap = {
-  getTokenList,
-  getLogs
-}
+getLogs()
+.then(logs => console.log(logs))
