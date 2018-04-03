@@ -48,26 +48,42 @@ class CandlestickChart extends Component {
     super(props);
     this.container = null;
     this.state = {
-      containerHeight: 100
+      containerHeight: 100,
+      containerWidth: 100,
     }
   }
 
-  componentDidMount() {
-    var height = ReactDOM.findDOMNode(this.container).clientHeight;
+  componentWillMount() {
+    window.addEventListener('resize', this.handleWindowSizeChange);
+  }
 
-    if (height > 0) {
-      this.setState({ containerHeight: height - 10 })
-    }
+  componentDidMount() {
+    this.handleWindowSizeChange();
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowSizeChange);
   }
 
   setRef = (el) => {
     this.container = el;
   }
 
+  handleWindowSizeChange = () => {
+    var height = ReactDOM.findDOMNode(this.container).clientHeight;
+    var width = ReactDOM.findDOMNode(this.container).clientWidth;
+    if (width > 0) {
+      this.setState({ containerHeight: height,
+                      containerWidth: width })
+    }
+  };
+
   getCandlestickChart = () => {
     if (!this.props.data) {
       return null;
     }
+
+    // let isMobile = this.state.containerWidth <= 500;
 
     const ema20 = ema()
       .options({
@@ -115,10 +131,10 @@ class CandlestickChart extends Component {
     const xExtents = [start, end];
 
     return (
-      <ChartCanvas height={this.state.containerHeight}
+      <ChartCanvas height={this.state.containerHeight - 30}
         ratio={this.props.ratio}
         width={this.props.width}
-        margin={{ left: 80, right: 80, top: 10, bottom: 40 }}
+        margin={{ left: 50, right: 50, top: 10, bottom: 50 }}
         type={this.props.type}
         seriesName="AirSwapDEXCandlestick"
         data={data}

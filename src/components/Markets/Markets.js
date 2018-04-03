@@ -28,7 +28,7 @@ class Markets extends React.Component {
       'statusMessage': null // status message shown at top
     }
   }
-
+  
   removeLeadingZeros = (data) => {
     let cleaned_string = data.replace(/0x0*/, '0x');
     while (cleaned_string.length < 42) cleaned_string = cleaned_string.replace('0x', '0x0')
@@ -193,7 +193,7 @@ class Markets extends React.Component {
     let statusMsg;
     let hasLoadedData=true;
     if (!this.state.pairedTx) {
-      statusMsg = 'Standby. Fetching AirSwap transactions from Etherscan.';
+      statusMsg = 'Standby. Fetching AirSwap transactions from Etherscan...';
       hasLoadedData = false;
     } else if (!this.state.txList) {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
@@ -215,7 +215,7 @@ class Markets extends React.Component {
     var candlestickElement = <CandlestickChart data={this.state.ohlcData} />;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-
+    var spinnerElement = !this.state.hasLoadedData ? <i className="fa fa-spinner fa-spin fa-3x"></i> : null;
     var viewElement;
     if (!this.state.txList) viewElement = null;
     else viewElement = this.state.viewCandlestick ? candlestickElement : txTableElement;
@@ -231,6 +231,7 @@ class Markets extends React.Component {
       }
       label="Show transactions as candlesticks"
     /> : null;
+
     return (
       <Auxilary>
         <div className={styles.Outer}>
@@ -262,7 +263,8 @@ class Markets extends React.Component {
             <div className={styles.SwitchContainer}>
               {switchElement}
             </div>
-            {statusMessageElement}
+            <div>{statusMessageElement}</div>
+            <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}>{spinnerElement}</div>
             <div className={styles.TableContainer}>
               {viewElement}
             </div>

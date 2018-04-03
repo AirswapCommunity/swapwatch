@@ -1,49 +1,49 @@
 
 :local(.Outer) {
-    composes: PageFrame from global;
+  composes: PageFrame from global;
 }
 
 :local(.PageContainer) {
-    composes: Container from global;
-    text-align: center;
+  composes: Container from global;
+  text-align: center;
 }
 
 .p {
-    color: black;
-    text-shadow: 1px 1px 0px white;
+  color: black;
+  text-shadow: 1px 1px 0px white;
 }
 
 .Heading {
-    text-align: center;
-    font-size: 2em;
+  text-align: center;
+  font-size: 2em;
 }
 
 .SubHeading {
-    text-align: center;
-    font-size: 1.25em;
-    margin-top: 40px;
+  text-align: center;
+  font-size: 1.25em;
+  margin-top: 40px;
 }
 
 .a {
-    color: #008eff;
-    text-decoration: none;
-    font-weight: bold;
+  color: #008eff;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .a:visited {
-    color: #008eff;
+  color: #008eff;
 }
 
 .Photo {
-    width: 180px;
+
 }
 
 .ContributorContainer {
-    display: inline-flex;
+  display: inline-flex;
 }
 
 .ContributorName {
-    font-weight: bold;
-    text-shadow: 1px 1px 0px white;
-    /* font-size: 1.25em; */
+  font-weight: bold;
+  text-shadow: 1px 1px 0px white;
+  /* font-size: 1.25em; */
 }

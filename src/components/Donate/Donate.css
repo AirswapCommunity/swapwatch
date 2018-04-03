@@ -1,60 +1,59 @@
 
 :local(.Outer) {
-    composes: PageFrame from global;
+  composes: PageFrame from global;
 }
 
 :local(.PageContainer) {
-    composes: Container from global;
-    text-align: center;
-    overflow: hidden;
+  composes: Container from global;
+  text-align: center;
 }
 
 .p {
-    color: black;
-    text-shadow: 1px 1px 0px white;
+  color: black;
+  text-shadow: 1px 1px 0px white;
 }
 
 .failedMessage {
-    color: red;
-    font-style: italic;
-    text-shadow: 1px 1px 0px white;    
+  color: red;
+  font-style: italic;
+  text-shadow: 1px 1px 0px white;  
 }
 
 .Heading {
-    text-align: center;
-    font-size: 2em;
+  text-align: center;
+  font-size: 2em;
 }
 
 .a {
-    color: #008eff;
-    text-decoration: none;
-    font-weight: bold;
+  color: #008eff;
+  text-decoration: none;
+  font-weight: bold;
 }
 
 .a:visited {
-    color: #008eff;
+  color: #008eff;
 }
 
 .Guestbook {
-    overflow: auto;
-    width: 100%;
-    height: 100%;
-    margin:auto;
+  overflow: auto;
+  width: 100%;
+  height: 100%;
+  margin:auto;
 }
 
 .GuestbookEnterMessage {
-    width: 49%;
-    float: left;
-    max-height: inherit;
-    overflow: hidden;
-    margin: auto;
-    padding: 20px;
-    box-sizing: border-box;
+  width: 49%;
+  float: left;
+  max-height: inherit;
+  overflow: hidden;
+  margin: auto;
+  /* padding: 20px; */
+  box-sizing: border-box;
 }
 
 .GuestbookReadMessages {
-    width: 49%;
-    float: right;
-    overflow: hidden;
-    margin: auto;
+  width: 49%;
+  float: right;
+  overflow: hidden;
+  margin: auto;
 }
