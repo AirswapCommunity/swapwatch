@@ -54,12 +54,14 @@ class TradingDataTable extends Component {
     if(this.state.containerHeight < 150) {
       return null
     } else {
-      var offset = 20;
-      var fontSize = '1em';
+      var offset = 75;
+      var fontSize = '.75em';
 
-      if (this.state.containerWidth < 600) {
+      if (this.state.containerWidth > 600) {
+        offset = 20;
+        fontSize = '1em';
+      } else if (this.state.containerWidth > 320) {
         offset = 70;
-        fontSize = '.75em';
       }
 
       let tableHeight = this.state.containerHeight - ((this.state.containerHeight-700)*30/(150-700) + offset);//50

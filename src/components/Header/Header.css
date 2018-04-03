@@ -5,9 +5,16 @@
     box-shadow: 0 0 30px rgba(0,0,0,0.5);
 }
 
-.LogoImage {
+.LogoContainer {
+    display: inline-flex;
+    height: 50px;
+    align-items: center;
     float: left;
-    margin-right: 20px;
+}
+
+.LogoImage {
+    height: 24px;
+    margin-right: 10px;
 }
 
 .LogoText {
@@ -15,8 +22,8 @@
     float: left;
     color: #005E9B;
     font-weight: bold;
-    font-size: 1.25em;
-    letter-spacing: 5px;
+    font-size: 1em;
+    letter-spacing: 2px;
     line-height: 50px;
     margin-top: 0;
 }
@@ -44,9 +51,23 @@
     text-decoration: none;
 }
 
-@media only screen and (min-width: 500px) {
+@media only screen and (min-width: 321px) {
+    .LogoText {
+        font-size: 1.25em;
+        letter-spacing: 5px;
+    }
+}
+
+@media only screen and (min-width: 383px) {
     .Link {
         line-height: 50px;
         margin-top: 0px;
+    }
+}
+
+@media only screen and (min-width: 500px) {
+    .LogoImage {
+        height: auto;
+        margin-right: 20px;
     }
 }
