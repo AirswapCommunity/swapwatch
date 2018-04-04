@@ -215,7 +215,7 @@ class Markets extends React.Component {
     var candlestickElement = <CandlestickChart data={this.state.ohlcData} />;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <i className="fa fa-spinner fa-spin fa-3x"></i> : null;
+    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
     var viewElement;
     if (!this.state.txList) viewElement = null;
     else viewElement = this.state.viewCandlestick ? candlestickElement : txTableElement;
@@ -237,25 +237,27 @@ class Markets extends React.Component {
         <div className={styles.Outer}>
           <div className={styles.PageContainer}>
             <div>
-              <div style={{ float: 'left', width: '40%' }}>
+              <div className={styles.AutoCompleteContainer}>
                 <AutoCompleteInput placeholder="Maker Token"
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
                   disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken1Selected}
-                  cleared={this.handleToken1Selected}>
+                  cleared={this.handleToken1Selected}
+                  zIndex='20'>
                   {data}
                 </AutoCompleteInput>
               </div>
-              <div style={{ float: 'right', width: '40%' }}>
+              <div className={styles.AutoCompleteContainerRight}>
                 <AutoCompleteInput placeholder="Taker Token"
                   displayField='name'
                   imageField='logo'
                   secondaryField='symbol'
                   disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken2Selected}
-                  cleared={this.handleToken2Selected}>
+                  cleared={this.handleToken2Selected}
+                  zIndex='10'>
                   {data}
                 </AutoCompleteInput>
               </div>
@@ -264,7 +266,7 @@ class Markets extends React.Component {
               {switchElement}
             </div>
             <div>{statusMessageElement}</div>
-            <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}>{spinnerElement}</div>
+            <div>{spinnerElement}</div>
             <div className={styles.TableContainer}>
               {viewElement}
             </div>

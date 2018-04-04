@@ -54,11 +54,21 @@ class TradingDataTable extends Component {
     if(this.state.containerHeight < 150) {
       return null
     } else {
-      let tableHeight = this.state.containerHeight - ((this.state.containerHeight-700)*30/(150-700) + 50);
+      var offset = 75;
+      var fontSize = '.75em';
+
+      if (this.state.containerWidth > 600) {
+        offset = 20;
+        fontSize = '1em';
+      } else if (this.state.containerWidth > 320) {
+        offset = 70;
+      }
+
+      let tableHeight = this.state.containerHeight - ((this.state.containerHeight-700)*30/(150-700) + offset);//50
       return (
         <ReactTable
           data={this.props.txList}
-          style={{height:tableHeight}}
+          style={{height:tableHeight, marginBottom: '10px', fontSize: fontSize}}
           columns={[
             {
               Header: "Date",
