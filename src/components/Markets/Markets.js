@@ -212,7 +212,11 @@ class Markets extends React.Component {
       EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
 
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
-    var candlestickElement = <CandlestickChart data={this.state.ohlcData} />;
+    var candlestickElement =  <CandlestickChart 
+                                data={this.state.ohlcData}
+                                token1={this.state.selectedToken1}
+                                token2={this.state.selectedToken2}
+                              />;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
     var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
