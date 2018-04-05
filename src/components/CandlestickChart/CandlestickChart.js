@@ -22,7 +22,8 @@ import {
   CrossHairCursor,
   CurrentCoordinate,
   MouseCoordinateX,
-  MouseCoordinateY
+  MouseCoordinateY,
+  EdgeIndicator
 } from "react-stockcharts/lib/coordinates";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
@@ -35,12 +36,12 @@ const styles = theme => ({
 });
 
 const bbStroke = {
-  top: "#964B00",
+  top: "#008eff",
   middle: "#000000",
-  bottom: "#964B00",
+  bottom: "#008eff",
 };
 
-const bbFill = "#4682B4";
+const bbFill = '#008eff'//"#4682B4";
 
 class CandlestickChart extends Component {
 
@@ -73,8 +74,10 @@ class CandlestickChart extends Component {
     var height = ReactDOM.findDOMNode(this.container).clientHeight;
     var width = ReactDOM.findDOMNode(this.container).clientWidth;
     if (width > 0) {
-      this.setState({ containerHeight: height,
-                      containerWidth: width })
+      this.setState({
+        containerHeight: height,
+        containerWidth: width
+      })
     }
   };
 
@@ -125,7 +128,7 @@ class CandlestickChart extends Component {
       xAccessor,
       displayXAccessor,
     } = xScaleProvider(calculatedData);
-    
+
     const start = xAccessor(last(data));
     const end = xAccessor(data[Math.max(0, data.length - 150)]);
     const xExtents = [start, end];
@@ -148,7 +151,7 @@ class CandlestickChart extends Component {
       <ChartCanvas height={height}
         ratio={this.props.ratio}
         width={this.props.width}
-        margin={{ left: 50, right: 50, top: 10, bottom: 50 }}
+        margin={{ left: 55, right: 55, top: 10, bottom: 50 }}
         type={this.props.type}
         seriesName="AirSwapDEXCandlestick"
         data={data}
@@ -185,6 +188,22 @@ class CandlestickChart extends Component {
           <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
 
           <OHLCTooltip origin={[-40, 0]} ohlcFormat={format(".5f")} />
+
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={sma20.accessor()} fill={sma20.stroke()} displayFormat={format(".5f")} />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={ema20.accessor()} fill={ema20.stroke()} displayFormat={format(".5f")} />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={ema50.accessor()} fill={ema50.stroke()} displayFormat={format(".5f")}/>
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} displayFormat={format(".5f")}/>
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={sma20.accessor()} fill={sma20.stroke()} displayFormat={format(".5f")}/>
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={ema20.accessor()} fill={ema20.stroke()} displayFormat={format(".5f")}/>
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={ema50.accessor()} fill={ema50.stroke()} displayFormat={format(".5f")}/>
+
         </Chart>
         <Chart id={2}
           yExtents={[d => d.volume, smaVolume50.accessor()]}
@@ -210,6 +229,15 @@ class CandlestickChart extends Component {
           <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()} />
           <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
           <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
+
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F" />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F" />
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={smaVolume50.accessor()} displayFormat={format(".4s")} fill={smaVolume50.fill()} />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={smaVolume50.accessor()} displayFormat={format(".4s")} fill={smaVolume50.fill()} />
         </Chart>
         <CrossHairCursor />
       </ChartCanvas>

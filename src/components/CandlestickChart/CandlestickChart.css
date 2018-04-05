@@ -12,3 +12,21 @@
 .forceFont {
     font-family: 'Open Sans' !important;
 }
+
+:global(.react-stockcharts-grabbing-cursor),
+:global(.react-stockcharts-crosshair-cursor) {
+	/* stroke: #000000; */
+	stroke-width: 1;
+	opacity: 1 !important;
+	fill-opacity: 0 !important;
+}
+
+:global(.react-stockcharts-tooltip) {
+    font-family: 'Open Sans';
+    font-weight: 600;
+}
+
+:global(text) {
+    font-family: 'Open Sans';
+    font-weight: 600;
+}
