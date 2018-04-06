@@ -146,24 +146,20 @@ class CandlestickChart extends Component {
     if (height - 60 < 0) {
       height = 60;
     }
-
-//<EdgeIndicator itemType="last" orient="right" edgeAt="right"
-//   yAccessor={sma20.accessor()} fill={sma20.stroke()} displayFormat={numberFormat} />
-// <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-//   yAccessor={ema20.accessor()} fill={ema20.stroke()} displayFormat={numberFormat} />
-// <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-//   yAccessor={ema50.accessor()} fill={ema50.stroke()} displayFormat={numberFormat}/>
-//<EdgeIndicator itemType="first" orient="left" edgeAt="left"
-//   yAccessor={sma20.accessor()} fill={sma20.stroke()} displayFormat={numberFormat}/>
-// <EdgeIndicator itemType="first" orient="left" edgeAt="left"
-//   yAccessor={ema20.accessor()} fill={ema20.stroke()} displayFormat={numberFormat}/>
-// <EdgeIndicator itemType="first" orient="left" edgeAt="left"
-//   yAccessor={ema50.accessor()} fill={ema50.stroke()} displayFormat={numberFormat}/>
-
-// <EdgeIndicator itemType="first" orient="left" edgeAt="left"
-//   yAccessor={smaVolume50.accessor()} displayFormat={format(".4s")} fill={smaVolume50.fill()} />
-// <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-//   yAccessor={smaVolume50.accessor()} displayFormat={format(".4s")} fill={smaVolume50.fill()} />
+    var bollingerBandElement = this.props.indicator.BollingerBand ? (<BollingerSeries 
+      yAccessor={d => d.bb}
+      stroke={bbStroke}
+      fill={bbFill} />) : null;
+    var emaElements = this.props.indicator.EMA ? (<span>
+      <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
+      <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
+      <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
+      <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
+    </span>) : null;
+    var smaElements = this.props.indicator.SMA ? (<span>
+      <LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
+      <CurrentCoordinate yAccessor={sma20.accessor()} fill={sma20.stroke()} />
+    </span>) : null;
     return (
       <ChartCanvas height={height}
         ratio={this.props.ratio}
@@ -193,16 +189,10 @@ class CandlestickChart extends Component {
             displayFormat={numberFormat}
           />
           <CandlestickSeries />
-          <BollingerSeries yAccessor={d => d.bb}
-            stroke={bbStroke}
-            fill={bbFill} />
+          {bollingerBandElement}
 
-          <LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
-          <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
-          <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
-          <CurrentCoordinate yAccessor={sma20.accessor()} fill={sma20.stroke()} />
-          <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-          <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
+          {emaElements}
+          {smaElements}
 
           <OHLCTooltip origin={[-40, 0]} ohlcFormat={numberFormat} />
           <HoverTooltip 

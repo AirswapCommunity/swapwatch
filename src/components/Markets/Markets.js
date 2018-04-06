@@ -13,6 +13,8 @@ import { EthereumTokens } from '../../services/Tokens/Tokens';
 import Switch from 'material-ui/Switch';
 import { FormControlLabel } from 'material-ui/Form';
 
+import OptionsMenu from './OptionsMenu';
+
 class Markets extends React.Component {
 
   constructor(props) {
@@ -25,8 +27,16 @@ class Markets extends React.Component {
       'selectedToken1': null, // currently selected token 1
       'selectedToken2': null, // currently selected token 2
       'viewCandlestick': true, // Display Candlestick or Display Table
-      'statusMessage': null // status message shown at top
+      'statusMessage': null, // status message shown at top
+      'indicator': {
+        'BollingerBand': true,
+        'EMA': true,
+        'SMA': true,
+      }
     }
+    this.toggleIndicator = this.toggleIndicator.bind(this);
+
+
   }
   
   removeLeadingZeros = (data) => {
@@ -206,6 +216,16 @@ class Markets extends React.Component {
                     statusMessage: statusMsg });
   }
 
+  toggleIndicator(ind) {
+    if(ind) {
+      var newIndicator = this.state.indicator;
+      newIndicator[ind] = !newIndicator[ind]
+      this.setState({
+        indicator: newIndicator
+      })
+    }
+  }
+
   render() {
     const data = [
       EthereumTokens.getTokenByName('AirSwap'),
@@ -216,6 +236,7 @@ class Markets extends React.Component {
                                 data={this.state.ohlcData}
                                 token1={this.state.selectedToken1}
                                 token2={this.state.selectedToken2}
+                                indicator={this.state.indicator}
                               />;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
@@ -235,6 +256,12 @@ class Markets extends React.Component {
       }
       label="Show transactions as candlesticks"
     /> : null;
+
+    var menuElement = (viewElement &&
+                       this.state.viewCandlestick) ? <OptionsMenu 
+      indicator={this.state.indicator}
+      toggleIndicator={this.toggleIndicator}
+      /> : null;
 
     return (
       <Auxilary>
@@ -268,6 +295,9 @@ class Markets extends React.Component {
             </div>
             <div className={styles.SwitchContainer}>
               {switchElement}
+            </div>
+            <div className={styles.MenuContainer}>
+              {menuElement}
             </div>
             <div>{statusMessageElement}</div>
             <div>{spinnerElement}</div>
