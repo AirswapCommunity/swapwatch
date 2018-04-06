@@ -205,7 +205,7 @@ class CandlestickChart extends Component {
           <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
           <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
 
-          <OHLCTooltip origin={[-40, 0]} ohlcFormat={numberFormat} />
+          <OHLCTooltip className={styles.OHLCTooltip} origin={[-40, 0]} ohlcFormat={numberFormat} />
           <HoverTooltip 
             yAccessor={ema50.accessor()}
             tooltipContent = {tooltipContent([])}
@@ -282,8 +282,8 @@ function tooltipContent(ys) {
       x: dateFormat(xAccessor(currentItem)),
       y: [
         {
-          label: "Price",
-          value: currentItem.close && numberFormat(currentItem.close)
+          label: "Open",
+          value: currentItem.open && numberFormat(currentItem.open)
         },
         {
           label: "High",
@@ -292,7 +292,16 @@ function tooltipContent(ys) {
         {
           label: "Low",
           value: currentItem.low && numberFormat(currentItem.low)
+        },
+        {
+          label: "Close",
+          value: currentItem.close && numberFormat(currentItem.close)
+        },
+        {
+          label: "Volume",
+          value: currentItem.volume && format('.0f')(currentItem.volume)
         }
+
       ]
         .concat(
           ys.map(each => ({

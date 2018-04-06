@@ -148,12 +148,9 @@ function drawOnCanvas(ctx, props, context, pointer, height) {
 
   ctx.translate(originX, originY);
 
-  const { x, y, content, centerX, pointWidth, bgSize } = pointer;
+  const { x, y, content, bgSize } = pointer;
 
   ctx.fillStyle = hexToRGBA(bgFill, bgOpacity);
-  // ctx.beginPath();
-  // ctx.rect(centerX - pointWidth / 2, 0, pointWidth, height);
-  // ctx.fill();
 
   ctx.translate(x, y);
   backgroundShapeCanvas(props, bgSize, ctx);
@@ -226,7 +223,7 @@ function calculateTooltipSize({ fontFamily, fontSize, fontFill }, content, ctx) 
   });
 
   const { width, height } = content.y
-    .map(({ label, value }) => measureText(`${label} ${value}`))
+    .map(({ label, value }) => measureText(`${label}  ${value}`))
     // Sum all y and x sizes (begin with x label size)
     .reduce((res, size) => sumSizes(res, size), measureText(String(content.x)))
   ;
