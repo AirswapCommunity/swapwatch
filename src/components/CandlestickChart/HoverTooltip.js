@@ -176,6 +176,7 @@ function tooltipCanvas({ fontFamily, fontSize, fontFill, token1, token2 },
   ctx.font = `${fontSize}px ${fontFamily}`;
   ctx.textAlign = "left";
   ctx.fillStyle = fontFill;
+  ctx.strokeStyle = '#FFFFFF';
   let imgToken1 = new Image();
   let imgToken2 = new Image();
   imgToken1.src = `/tokens/${token1.logo}`;
@@ -189,21 +190,29 @@ function tooltipCanvas({ fontFamily, fontSize, fontFill, token1, token2 },
 
   ctx.fillText('in', X + 28 + (imgSpacing-widthIn)/2, Y + (28+fontSize)/2);
 
-
-  const startY = Y + fontSize * 0.25; // margin at top
-  // ctx.fillText(content.x, X, startY);
+  const upperLineHeight = Y + 28 + 7
+  ctx.moveTo(X, upperLineHeight);
+  ctx.lineTo(bgSize.width-X, upperLineHeight);
+  ctx.stroke();
+  const startY = Y + upperLineHeight + 7; // margin at top
 
   for (let i = 0; i < content.y.length; i++) {
     const y = content.y[i];
-    const textY = startY + 40 + (fontSize * i);
+    const textY = startY + (fontSize * i);
     const text_width = ctx.measureText(y.value).width
     ctx.fillText(y.label, X, textY);
     ctx.fillText(y.value, bgSize.width - X - text_width , textY);
   }
+
+  const lowerLineHeight = startY + fontSize * (content.y.length-1) + 6;
+  ctx.moveTo(X, lowerLineHeight);
+  ctx.lineTo(bgSize.width-X, lowerLineHeight);
+  ctx.stroke();
+
   const x = content.x;
-  const textY = startY + 40 + (fontSize * content.y.length);
+  const textY = lowerLineHeight + fontSize + 1;
   const text_width = ctx.measureText(x).width
-  ctx.fillText(x, (bgSize.width - text_width)/2  , textY);
+  ctx.fillText(x, (bgSize.width - text_width)/2, textY);
 }
 
 
@@ -230,7 +239,7 @@ function calculateTooltipSize({ fontFamily, fontSize, fontFill }, content, ctx) 
 
   return {
     width: width + 2 * X,
-    height: height + 2 * Y + 28
+    height: height + 2 * Y + 42 
   };
 }
 

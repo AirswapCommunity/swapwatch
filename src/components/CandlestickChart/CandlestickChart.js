@@ -45,7 +45,7 @@ const bbStroke = {
 
 const bbFill = '#008eff'//"#4682B4";
 const dateFormat = timeFormat("%Y-%m-%d");
-const numberFormat = format(".5f");
+const numberFormat = format(".4s");
 class CandlestickChart extends Component {
 
   constructor(props) {
@@ -88,7 +88,6 @@ class CandlestickChart extends Component {
     if (!this.props.data) {
       return null;
     }
-
     const ema20 = ema()
       .options({
         windowSize: 20, // optional will default to 10
@@ -205,10 +204,10 @@ class CandlestickChart extends Component {
           <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
           <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
 
-          <OHLCTooltip className={styles.OHLCTooltip} origin={[-40, 0]} ohlcFormat={numberFormat} />
+          <OHLCTooltip origin={[-40, 0]} ohlcFormat={numberFormat} />
           <HoverTooltip 
             yAccessor={ema50.accessor()}
-            tooltipContent = {tooltipContent([])}
+            tooltipContent = {tooltipContent()}
             fontSize={15}
             token1={this.props.token1}
             token2={this.props.token2}
@@ -244,9 +243,9 @@ class CandlestickChart extends Component {
           <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
 
           <EdgeIndicator itemType="first" orient="left" edgeAt="left"
-            yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F" />
+            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
           <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-            yAccessor={d => d.volume} displayFormat={format(".4s")} fill="#0F0F0F" />
+            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
         </Chart>
         <CrossHairCursor />
         
@@ -276,7 +275,7 @@ CandlestickChart.defaultProps = {
 };
 CandlestickChart = fitWidth(CandlestickChart);
 
-function tooltipContent(ys) {
+function tooltipContent() {
   return ({ currentItem, xAccessor }) => {
     return {
       x: dateFormat(xAccessor(currentItem)),
@@ -299,18 +298,10 @@ function tooltipContent(ys) {
         },
         {
           label: "Volume",
-          value: currentItem.volume && format('.0f')(currentItem.volume)
+          value: currentItem.volume && numberFormat(currentItem.volume)
         }
 
-      ]
-        .concat(
-          ys.map(each => ({
-            label: each.label,
-            value: each.value(currentItem),
-            stroke: each.stroke
-          }))
-        )
-        .filter(line => line.value)
+      ].filter(line => line.value)
     };
   };
 }
