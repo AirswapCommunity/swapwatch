@@ -146,20 +146,55 @@ class CandlestickChart extends Component {
     if (height - 60 < 0) {
       height = 60;
     }
+    
     var bollingerBandElement = this.props.indicator.BollingerBand ? (<BollingerSeries 
       yAccessor={d => d.bb}
       stroke={bbStroke}
       fill={bbFill} />) : null;
+    
     var emaElements = this.props.indicator.EMA ? (<span>
       <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
       <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
       <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
       <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
     </span>) : null;
+    
     var smaElements = this.props.indicator.SMA ? (<span>
       <LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
       <CurrentCoordinate yAccessor={sma20.accessor()} fill={sma20.stroke()} />
     </span>) : null;
+    
+    var volumeElement = this.props.indicator.Volume ? (<Chart id={2}
+          yExtents={[d => d.volume, smaVolume50.accessor()]}
+          height={150} origin={(w, h) => [0, h - 150]}
+        >
+          <YAxis
+            axisAt="left"
+            orient="left"
+            ticks={5}
+            tickFormat={format(".2s")}
+          />
+
+          <MouseCoordinateY
+            at="left"
+            orient="left"
+            displayFormat={format(".4s")}
+          />
+
+          <BarSeries
+            yAccessor={d => d.volume}
+            fill={d => (d.close > d.open ? "#6BA583" : "#FF0000")}
+          />
+          <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()} />
+          <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
+          <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
+
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
+        </Chart>) : null;
+
     return (
       <ChartCanvas height={height}
         ratio={this.props.ratio}
@@ -207,38 +242,8 @@ class CandlestickChart extends Component {
           <EdgeIndicator itemType="last" orient="right" edgeAt="right"
             yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} displayFormat={numberFormat}/>
         </Chart>
-        <Chart id={2}
-          yExtents={[d => d.volume, smaVolume50.accessor()]}
-          height={150} origin={(w, h) => [0, h - 150]}
-        >
-          <YAxis
-            axisAt="left"
-            orient="left"
-            ticks={5}
-            tickFormat={format(".2s")}
-          />
-
-          <MouseCoordinateY
-            at="left"
-            orient="left"
-            displayFormat={format(".4s")}
-          />
-
-          <BarSeries
-            yAccessor={d => d.volume}
-            fill={d => (d.close > d.open ? "#6BA583" : "#FF0000")}
-          />
-          <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()} />
-          <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
-          <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
-
-          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
-            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
-          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
-            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
-        </Chart>
         <CrossHairCursor />
-        
+        {volumeElement}
       </ChartCanvas>
     )
   }

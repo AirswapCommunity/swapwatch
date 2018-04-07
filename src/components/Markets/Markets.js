@@ -32,6 +32,7 @@ class Markets extends React.Component {
         'BollingerBand': true,
         'EMA': true,
         'SMA': true,
+        'Volume': true,
       }
     }
     this.toggleIndicator = this.toggleIndicator.bind(this);
