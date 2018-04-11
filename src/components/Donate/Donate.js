@@ -12,7 +12,8 @@ import Card, { CardActions, CardContent } from 'material-ui/Card';
 import * as Web3 from 'web3';
 import * as d3 from "d3";
 
-var guestbookAddress = '0xdc20B1256E2def911B1B6Db7dc98F62878dCAFD2';
+var guestbookAddress = '0x75AA66B8405DCEF0E935dE1c1627196B704A0e91';
+// Ropsten version: '0xdc20B1256E2def911B1B6Db7dc98F62878dCAFD2';
 var guestbookABI = [{"constant":true,"inputs":[],"name":"minimum_donation","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_new_storage","type":"address"}],"name":"changeDonationWallet","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"running_id","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[],"name":"destroy","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_new_owner","type":"address"}],"name":"changeOwner","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"entries","outputs":[{"name":"owner","type":"address"},{"name":"alias","type":"string"},{"name":"timestamp","type":"uint256"},{"name":"blocknumber","type":"uint256"},{"name":"donation","type":"uint256"},{"name":"message","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_minDonation","type":"uint256"}],"name":"changeMinimumDonation","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"entry_id","type":"uint256"}],"name":"getEntry","outputs":[{"name":"","type":"address"},{"name":"","type":"string"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"uint256"},{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"_alias","type":"string"},{"name":"_message","type":"string"}],"name":"createEntry","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"constant":true,"inputs":[],"name":"donationWallet","outputs":[{"name":"","type":"address"}],"payable":false,"stateMutability":"view","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"}];
 
 class Donate extends React.Component {
@@ -20,7 +21,6 @@ class Donate extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      'containerWidth': 100,
       'web3': null,
       'isConnected': false,
       'Network': null,
@@ -32,6 +32,7 @@ class Donate extends React.Component {
       'message': "",
       'donation': "0.05",
       'idxMessage': null,
+      'loadedGuestbook': false
     }
 
     this.donate = this.donate.bind(this);
@@ -40,8 +41,6 @@ class Donate extends React.Component {
   }
 
   componentWillMount() {
-    window.addEventListener('resize', this.handleWindowSizeChange);
-
     //connect to web3
     let web3;
     if(window.web3) { // Metamask
@@ -60,7 +59,7 @@ class Donate extends React.Component {
         }
       })
     } else { // Infura
-      web3 = new Web3('https://ropsten.infura.io/506w9CbDQR8fULSDR7H0');
+      web3 = new Web3('https://mainnet.infura.io/506w9CbDQR8fULSDR7H0');
     }
     web3.eth.net.isListening()
     .then(connected => {
@@ -78,7 +77,7 @@ class Donate extends React.Component {
             default: connectedToNetwork = null;
           }
           this.setState({Network: connectedToNetwork})
-          if(connectedToNetwork === 'Ropsten') {
+          if(connectedToNetwork === 'Mainnet') {
             this.loadGuestbookContract();
             this.interval = setInterval(this.refreshData, 5000);
           }
@@ -87,26 +86,13 @@ class Donate extends React.Component {
     })  
   }
 
-  componentDidMount() {
-    this.handleWindowSizeChange();
-  }
-
-
   componentWillUnmount() {
-    window.removeEventListener('resize', this.handleWindowSizeChange);
     clearInterval(this.interval);
   }
 
   setRef = (el) => {
     this.container = el;
   }
-
-  handleWindowSizeChange = () => {
-    var width = ReactDOM.findDOMNode(this.container).clientWidth;
-    if (width > 0) {
-      this.setState({ containerWidth: width })
-    }
-  };
 
   refreshData() {
     this.state.guestbookContract.methods.running_id().call()
@@ -146,6 +132,7 @@ class Donate extends React.Component {
       this.setState({
         guestbookMessages: messages.concat(this.state.guestbookMessages),
         idxMessage: 0,
+        loadedGuestbook: true
       })
     })
   }
@@ -187,17 +174,12 @@ class Donate extends React.Component {
   }
 
   getGuestbook() {
-    const isMobile = this.state.containerWidth <= 500;
-    var guestbookReadElementStyle = isMobile ? {width:'100%'} : {width:'49%'};
-
     if(!this.state.isConnected){
       return (<p className={cssStyles.failedMessage}>Connecting to Ethereum via Infura seems to have failed. You're supposed to see our guestbook here. Check if your internet provider is blocking or come into contact with us, so we can trace this down.</p>)
     }
     else {
       let guestbookWriteElement;
-      if(isMobile) { // window width too small, drop it
-        guestbookWriteElement = null;
-      } else if (!window.web3) { // in Infura
+      if (!window.web3) { // in Infura
         guestbookWriteElement = (
           <div>
             <a className={cssStyles.a} href='http://metamask.io' target="_blank" rel="noopener noreferrer">
@@ -296,13 +278,17 @@ class Donate extends React.Component {
             <div style={{marginTop:'70px'}}>No connection to Ethereum. Can't show guestbook.</div>
           )
         } else {
-          if(window.web3 && this.state.Network !== "Ropsten") {
+          if(window.web3 && this.state.Network !== "Mainnet") {
             guestbookMessagesElement = (
-             <div style={{marginTop:'70px'}}>The guestbook lives on Ropsten at the moment. Set Metamask to Ropsten to see it.</div>
+             <div style={{marginTop:'70px'}}>You are not connected to the mainnet but {this.state.Network}. Set Metamask to Mainnet to see the guestbook.</div>
+            )
+          } else if (!this.state.loadedGuestbook) {
+            guestbookMessagesElement = (
+              <div style={{marginTop:'70px'}}>Loading Guestbook...</div>
             )
           } else {
             guestbookMessagesElement = (
-              <div style={{marginTop:'70px'}}>Loading Guestbook...</div>
+              <div style={{marginTop:'70px'}}>There are no donations in the guestbook yet.</div>
             )
           }
         }
@@ -312,7 +298,7 @@ class Donate extends React.Component {
           <div className={cssStyles.GuestbookEnterMessage}>
             {guestbookWriteElement}
           </div>
-          <div className={cssStyles.GuestbookReadMessages} style={guestbookReadElementStyle}>
+          <div className={cssStyles.GuestbookReadMessages}>
             {guestbookMessagesElement}
           </div>
         </div>
