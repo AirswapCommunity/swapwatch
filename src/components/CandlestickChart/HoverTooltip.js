@@ -12,6 +12,7 @@ class HoverTooltip extends Component {
     this.drawOnCanvas = this.drawOnCanvas.bind(this);
   }
   drawOnCanvas(ctx, moreProps) {
+   
     const pointer = helper(this.props, moreProps, ctx);
     const { height } = moreProps;
 
@@ -86,15 +87,15 @@ HoverTooltip.defaultProps = {
   tooltipSVG: tooltipSVG,
   tooltipCanvas: tooltipCanvas,
   origin: origin,
-  fill: "#000000",
-  bgFill: "#000000",
-  bgOpacity: 0.6,
-  stroke: "#000000",
+  fill: "#2D3E50",
+  bgFill: "#2D35E0",
+  bgOpacity: 0.85,
+  stroke: "#576573",
   fontFill: "#FFFFFF",
-  opacity: 0.8,
+  opacity: 0.85,
   backgroundShapeSVG: backgroundShapeSVG,
   backgroundShapeCanvas: backgroundShapeCanvas,
-  fontFamily: "Helvetica Neue, Helvetica, Arial, sans-serif",
+  fontFamily: "Open Sans, Helvetica, Arial, sans-serif",
   fontSize: 12,
 };
 
@@ -104,7 +105,7 @@ const Y = 10;
 
 
 /* eslint-disable react/prop-types */
-function backgroundShapeSVG({ fill, stroke, opacity }, { height, width }) {
+function backgroundShapeSVG({ fill, stroke, opacity }, { height, width }) { 
   return <rect
     height={height}
     width={width}
@@ -164,7 +165,7 @@ function backgroundShapeCanvas(props, { width, height }, ctx) {
   const { fill, stroke, opacity } = props;
 
   ctx.fillStyle = hexToRGBA(fill, opacity);
-  ctx.strokeStyle = stroke;
+  ctx.strokeStyle = hexToRGBA(stroke);
   ctx.beginPath();
   ctx.rect(0, 0, width, height);
   ctx.fill();
@@ -173,10 +174,10 @@ function backgroundShapeCanvas(props, { width, height }, ctx) {
 
 function tooltipCanvas({ fontFamily, fontSize, fontFill, token1, token2 },
                          content, ctx, bgSize) {
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.font = `bold ${fontSize}px ${fontFamily}`;
   ctx.textAlign = "left";
   ctx.fillStyle = fontFill;
-  ctx.strokeStyle = '#FFFFFF';
+  ctx.strokeStyle = '#202020';
   let imgToken1 = new Image();
   let imgToken2 = new Image();
   imgToken1.src = `/tokens/${token1.logo}`;
@@ -191,28 +192,32 @@ function tooltipCanvas({ fontFamily, fontSize, fontFill, token1, token2 },
   ctx.fillText('in', X + 28 + (imgSpacing-widthIn)/2, Y + (28+fontSize)/2);
 
   const upperLineHeight = Y + 28 + 7
+  ctx.beginPath();
   ctx.moveTo(X, upperLineHeight);
   ctx.lineTo(bgSize.width-X, upperLineHeight);
   ctx.stroke();
-  const startY = Y + upperLineHeight + 7; // margin at top
+  let startY = Y + upperLineHeight + 7; // margin at top
 
   for (let i = 0; i < content.y.length; i++) {
+    startY += i > 0 ? (fontSize + 5) : 0;
     const y = content.y[i];
-    const textY = startY + (fontSize * i);
     const text_width = ctx.measureText(y.value).width
-    ctx.fillText(y.label, X, textY);
-    ctx.fillText(y.value, bgSize.width - X - text_width , textY);
+    ctx.fillText(y.label, X, startY);
+    ctx.fillText(y.value, bgSize.width - X - text_width , startY);
   }
 
-  const lowerLineHeight = startY + fontSize * (content.y.length-1) + 6;
-  ctx.moveTo(X, lowerLineHeight);
-  ctx.lineTo(bgSize.width-X, lowerLineHeight);
+  // const lowerLineHeight = startY + fontSize * (content.y.length-1) + 6;
+  startY += 6;
+  ctx.beginPath();
+  ctx.moveTo(X, startY);
+  ctx.lineTo(bgSize.width-X, startY);
   ctx.stroke();
 
   const x = content.x;
-  const textY = lowerLineHeight + fontSize + 1;
+  // const textY = lowerLineHeight + fontSize + 1;
+  startY += fontSize + 2;
   const text_width = ctx.measureText(x).width
-  ctx.fillText(x, (bgSize.width - text_width)/2, textY);
+  ctx.fillText(x, (bgSize.width - text_width)/2, startY);
 }
 
 
@@ -222,13 +227,13 @@ function calculateTooltipSize({ fontFamily, fontSize, fontFill }, content, ctx) 
     ctx = canvas.getContext("2d");
   }
 
-  ctx.font = `${fontSize}px ${fontFamily}`;
+  ctx.font = `bold ${fontSize}px ${fontFamily}`;
   ctx.fillStyle = fontFill;
   ctx.textAlign = "left";
 
   const measureText = str => ({
     width: ctx.measureText(str).width,
-    height: fontSize,
+    height: fontSize + 5,
   });
 
   const { width, height } = content.y
