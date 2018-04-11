@@ -98,15 +98,20 @@ class CandlestickChart extends Component {
       .accessor(d => d.ema20) // Required, if not provided, log an error during calculation
       .stroke("blue"); // Optional
 
-    const sma20 = sma()
-      .options({ windowSize: 20 })
-      .merge((d, c) => { d.sma20 = c; })
-      .accessor(d => d.sma20);
-
     const ema50 = ema()
       .options({ windowSize: 50 })
       .merge((d, c) => { d.ema50 = c; })
-      .accessor(d => d.ema50);
+      .accessor(d => d.ema50)
+      .stroke("#A54FC7");
+
+    const sma20 = sma()
+      .options({ windowSize: 20 })
+      .merge((d, c) => { d.sma20 = c; })
+      .accessor(d => d.sma20)
+      .stroke('#000000')
+      .fill('#000000')
+
+
 
     const smaVolume50 = sma()
       .options({ windowSize: 20, sourcePath: "volume" })
@@ -157,11 +162,6 @@ class CandlestickChart extends Component {
       <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
       <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
       <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
-    </span>) : null;
-    
-    var smaElements = this.props.indicator.SMA ? (<span>
-      <LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
-      <CurrentCoordinate yAccessor={sma20.accessor()} fill={sma20.stroke()} />
     </span>) : null;
     
     var volumeElement = this.props.indicator.Volume ? (<Chart id={2}
@@ -227,7 +227,6 @@ class CandlestickChart extends Component {
           {bollingerBandElement}
 
           {emaElements}
-          {smaElements}
 
           <OHLCTooltip origin={[-40, 0]} ohlcFormat={numberFormat} />
           <HoverTooltip 
