@@ -4,6 +4,7 @@ import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
 import CandlestickChart from "../CandlestickChart/CandlestickChart";
+import MindmapPlot from '../MindmapPlot/MindmapPlot';
 import TradingDataTable from "../TradingDataTable/TradingDataTable";
 import { timeParse } from "d3-time-format";
 
@@ -246,7 +247,10 @@ class Markets extends React.Component {
                                 token2={this.state.selectedToken2}
                                 indicator={this.state.indicator}
                               />;
-    var mindmapElement = null;
+    var mindmapElement = <MindmapPlot
+                          txList={this.state.txList}
+                          token1={this.state.selectedToken1}
+                          token2={this.state.selectedToken2}/>;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
 
     var viewElement;

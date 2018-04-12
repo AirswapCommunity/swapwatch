@@ -1,0 +1,36 @@
+:global(.-header) {
+  background-color: #008eff;
+  color: white;   
+  /* font-weight: bold; */
+}
+
+:local(.PageContainer) {
+  composes: Container from global;
+  overflow: hidden;
+}
+
+.MindmapContainer {
+  text-align: center;
+  width: 100%;
+  height: 95%;
+}
+
+.Mindmap {
+  text-align: left;
+  width: 100%;
+  height: 100%;
+}
+
+#spinner {
+  margin: auto;
+}
+
+#messageText {
+  margin:auto;
+  font-size: 1.5em;
+  margin-top: 100px;
+}
+#progressText {
+  margin:auto;
+  font-size: 1.5em;
+}
