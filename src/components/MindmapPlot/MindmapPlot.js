@@ -217,7 +217,7 @@ class MindmapPlot extends Component {
   createMindmap = (nodeList, edgeList) => {
     let nodes = new vis.DataSet(this.state.nodes);
     let edges = new vis.DataSet(this.state.edges);
-    
+
     var graph = {
       nodes: nodes,
       edges: edges

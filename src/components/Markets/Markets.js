@@ -60,7 +60,7 @@ class Markets extends React.Component {
         "makerAddress": this.removeLeadingZeros(txData.topics['1']),
         "makerAmount": parseInt(data.slice(0, 2 + 64 * 1), 16),
         "makerToken": this.removeLeadingZeros(txData.topics['2']),
-        "takerAdress": this.removeLeadingZeros('0x' + data.slice(2 + 64 * 1, 2 + 64 * 2)),
+        "takerAddress": this.removeLeadingZeros('0x' + data.slice(2 + 64 * 1, 2 + 64 * 2)),
         "takerAmount": parseInt('0x' + data.slice(2 + 64 * 2, 2 + 64 * 3), 16),
         "takerToken": this.removeLeadingZeros(txData.topics['3']),
         "expiration": '0x' + data.slice(2 + 64 * 3, 2 + 64 * 4),
@@ -250,7 +250,8 @@ class Markets extends React.Component {
     var mindmapElement = <MindmapPlot
                           txList={this.state.txList}
                           token1={this.state.selectedToken1}
-                          token2={this.state.selectedToken2}/>;
+                          token2={this.state.selectedToken2}
+                         />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
 
     var viewElement;
