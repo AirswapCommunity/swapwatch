@@ -10,10 +10,8 @@ import { timeParse } from "d3-time-format";
 import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
-import Switch from 'material-ui/Switch';
-import { FormControlLabel } from 'material-ui/Form';
-
 import OptionsMenu from './OptionsMenu';
+import TabsBar from './TabsBar';
 
 class Markets extends React.Component {
 
@@ -26,16 +24,16 @@ class Markets extends React.Component {
       'ohlcData': null, // Data transformed to OHLC format
       'selectedToken1': null, // currently selected token 1
       'selectedToken2': null, // currently selected token 2
-      'viewCandlestick': true, // Display Candlestick or Display Table
+      'viewElement': 'Candlestick', // which Element to display
       'statusMessage': null, // status message shown at top
       'indicator': {
         'BollingerBand': true,
         'EMA': true,
-        'SMA': true,
         'Volume': true,
       }
     }
     this.toggleIndicator = this.toggleIndicator.bind(this);
+    this.toggleViewElement = this.toggleViewElement.bind(this);
 
 
   }
@@ -227,42 +225,56 @@ class Markets extends React.Component {
     }
   }
 
+  toggleViewElement(state) {
+    this.setState({
+      viewElement: state
+    })
+  }
+
   render() {
     const data = [
       EthereumTokens.getTokenByName('AirSwap'),
       EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
 
-    var txTableElement = <TradingDataTable txList={this.state.txList} />;
+    var tabsBarElement = this.state.txList ? <TabsBar 
+      toggleState={this.toggleViewElement}
+      /> : null;
+    
     var candlestickElement =  <CandlestickChart 
                                 data={this.state.ohlcData}
                                 token1={this.state.selectedToken1}
                                 token2={this.state.selectedToken2}
                                 indicator={this.state.indicator}
                               />;
+    var mindmapElement = null;
+    var txTableElement = <TradingDataTable txList={this.state.txList} />;
 
-    var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
     var viewElement;
     if (!this.state.txList) viewElement = null;
-    else viewElement = this.state.viewCandlestick ? candlestickElement : txTableElement;
-
-    var switchElement = this.state.txList ? <FormControlLabel
-      control={
-        <Switch
-          checked={this.state.viewCandlestick}
-          onChange={this.handleViewChange('viewCandlestick')}
-          value="viewCandlestick"
-          color="primary"
-        />
+    else {
+      switch(this.state.viewElement) {
+        case 'Candlestick':
+          viewElement = candlestickElement;
+          break;
+        case 'Mindmap':
+          viewElement = mindmapElement;
+          break;
+        case 'Table':
+          viewElement = txTableElement;
+          break;
+        default:
+          viewElement = null;
       }
-      label="Show transactions as candlesticks"
-    /> : null;
+    }
 
     var menuElement = (viewElement &&
-                       this.state.viewCandlestick) ? <OptionsMenu 
+                      this.state.viewElement === 'Candlestick') ? <OptionsMenu 
       indicator={this.state.indicator}
       toggleIndicator={this.toggleIndicator}
       /> : null;
+
+    var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
+    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
 
     return (
       <Auxilary>
@@ -294,8 +306,8 @@ class Markets extends React.Component {
                 </AutoCompleteInput>
               </div>
             </div>
-            <div className={styles.SwitchContainer}>
-              {switchElement}
+            <div className={styles.TabsBarContainer}>
+              {tabsBarElement}
             </div>
             <div className={styles.MenuContainer}>
               {menuElement}
