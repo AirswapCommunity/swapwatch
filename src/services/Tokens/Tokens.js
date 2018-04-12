@@ -281,8 +281,26 @@ const EthereumTokens = [
     },
 ]
 
+let EthereumTokensSN = EthereumTokens.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+});
+
 var getTokenByName = (name) => {
-    return EthereumTokens.find(token => token.name === name);
+    let l = 0;
+    let h = EthereumTokensSN.length - 1;
+    while(l <= h) {
+        let m = Math.floor((l + h) / 2);
+        let mName = EthereumTokensSN[m].name;
+        let c = name.toLocaleLowerCase().localeCompare(mName.toLocaleLowerCase());
+        if(c == 0) {
+            return EthereumTokensSN[m];
+        } else if(c > 0) {
+            l = m + 1;
+        } else {
+            h = m - 1;
+        }
+    }
+    return undefined;
 }
 
 var getTokenByAddress = (address) => {
