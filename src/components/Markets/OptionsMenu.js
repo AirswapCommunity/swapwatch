@@ -36,7 +36,7 @@ class OptionsMenu extends React.Component {
           aria-haspopup="true"
           onClick={this.handleClick}
         >
-          <i className="fa fa-bars"></i>
+          <i className="fa fa-bars" style={{color:'black', fontSize:'0.75em'}}></i>
         </IconButton>
         <Menu
           id="simple-menu"
