@@ -281,12 +281,48 @@ const EthereumTokens = [
     },
 ]
 
+let EthereumTokensSN = EthereumTokens.sort((a, b) => {
+    return a.name.localeCompare(b.name);
+});
+
 var getTokenByName = (name) => {
-    return EthereumTokens.find(token => token.name === name);
+    let l = 0;
+    let h = EthereumTokensSN.length - 1;
+    while(l <= h) {
+        let m = Math.floor((l + h) / 2);
+        let mName = EthereumTokensSN[m].name;
+        let c = name.toLocaleLowerCase().localeCompare(mName.toLocaleLowerCase());
+        if(c == 0) {
+            return EthereumTokensSN[m];
+        } else if(c > 0) {
+            l = m + 1;
+        } else {
+            h = m - 1;
+        }
+    }
+    return undefined;
 }
 
+let EthereumTokensSA = EthereumTokens.sort((a, b) => {
+    return a.address.localeCompare(b.address);
+});
+
 var getTokenByAddress = (address) => {
-    return EthereumTokens.find(token => token.address === address);
+    let l = 0;
+    let h = EthereumTokensSA.length - 1;
+    while(l <= h) {
+        let m = Math.floor((l + h) / 2);
+        let mAddr = EthereumTokensSA[m].address;
+        let c = address.toLocaleLowerCase().localeCompare(mAddr.toLocaleLowerCase());
+        if(c == 0) {
+            return EthereumTokensSA[m];
+        } else if(c > 0) {
+            l = m + 1;
+        } else {
+            h = m - 1;
+        }
+    }
+    return undefined;
 }
 
 module.exports.EthereumTokens = {
