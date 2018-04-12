@@ -22,7 +22,8 @@ import {
   CrossHairCursor,
   CurrentCoordinate,
   MouseCoordinateX,
-  MouseCoordinateY
+  MouseCoordinateY,
+  EdgeIndicator
 } from "react-stockcharts/lib/coordinates";
 
 import { discontinuousTimeScaleProvider } from "react-stockcharts/lib/scale";
@@ -31,17 +32,20 @@ import { ema, sma, bollingerBand } from "react-stockcharts/lib/indicator";
 import { fitWidth } from "react-stockcharts/lib/helper";
 import { last } from "react-stockcharts/lib/utils";
 
+import HoverTooltip from './HoverTooltip';
+
 const styles = theme => ({
 });
 
 const bbStroke = {
-  top: "#964B00",
+  top: "#008eff",
   middle: "#000000",
-  bottom: "#964B00",
+  bottom: "#008eff",
 };
 
-const bbFill = "#4682B4";
-
+const bbFill = '#008eff'//"#4682B4";
+const dateFormat = timeFormat("%Y-%m-%d");
+const numberFormat = format(".4s");
 class CandlestickChart extends Component {
 
   constructor(props) {
@@ -73,8 +77,10 @@ class CandlestickChart extends Component {
     var height = ReactDOM.findDOMNode(this.container).clientHeight;
     var width = ReactDOM.findDOMNode(this.container).clientWidth;
     if (width > 0) {
-      this.setState({ containerHeight: height,
-                      containerWidth: width })
+      this.setState({
+        containerHeight: height,
+        containerWidth: width
+      })
     }
   };
 
@@ -82,9 +88,6 @@ class CandlestickChart extends Component {
     if (!this.props.data) {
       return null;
     }
-
-    // let isMobile = this.state.containerWidth <= 500;
-
     const ema20 = ema()
       .options({
         windowSize: 20, // optional will default to 10
@@ -95,15 +98,20 @@ class CandlestickChart extends Component {
       .accessor(d => d.ema20) // Required, if not provided, log an error during calculation
       .stroke("blue"); // Optional
 
-    const sma20 = sma()
-      .options({ windowSize: 20 })
-      .merge((d, c) => { d.sma20 = c; })
-      .accessor(d => d.sma20);
-
     const ema50 = ema()
       .options({ windowSize: 50 })
       .merge((d, c) => { d.ema50 = c; })
-      .accessor(d => d.ema50);
+      .accessor(d => d.ema50)
+      .stroke("#A54FC7");
+
+    const sma20 = sma()
+      .options({ windowSize: 20 })
+      .merge((d, c) => { d.sma20 = c; })
+      .accessor(d => d.sma20)
+      .stroke('#000000')
+      .fill('#000000')
+
+
 
     const smaVolume50 = sma()
       .options({ windowSize: 20, sourcePath: "volume" })
@@ -125,9 +133,9 @@ class CandlestickChart extends Component {
       xAccessor,
       displayXAccessor,
     } = xScaleProvider(calculatedData);
-    
+
     const start = xAccessor(last(data));
-    const end = xAccessor(data[Math.max(0, data.length - 150)]);
+    const end = xAccessor(data[Math.max(0, data.length - 30)]);
     const xExtents = [start, end];
 
     var bottomOffset = 65;
@@ -143,50 +151,20 @@ class CandlestickChart extends Component {
     if (height - 60 < 0) {
       height = 60;
     }
-
-    return (
-      <ChartCanvas height={height}
-        ratio={this.props.ratio}
-        width={this.props.width}
-        margin={{ left: 50, right: 50, top: 10, bottom: 50 }}
-        type={this.props.type}
-        seriesName="AirSwapDEXCandlestick"
-        data={data}
-        xScale={xScale}
-        xAccessor={xAccessor}
-        displayXAccessor={displayXAccessor}
-        xExtents={xExtents}
-      >
-        <Chart id={1}
-          yExtents={[d => [d.high, d.low], sma20.accessor(), ema20.accessor(), ema50.accessor(), bb.accessor()]}
-          padding={{ top: 10, bottom: 100 }}
-        >
-          <XAxis axisAt="bottom" orient="bottom" ticks={6} />
-          <YAxis axisAt="right" orient="right" ticks={5} />
-          <MouseCoordinateX
-            at="bottom"
-            orient="bottom"
-            displayFormat={timeFormat("%Y-%m-%d")} />
-          <MouseCoordinateY
-            at="right"
-            orient="right"
-            displayFormat={format(".5f")}
-          />
-          <CandlestickSeries />
-          <BollingerSeries yAccessor={d => d.bb}
-            stroke={bbStroke}
-            fill={bbFill} />
-
-          <LineSeries yAccessor={sma20.accessor()} stroke={sma20.stroke()} />
-          <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
-          <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
-          <CurrentCoordinate yAccessor={sma20.accessor()} fill={sma20.stroke()} />
-          <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
-          <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
-
-          <OHLCTooltip origin={[-40, 0]} ohlcFormat={format(".5f")} />
-        </Chart>
-        <Chart id={2}
+    
+    var bollingerBandElement = this.props.indicator.BollingerBand ? (<BollingerSeries 
+      yAccessor={d => d.bb}
+      stroke={bbStroke}
+      fill={bbFill} />) : null;
+    
+    var emaElements = this.props.indicator.EMA ? (<span>
+      <LineSeries yAccessor={ema20.accessor()} stroke={ema20.stroke()} />
+      <LineSeries yAccessor={ema50.accessor()} stroke={ema50.stroke()} />
+      <CurrentCoordinate yAccessor={ema20.accessor()} fill={ema20.stroke()} />
+      <CurrentCoordinate yAccessor={ema50.accessor()} fill={ema50.stroke()} />
+    </span>) : null;
+    
+    var volumeElement = this.props.indicator.Volume ? (<Chart id={2}
           yExtents={[d => d.volume, smaVolume50.accessor()]}
           height={150} origin={(w, h) => [0, h - 150]}
         >
@@ -210,12 +188,64 @@ class CandlestickChart extends Component {
           <AreaSeries yAccessor={smaVolume50.accessor()} stroke={smaVolume50.stroke()} fill={smaVolume50.fill()} />
           <CurrentCoordinate yAccessor={smaVolume50.accessor()} fill={smaVolume50.stroke()} />
           <CurrentCoordinate yAccessor={d => d.volume} fill="#9B0A47" />
+
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={d => d.volume} displayFormat={numberFormat} fill="#0F0F0F" />
+        </Chart>) : null;
+
+    return (
+      <ChartCanvas height={height}
+        ratio={this.props.ratio}
+        width={this.props.width}
+        margin={{ left: 55, right: 55, top: 10, bottom: 50 }}
+        type={this.props.type}
+        seriesName="AirSwapDEXCandlestick"
+        data={data}
+        xScale={xScale}
+        xAccessor={xAccessor}
+        displayXAccessor={displayXAccessor}
+        xExtents={xExtents}
+      >
+        <Chart id={1}
+          yExtents={[d => [d.high, d.low], sma20.accessor(), ema20.accessor(), ema50.accessor(), bb.accessor()]}
+          padding={{ top: 10, bottom: 100 }}
+        >
+          <XAxis axisAt="bottom" orient="bottom" ticks={6} />
+          <YAxis axisAt="right" orient="right" ticks={5} />
+          <MouseCoordinateX
+            at="bottom"
+            orient="bottom"
+            displayFormat={timeFormat("%Y-%m-%d")} />
+          <MouseCoordinateY
+            at="right"
+            orient="right"
+            displayFormat={numberFormat}
+          />
+          <CandlestickSeries />
+          {bollingerBandElement}
+
+          {emaElements}
+
+          <OHLCTooltip origin={[-40, 0]} ohlcFormat={numberFormat} />
+          <HoverTooltip 
+            yAccessor={ema50.accessor()}
+            tooltipContent = {tooltipContent()}
+            fontSize={15}
+            token1={this.props.token1}
+            token2={this.props.token2}
+          />
+          <EdgeIndicator itemType="first" orient="left" edgeAt="left"
+            yAccessor={d => d.open} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} displayFormat={numberFormat}/>
+          <EdgeIndicator itemType="last" orient="right" edgeAt="right"
+            yAccessor={d => d.close} fill={d => d.close > d.open ? "#6BA583" : "#FF0000"} displayFormat={numberFormat}/>
         </Chart>
         <CrossHairCursor />
+        {volumeElement}
       </ChartCanvas>
     )
   }
-
   render() {
     var chart = (this.props.data && this.props.data.length > 0) ? (
       this.getCandlestickChart()) : null;
@@ -239,4 +269,41 @@ CandlestickChart.defaultProps = {
 };
 CandlestickChart = fitWidth(CandlestickChart);
 
+function tooltipContent() {
+  return ({ currentItem, xAccessor }) => {
+    return {
+      x: dateFormat(xAccessor(currentItem)),
+      y: [
+        {
+          label: "Open",
+          value: currentItem.open && numberFormat(currentItem.open)
+        },
+        {
+          label: "High",
+          value: currentItem.high && numberFormat(currentItem.high)
+        },
+        {
+          label: "Low",
+          value: currentItem.low && numberFormat(currentItem.low)
+        },
+        {
+          label: "Close",
+          value: currentItem.close && numberFormat(currentItem.close)
+        },
+        {
+          label: "Volume",
+          value: currentItem.volume && numberFormat(currentItem.volume)
+        }
+
+      ].filter(line => line.value)
+    };
+  };
+}
 export default withStyles(styles)(CandlestickChart);
+
+
+// ,
+//         {
+//           label: "",
+//           value: currentItem.date && dateFormat(currentItem.date)
+//         }

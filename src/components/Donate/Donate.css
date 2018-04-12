@@ -64,6 +64,16 @@
     margin: 10px;
     font-size: 0.85em;
   }
+
+}
+
+@media only screen and (max-width: 600px) {
+  .GuestbookEnterMessage {
+    display: none;
+  }
+  .GuestbookReadMessages {
+    width: 100%;
+  }
 }
 
 @media only screen and (min-width: 361px) {
@@ -75,4 +85,6 @@
   .p {
     margin: default;
   }
+
+
 }
