@@ -281,18 +281,29 @@ const EthereumTokens = [
     },
 ]
 
-let EthereumTokensSN = EthereumTokens.sort((a, b) => {
-    return a.name.localeCompare(b.name);
+let EthereumTokensSN = EthereumTokens.slice(0);
+
+EthereumTokensSN.sort((a, b) => {
+    let aLow = a.name.toLocaleLowerCase();
+    let bLow = b.name.toLocaleLowerCase();
+
+    return aLow < bLow ? -1 : aLow === bLow ? 0 : 1;
 });
 
 var getTokenByName = (name) => {
     let l = 0;
     let h = EthereumTokensSN.length - 1;
+    
+    let nameLow = name.toLocaleLowerCase();
+
     while(l <= h) {
         let m = Math.floor((l + h) / 2);
-        let mName = EthereumTokensSN[m].name;
-        let c = name.toLocaleLowerCase().localeCompare(mName.toLocaleLowerCase());
-        if(c == 0) {
+
+        let mName = EthereumTokensSN[m].name.toLocaleLowerCase();
+    
+        let c = nameLow < mName ? -1 : nameLow === mName ? 0 : 1;
+
+        if(c === 0) {
             return EthereumTokensSN[m];
         } else if(c > 0) {
             l = m + 1;
@@ -303,18 +314,26 @@ var getTokenByName = (name) => {
     return undefined;
 }
 
-let EthereumTokensSA = EthereumTokens.sort((a, b) => {
-    return a.address.localeCompare(b.address);
+let EthereumTokensSA = EthereumTokens.slice(0);
+
+EthereumTokensSA.sort((a, b) => {
+    let aLow = a.address.toLocaleLowerCase();
+    let bLow = b.address.toLocaleLowerCase();
+
+    return aLow < bLow ? -1 : aLow === bLow ? 0 : 1;
 });
 
 var getTokenByAddress = (address) => {
     let l = 0;
     let h = EthereumTokensSA.length - 1;
+
+    let addressLow = address.toLocaleLowerCase();
+
     while(l <= h) {
         let m = Math.floor((l + h) / 2);
-        let mAddr = EthereumTokensSA[m].address;
-        let c = address.toLocaleLowerCase().localeCompare(mAddr.toLocaleLowerCase());
-        if(c == 0) {
+        let mAddr = EthereumTokensSA[m].address.toLocaleLowerCase();
+        let c = addressLow < mAddr ? -1 : addressLow === mAddr ? 0 : 1;
+        if(c === 0) {
             return EthereumTokensSA[m];
         } else if(c > 0) {
             l = m + 1;
