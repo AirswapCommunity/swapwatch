@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from 'react-dom';
 import Auxilary from "../../hoc/Auxilary";
 import { withStyles } from 'material-ui/styles';
 import cssStyles from "./Donate.css";
