@@ -133,7 +133,6 @@ class TradingDataTable extends Component {
   }
 
   render() {
-    console.log('Rendering TradingDataTable');
     var table = (this.props.txList && this.props.txList.length > 0) ? (
       this.getTable()) : null;
 
