@@ -1,25 +1,24 @@
 language: node_js
 node_js:
-    - "node"
+- node
 cache: pip
 install:
-    - "npm i"
+- npm i
 script:
-    - "npm run build"
+- npm run build
 before_deploy:
-    - "pip install awscli"
+- pip install awscli
 deploy:
-    provider: s3
-    access_key_id: AKIAIUSVR6GUW4W5EUMQ
-    secret_access_key:
-        secure: X62+edw3VSf6xMNjg7IsBH67x/atLLA+VurEGc0JtwIM0UM+NUBrlFg2OJQpTUBUOgnirh4RH7tgj35XCjV/GhgAjE6/W3QvBYwpHCQyDaIuy9LtkJ9IrMuF8EaedbFS2Yu2TbeP/xmHZikkefMWVAKA0QhckPkOGJA0qEnpdHRhfow+3k6RWQ//W5dvMWBVms+hwAvleBxO9+Sg4IOLAkXRHQuhKr3mdoWTqeS5rlFP3SWqiHysOcXXcgY1p4QAgfLNzMhPueQEtGA8r8kWmYs4hx1GYWcCXD9Xlh36CaMbWVu0ZVAfcwRBiEBLRFSoktFaarpK/rz+smViOrk/cEcOW1is9v5KE+M9TXBIJ5xvFrGvE7VfFiNaMJOEtWjDbn9Rbdl42hy1Iv+FXa8cHStnBna4cqDHvESW3bP5K7qi2w7qF9gQ/EAaag+6DteSJsbEGc0VrlgABaVAU0ShgAnpPKXF3EnT1nsqBsDsl7VYks0t5yLF78lK4fwo8qOezAyf5xJ1aXWk2a0O8gQY09RL8ZpApWkQBPhXvbPeIPClG2Bmb5x0m1ec2m6OlodqLpoBIFyF1KPDZU6vFRoXngitqZo8sMi/VuFsSAKGirV4Rb2D79QtgsVM6DAxy5ov/nm0ztuTTXn3ue6+wvJqGb7Z/nw8mv3yk8lKV+YBQfw=
-    bucket: swapwatch.io
-    region: us-east-1
-    acl: public_read
-    skip_cleanup: true
-    local-dir: build
-    on:
-        branch: master
+  provider: s3
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  bucket: swapwatch.io
+  region: $AWS_DEFAULT_REGION
+  acl: public_read
+  skip_cleanup: true
+  local-dir: build
+  on:
+    branch: master
 after_deploy:
-    - aws configure set preview.cloudfront true
-    - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DID --paths "/*"
+- aws configure set preview.cloudfront true
+- aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
