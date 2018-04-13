@@ -3,10 +3,11 @@ node_js:
     - "node"
 cache: pip
 install:
-    - "pip install awscli"
     - "npm i"
 script:
     - "npm run build"
+before_deploy:
+    - "pip install awscli"
 deploy:
     provider: s3
     access_key_id: AKIAIUSVR6GUW4W5EUMQ
