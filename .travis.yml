@@ -1,7 +1,9 @@
 language: node_js
 node_js:
     - "node"
+cache: pip
 install:
+    - "pip install awscli"
     - "npm i"
 script:
     - "npm run build"
@@ -17,3 +19,6 @@ deploy:
     local-dir: build
     on:
         branch: master
+after_deploy:
+    - aws configure set preview.cloudfront true
+    - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DID --paths "/*"
