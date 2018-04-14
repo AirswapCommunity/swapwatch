@@ -7,7 +7,7 @@ install:
 script:
 - npm run build
 before_deploy:
-- pip install awscli
+- pip install awscli --user
 deploy:
   provider: s3
   access_key_id: $AWS_ACCESS_KEY_ID
