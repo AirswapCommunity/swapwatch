@@ -2,7 +2,7 @@
     padding: 15px 20px;
     height: 50px;
     background-color: white;
-    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+    /* box-shadow: 0 0 30px rgba(0,0,0,0.5); */
 }
 
 .LogoContainer {
@@ -20,7 +20,7 @@
 .LogoText {
     display: inline;
     float: left;
-    color: #005E9B;
+    color: black;
     font-weight: bold;
     font-size: 1em;
     letter-spacing: 2px;
