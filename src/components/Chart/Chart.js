@@ -47,6 +47,19 @@ class Chart extends React.Component {
             });
     }
 
+    measureAxis(className) {
+        let maxWidth = 0;
+        select(this.node)
+            .select(className)
+            .selectAll('text')
+            .each(function() {
+                if (this.getBBox().width > maxWidth)
+                    maxWidth = this.getBBox().width;
+            });
+
+        return maxWidth;
+    }
+
     createChart() {
         console.log(this.props.data);
 
@@ -57,45 +70,54 @@ class Chart extends React.Component {
         const data = this.props.data;
 
         const dates = data.map(d => new Date(d.date));
-
-        const xScale = scaleTime()
-            .domain([min(dates), max(dates)])
-            .range([0, this.maxWidth]);
-
         const values = data.map(d => d.high).concat(data.map(d => d.low)).concat(data.map(d => d.open)).concat(data.map(d => d.close));
 
         const yScale = scaleLinear()
             .domain([min(values) < 0 ? min(values) : 0, max(values)])
             .range([chartHeight, 0]);
 
-        //X-Axis
-        select(node)
-            .append("g")
-            .attr('font-family', 'Open Sans')
-            .attr("transform", `translate(0, ${chartHeight})`)
-            .call(axisBottom(xScale));
-
         //Y-Axis
         const y = select(node)
             .append('g')
+            .attr('class', 'axis-y1')
             .attr('font-family', 'open sans')
             .attr('font-weight', 'bold')
             .call(this.yGen(axisRight, yScale, this.maxWidth, formatNumber));
         y.select(".domain").remove();
         y.selectAll(".tick:not(:first-of-type) line").attr("stroke", hexToRGBA('#000', 0.15)).attr("stroke-dasharray", "2,4");
-        y.selectAll(".tick text").attr("x", 4).attr("dy", -4);
+        y.selectAll(".tick text").attr("x", 0).attr("dy", -4);
 
         const y2 = select(node)
             .append('g')
+            .attr('class', 'axis-y2')
             .attr('font-family', 'open sans')
             .attr('font-weight', 'bold')
             .attr('transform', `translate(${this.maxWidth}, 0)`)
             .call(this.yGen(axisLeft, yScale, this.maxWidth, formatNumber));
         y2.select(".domain").remove();
         y2.selectAll("line").remove();
-        y2.selectAll(".tick text").attr("x", -4).attr("dy", -4);
+        y2.selectAll(".tick text").attr("x", 0).attr("dy", -4);
 
-        const candleGroup = select(node).append('g');
+        const yAxisOffsetLeft = this.measureAxis('.axis-y1');
+        const yAxisOffsetRight = this.measureAxis('.axis-y2');
+
+        const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
+
+        //X-Axis
+        const xScale = scaleTime()
+            .domain([min(dates), max(dates)])
+            .range([0, chartWidth]);
+
+        select(node)
+            .append("g")
+            .attr('font-family', 'Open Sans')
+            .attr("transform", `translate(0, ${chartHeight})`)
+            .call(axisBottom(xScale));
+
+        //Chart
+        const candleGroup = select(node)
+            .append('g')
+            .attr('transform', `translate(${yAxisOffsetLeft + 10}, 0)`);
 
         // Wicks
         candleGroup
@@ -104,8 +126,8 @@ class Chart extends React.Component {
             .enter()
             .append('line')
             .attr('class', 'wick')
-            .attr('x1', d => xScale(d.date) + ((this.maxWidth / data.length) - 10) / 2)
-            .attr('x2', d => xScale(d.date) + ((this.maxWidth / data.length) - 10) / 2)
+            .attr('x1', d => xScale(d.date) + ((chartWidth / data.length) - 10) / 2)
+            .attr('x2', d => xScale(d.date) + ((chartWidth / data.length) - 10) / 2)
             .attr('y2', d => yScale(d.high))
             .attr('y1', d => yScale(d.low))
             .attr('style', d => `stroke:${d.close < d.open ? '#f54748' : '#34f493'};stroke-width:2`);
@@ -117,11 +139,11 @@ class Chart extends React.Component {
             .enter()
             .append('rect')
             .attr('class', 'candle')
-            .attr('width', (this.maxWidth / data.length) - 10)
+            .attr('width', (chartWidth / data.length) - 10)
             .attr('height', d => Math.abs(yScale(d.open) - yScale(d.close)))
             .attr('x', d => xScale(d.date))
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
-            .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493')
+            .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
     }
 
     render() {
