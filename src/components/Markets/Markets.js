@@ -293,6 +293,7 @@ class Markets extends React.Component {
                   secondaryField='symbol'
                   disabled={!this.state.hasLoadedData}
                   itemSelected={this.handleToken1Selected}
+                  excludeItem={this.state.selectedToken2}
                   cleared={this.handleToken1Selected}
                   zIndex='20'>
                   {data}
@@ -304,6 +305,7 @@ class Markets extends React.Component {
                   imageField='logo'
                   secondaryField='symbol'
                   disabled={!this.state.hasLoadedData}
+                  excludeItem={this.state.selectedToken1}
                   itemSelected={this.handleToken2Selected}
                   cleared={this.handleToken2Selected}
                   zIndex='10'>
