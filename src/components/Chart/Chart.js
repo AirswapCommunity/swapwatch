@@ -76,13 +76,6 @@ class Chart extends React.Component {
             .call(axisBottom(xScale));
 
         //Y-Axis
-        // const yAxis = axisRight(yScale)
-        //     .tickSize(this.maxWidth)
-        //     .tickFormat(d => {
-        //         var s = formatNumber(d);
-        //         return "\xa0" + s;
-        //     });
-
         const y = select(node)
             .append('g')
             .attr('font-family', 'open sans')
@@ -100,7 +93,6 @@ class Chart extends React.Component {
             .call(this.yGen(axisLeft, yScale, this.maxWidth, formatNumber));
         y2.select(".domain").remove();
         y2.selectAll("line").remove();
-        // y2.selectAll(".tick:not(:first-of-type) line").attr("stroke", hexToRGBA('#000', 0.15)).attr("stroke-dasharray", "2,4");
         y2.selectAll(".tick text").attr("x", -4).attr("dy", -4);
 
         const candleGroup = select(node).append('g');
