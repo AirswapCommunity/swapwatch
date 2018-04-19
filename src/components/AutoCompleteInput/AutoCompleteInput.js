@@ -136,10 +136,10 @@ class AutoCompleteInput extends Component {
         if (this.state.popupVisible) {
             var data = this.props.children
                 .filter((item) => {
+                    if(this.props.excludeItem && this.props.excludeItem === item) return false;
                     if (!this.state.inputValue) {
                         return true;
                     }
-
                     var matchesSecondary = false;
 
                     if (this.getSecondaryValue(item)) {
