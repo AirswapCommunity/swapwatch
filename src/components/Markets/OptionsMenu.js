@@ -1,6 +1,6 @@
-import React from "react";
+import React from 'react';
 import IconButton from 'material-ui/IconButton';
-import Menu, { MenuItem } from 'material-ui/Menu';
+import Menu, {MenuItem} from 'material-ui/Menu';
 
 
 class OptionsMenu extends React.Component {
@@ -8,26 +8,26 @@ class OptionsMenu extends React.Component {
     anchorEl: null,
   };
 
-  handleClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
+  handleClick = (event) => {
+    this.setState({anchorEl: event.currentTarget});
   };
 
   handleClose = (element) => {
-    if(element) {
+    if (element) {
       this.props.toggleIndicator(element);
     }
-    this.setState({ anchorEl: null });
+    this.setState({anchorEl: null});
   };
 
   render() {
-    const { anchorEl } = this.state;
+    const {anchorEl} = this.state;
 
-    const {indicator} = this.props
+    const {indicator} = this.props;
 
-    var checkBollingerBand = indicator.BollingerBand ? <i className="fa fa-check"></i> : null
-    var checkEMA = indicator.EMA ? <i className="fa fa-check"></i> : null
-    var checkVolume = indicator.Volume ? <i className="fa fa-check"></i> : null
-    
+    let checkBollingerBand = indicator.BollingerBand ? <i className="fa fa-check"></i> : null;
+    let checkEMA = indicator.EMA ? <i className="fa fa-check"></i> : null;
+    let checkVolume = indicator.Volume ? <i className="fa fa-check"></i> : null;
+
     return (
       <div>
         <IconButton
@@ -36,7 +36,7 @@ class OptionsMenu extends React.Component {
           aria-haspopup="true"
           onClick={this.handleClick}
         >
-          <i className="fa fa-bars" style={{color:'black', fontSize:'0.75em'}}></i>
+          <i className="fa fa-bars" style={{color: 'black', fontSize: '0.75em'}}></i>
         </IconButton>
         <Menu
           id="simple-menu"
@@ -50,7 +50,6 @@ class OptionsMenu extends React.Component {
         </Menu>
       </div>
     );
-    
   }
 }
 

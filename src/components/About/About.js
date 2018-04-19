@@ -1,11 +1,11 @@
-import React, { Component } from "react";
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import Auxilary from "../../hoc/Auxilary";
-import cssStyles from "./About.css";
-import { withStyles } from 'material-ui/styles';
+import Auxilary from '../../hoc/Auxilary';
+import cssStyles from './About.css';
+import {withStyles} from 'material-ui/styles';
 import Avatar from 'material-ui/Avatar';
 
-const styles = theme => ({
+const styles = (theme) => ({
   avatar: {
     width: '200px',
     height: '200px',
@@ -27,8 +27,8 @@ class About extends Component {
     this.container = null;
     this.state = {
       containerWidth: 100,
-      containerHeight: 100
-    }
+      containerHeight: 100,
+    };
   }
 
   componentWillMount() {
@@ -49,9 +49,9 @@ class About extends Component {
   }
 
   handleWindowSizeChange = () => {
-    var width = ReactDOM.findDOMNode(this.container).clientWidth;
+    let width = ReactDOM.findDOMNode(this.container).clientWidth;
     if (width > 0) {
-      this.setState({ containerWidth: width })
+      this.setState({containerWidth: width});
     }
   };
 
@@ -63,18 +63,18 @@ class About extends Component {
     let avatarInternalStyle;
     let evolveSubtext;
     if (isMobile) {
-      photoElementStyle = {width: '60px'}
+      photoElementStyle = {width: '60px'};
       avatarStyle = {width: '70px',
-                     height: '70px'}
+                     height: '70px'};
       avatarInternalStyle = {width: '60px',
-                             height: '60px'}
+                             height: '60px'};
       evolveSubtext = 'evolve';
     } else {
-      photoElementStyle = {width: '180px'}
+      photoElementStyle = {width: '180px'};
       avatarStyle = {width: '200px',
-                     height: '200px'}
+                     height: '200px'};
       avatarInternalStyle = {width: '180px',
-                             height: '180px'}
+                             height: '180px'};
       evolveSubtext = 'evolve (aka: Cryptonious)';
     }
 
@@ -93,7 +93,7 @@ class About extends Component {
                         style={avatarStyle}>
                   <Avatar className={this.props.classes.avatarInternal}
                           style={avatarInternalStyle}>
-                    <img src={require('../../assets/images/codeNinja.png')} 
+                    <img src={require('../../assets/images/codeNinja.png')}
                          style={photoElementStyle}
                          className={cssStyles.Photo}
                          alt="evolve" />
@@ -106,9 +106,9 @@ class About extends Component {
                         style={avatarStyle}>
                   <Avatar className={this.props.classes.avatarInternal}
                           style={avatarInternalStyle}>
-                    <img src={require('../../assets/images/homiedomi.png')} 
+                    <img src={require('../../assets/images/homiedomi.png')}
                          style={photoElementStyle}
-                         className={cssStyles.Photo} 
+                         className={cssStyles.Photo}
                          alt="homiedomi" />
                   </Avatar>
                 </Avatar>

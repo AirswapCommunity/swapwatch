@@ -1,5 +1,5 @@
-import React from "react";
-import Tabs, { Tab } from 'material-ui/Tabs';
+import React from 'react';
+import Tabs, {Tab} from 'material-ui/Tabs';
 
 class TabsBar extends React.Component {
   state = {
@@ -8,7 +8,7 @@ class TabsBar extends React.Component {
 
   handleChange = (event, value) => {
     let selectedState;
-    switch(value) {
+    switch (value) {
       case 0:
         selectedState = 'Candlestick';
         break;
@@ -17,12 +17,12 @@ class TabsBar extends React.Component {
         break;
       case 2:
         selectedState = 'Table';
-        break
+        break;
       default:
         console.log('Unexpected state set in TabsBar.');
     }
     this.props.toggleState(selectedState);
-    this.setState({ value });
+    this.setState({value});
   };
 
   render() {
@@ -31,7 +31,7 @@ class TabsBar extends React.Component {
         value={this.state.value}
         onChange={this.handleChange}
         textColor="inherit"
-        indicatorColor={"#4FC0FF"}
+        indicatorColor={'#4FC0FF'}
       >
         <Tab icon={<i className="fa fa-line-chart"></i>} />
         <Tab icon={<i className="fa fa-sitemap"></i>} />

@@ -1,8 +1,8 @@
-import React from "react";
-import Auxilary from "../../hoc/Auxilary";
-import cssStyles from "./MyTrades.css";
+import React from 'react';
+import Auxilary from '../../hoc/Auxilary';
+import cssStyles from './MyTrades.css';
 
-const MyTrades = props => (
+const MyTrades = (props) => (
     <Auxilary>
         <div className={cssStyles.Outer}>
             <div className={cssStyles.PageContainer}>

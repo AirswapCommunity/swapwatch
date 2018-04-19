@@ -1,21 +1,20 @@
-import React from "react";
-import * as d3 from "d3";
-import styles from "./Markets.css";
-import Auxilary from "../../hoc/Auxilary";
-import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
-import CandlestickChart from "../CandlestickChart/CandlestickChart";
+import React from 'react';
+import * as d3 from 'd3';
+import styles from './Markets.css';
+import Auxilary from '../../hoc/Auxilary';
+import AutoCompleteInput from '../AutoCompleteInput/AutoCompleteInput';
+import CandlestickChart from '../CandlestickChart/CandlestickChart';
 import MindmapPlot from '../MindmapPlot/MindmapPlot';
-import TradingDataTable from "../TradingDataTable/TradingDataTable";
-import { timeParse } from "d3-time-format";
+import TradingDataTable from '../TradingDataTable/TradingDataTable';
+import {timeParse} from 'd3-time-format';
 
-import { AirSwap } from '../../services/AirSwap/AirSwap';
-import { EthereumTokens } from '../../services/Tokens/Tokens';
+import {AirSwap} from '../../services/AirSwap/AirSwap';
+import {EthereumTokens} from '../../services/Tokens/Tokens';
 
 import OptionsMenu from './OptionsMenu';
 import TabsBar from './TabsBar';
 
 class Markets extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = {
@@ -31,17 +30,15 @@ class Markets extends React.Component {
         'BollingerBand': true,
         'EMA': true,
         'Volume': true,
-      }
-    }
+      },
+    };
     this.toggleIndicator = this.toggleIndicator.bind(this);
     this.toggleViewElement = this.toggleViewElement.bind(this);
-
-
   }
-  
+
   removeLeadingZeros = (data) => {
     let cleaned_string = data.replace(/0x0*/, '0x');
-    while (cleaned_string.length < 42) cleaned_string = cleaned_string.replace('0x', '0x0')
+    while (cleaned_string.length < 42) cleaned_string = cleaned_string.replace('0x', '0x0');
     return cleaned_string;
   }
 
@@ -56,31 +53,31 @@ class Markets extends React.Component {
       //   uint256 nonce);
       let data = txData.data;
       let trade = {
-        "hash": txData.transactionHash,
-        "makerAddress": this.removeLeadingZeros(txData.topics['1']),
-        "makerAmount": parseInt(data.slice(0, 2 + 64 * 1), 16),
-        "makerToken": this.removeLeadingZeros(txData.topics['2']),
-        "takerAddress": this.removeLeadingZeros('0x' + data.slice(2 + 64 * 1, 2 + 64 * 2)),
-        "takerAmount": parseInt('0x' + data.slice(2 + 64 * 2, 2 + 64 * 3), 16),
-        "takerToken": this.removeLeadingZeros(txData.topics['3']),
-        "expiration": '0x' + data.slice(2 + 64 * 3, 2 + 64 * 4),
-        "nonce": '0x' + data.slice(2 + 64 * 4, 2 + 64 * 5),
-        "gasUsed": parseInt(txData.gasUsed, 16),
-        "gasPrice": parseInt(txData.gasPrice, 16),
-        "timestamp": parseInt(txData.timeStamp, 16),
-      }
-      trade["gasCost"] = trade.gasPrice * trade.gasUsed / 1e18;
+        'hash': txData.transactionHash,
+        'makerAddress': this.removeLeadingZeros(txData.topics['1']),
+        'makerAmount': parseInt(data.slice(0, 2 + 64 * 1), 16),
+        'makerToken': this.removeLeadingZeros(txData.topics['2']),
+        'takerAddress': this.removeLeadingZeros('0x' + data.slice(2 + 64 * 1, 2 + 64 * 2)),
+        'takerAmount': parseInt('0x' + data.slice(2 + 64 * 2, 2 + 64 * 3), 16),
+        'takerToken': this.removeLeadingZeros(txData.topics['3']),
+        'expiration': '0x' + data.slice(2 + 64 * 3, 2 + 64 * 4),
+        'nonce': '0x' + data.slice(2 + 64 * 4, 2 + 64 * 5),
+        'gasUsed': parseInt(txData.gasUsed, 16),
+        'gasPrice': parseInt(txData.gasPrice, 16),
+        'timestamp': parseInt(txData.timeStamp, 16),
+      };
+      trade['gasCost'] = trade.gasPrice * trade.gasUsed / 1e18;
 
       let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
       let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
 
-      trade["makerSymbol"] = makerProps.symbol;
-      trade["takerSymbol"] = takerProps.symbol;
+      trade['makerSymbol'] = makerProps.symbol;
+      trade['takerSymbol'] = takerProps.symbol;
 
       trade.makerAmount /= 10 ** makerProps.decimal;
       trade.takerAmount /= 10 ** takerProps.decimal;
 
-      trade["price"] = trade.takerAmount / trade.makerAmount;
+      trade['price'] = trade.takerAmount / trade.makerAmount;
 
       if (!newPairedTx[trade.makerToken]) {
         newPairedTx[trade.makerToken] = {};
@@ -94,8 +91,8 @@ class Markets extends React.Component {
     }
     this.setState({
       pairedTx: newPairedTx,
-      statusMessage: null
-    }, this.checkStatus)
+      statusMessage: null,
+    }, this.checkStatus);
   }
 
   combineMarkets = (token1address, token2address) => {
@@ -106,7 +103,7 @@ class Markets extends React.Component {
       tx['volume'] = tx.makerAmount;
     }
     if (oppositeMarket && oppositeMarket.length > 0) {
-      let copyOppositeMarket = oppositeMarket.map(x => Object.assign({}, x));
+      let copyOppositeMarket = oppositeMarket.map((x) => Object.assign({}, x));
       for (let tx of copyOppositeMarket) {
         tx.price = 1 / tx.price;
         tx['volume'] = tx.takerAmount;
@@ -127,71 +124,71 @@ class Markets extends React.Component {
       let ohlcData = this.convertToOHLC(combinedMarket);
       this.setState({
         txList: combinedMarket,
-        ohlcData: ohlcData
-      }, this.checkStatus)
+        ohlcData: ohlcData,
+      }, this.checkStatus);
     }
   }
 
   convertToOHLC(data) {
-    let copyData = data.map(x => Object.assign({}, x));
+    let copyData = data.map((x) => Object.assign({}, x));
     copyData.sort((a, b) => d3.ascending(a.timestamp, b.timestamp));
     let result = [];
-    let format = d3.timeFormat("%Y-%m-%d");
-    let parseDate = timeParse("%Y-%m-%d");
-    copyData.forEach(d => d.timestamp = format(new Date(d.timestamp * 1000)));
-    let allDates = [...Array.from(new Set(copyData.map(d => d.timestamp)))];
-    allDates.forEach(d => {
+    let format = d3.timeFormat('%Y-%m-%d');
+    let parseDate = timeParse('%Y-%m-%d');
+    copyData.forEach((d) => d.timestamp = format(new Date(d.timestamp * 1000)));
+    let allDates = [...Array.from(new Set(copyData.map((d) => d.timestamp)))];
+    allDates.forEach((d) => {
       let tempObject = {};
-      let filteredData = copyData.filter(e => e.timestamp === d);
+      let filteredData = copyData.filter((e) => e.timestamp === d);
       tempObject['date'] = parseDate(d);
-      tempObject['volume'] = d3.sum(filteredData, e => e.volume);
+      tempObject['volume'] = d3.sum(filteredData, (e) => e.volume);
       tempObject['open'] = filteredData[0].price;
       tempObject['close'] = filteredData[filteredData.length - 1].price;
-      tempObject['high'] = d3.max(filteredData, e => e.price);
-      tempObject['low'] = d3.min(filteredData, e => e.price);
+      tempObject['high'] = d3.max(filteredData, (e) => e.price);
+      tempObject['low'] = d3.min(filteredData, (e) => e.price);
       result.push(tempObject);
     });
-    result['columns'] = ['date', 'volume', 'open', 'close', 'high', 'low']
+    result['columns'] = ['date', 'volume', 'open', 'close', 'high', 'low'];
     return result;
   };
 
 
   handleToken1Selected = (selectedToken) => {
     if (!selectedToken) {
-      this.setState({ txList: null });
+      this.setState({txList: null});
     }
 
     this.setState({
       txList: null,
-      selectedToken1: selectedToken
+      selectedToken1: selectedToken,
     }, () => {
       if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
       this.checkStatus();
-    })
+    });
   }
 
   handleToken2Selected = (selectedToken) => {
     if (!selectedToken) {
-      this.setState({ txList: null });
+      this.setState({txList: null});
     }
 
     this.setState({
       txList: null,
-      selectedToken2: selectedToken
+      selectedToken2: selectedToken,
     }, () => {
       if (this.state.selectedToken1 && this.state.selectedToken2) this.getTokenPairTxList();
       this.checkStatus();
-    })
+    });
   }
 
-  handleViewChange = name => event => {
-    this.setState({ [name]: event.target.checked });
+  handleViewChange = (name) => (event) => {
+    this.setState({[name]: event.target.checked});
   };
 
 
   componentWillMount() {
     AirSwap.getLogs()
-      .then(x => {
+      .then((x) => {
         this.evalAirSwapDEXFilledEventLogs(x);
         // this.handleToken1Selected(data[0]);
         // this.handleToken2Selected(data[1]);
@@ -212,52 +209,52 @@ class Markets extends React.Component {
         statusMsg = 'Please select a token pair';
       }
     }
-    this.setState({ hasLoadedData: hasLoadedData,
-                    statusMessage: statusMsg });
+    this.setState({hasLoadedData: hasLoadedData,
+                    statusMessage: statusMsg});
   }
 
   toggleIndicator(ind) {
-    if(ind) {
-      var newIndicator = this.state.indicator;
-      newIndicator[ind] = !newIndicator[ind]
+    if (ind) {
+      let newIndicator = this.state.indicator;
+      newIndicator[ind] = !newIndicator[ind];
       this.setState({
-        indicator: newIndicator
-      })
+        indicator: newIndicator,
+      });
     }
   }
 
   toggleViewElement(state) {
     this.setState({
-      viewElement: state
-    })
+      viewElement: state,
+    });
   }
 
   render() {
     const data = [
       EthereumTokens.getTokenByName('AirSwap'),
-      EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
+      EthereumTokens.getTokenByName('Wrapped Ether')]; // which tokens to display in dropdown
 
-    var tabsBarElement = this.state.txList ? <TabsBar 
+    let tabsBarElement = this.state.txList ? <TabsBar
       toggleState={this.toggleViewElement}
       /> : null;
-    
-    var candlestickElement =  <CandlestickChart 
+
+    let candlestickElement = <CandlestickChart
                                 data={this.state.ohlcData}
                                 token1={this.state.selectedToken1}
                                 token2={this.state.selectedToken2}
                                 indicator={this.state.indicator}
                               />;
-    var mindmapElement = <MindmapPlot
+    let mindmapElement = <MindmapPlot
                           txList={this.state.txList}
                           token1={this.state.selectedToken1}
                           token2={this.state.selectedToken2}
                          />;
-    var txTableElement = <TradingDataTable txList={this.state.txList} />;
+    let txTableElement = <TradingDataTable txList={this.state.txList} />;
 
-    var viewElement;
+    let viewElement;
     if (!this.state.txList) viewElement = null;
     else {
-      switch(this.state.viewElement) {
+      switch (this.state.viewElement) {
         case 'Candlestick':
           viewElement = candlestickElement;
           break;
@@ -272,14 +269,14 @@ class Markets extends React.Component {
       }
     }
 
-    var menuElement = (viewElement &&
-                      this.state.viewElement === 'Candlestick') ? <OptionsMenu 
+    let menuElement = (viewElement &&
+                      this.state.viewElement === 'Candlestick') ? <OptionsMenu
       indicator={this.state.indicator}
       toggleIndicator={this.toggleIndicator}
       /> : null;
 
-    var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
+    let statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
+    let spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign: 'center', marginTop: '20px', color: 'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
 
     return (
       <Auxilary>
