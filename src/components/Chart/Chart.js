@@ -79,7 +79,7 @@ class Chart extends React.Component {
         //Y-Axis
         const y = select(node)
             .append('g')
-            .attr('class', 'axis-y1')
+            .attr('class', 'axis y1')
             .attr('font-family', 'open sans')
             .attr('font-weight', 'bold')
             .call(this.yGen(axisRight, yScale, this.maxWidth, formatNumber));
@@ -89,7 +89,7 @@ class Chart extends React.Component {
 
         const y2 = select(node)
             .append('g')
-            .attr('class', 'axis-y2')
+            .attr('class', 'axis y2')
             .attr('font-family', 'open sans')
             .attr('font-weight', 'bold')
             .attr('transform', `translate(${this.maxWidth}, 0)`)
@@ -98,8 +98,8 @@ class Chart extends React.Component {
         y2.selectAll("line").remove();
         y2.selectAll(".tick text").attr("x", 0).attr("dy", -4);
 
-        const yAxisOffsetLeft = this.measureAxis('.axis-y1');
-        const yAxisOffsetRight = this.measureAxis('.axis-y2');
+        const yAxisOffsetLeft = this.measureAxis('.y1');
+        const yAxisOffsetRight = this.measureAxis('.y2');
 
         const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
 
@@ -109,9 +109,10 @@ class Chart extends React.Component {
             .range([0, chartWidth]);
 
         select(node)
-            .append("g")
+            .append('g')
+            .attr('class', 'axis')
             .attr('font-family', 'Open Sans')
-            .attr("transform", `translate(0, ${chartHeight})`)
+            .attr('transform', `translate(0, ${chartHeight})`)
             .call(axisBottom(xScale));
 
         //Chart
