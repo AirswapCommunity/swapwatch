@@ -11,6 +11,7 @@ const styles = theme => ({
 });
 
 const ERC20_abi = [{"constant": true,"inputs": [],"name": "name","outputs": [{"name": "","type": "string"    }  ],  "payable": false,  "type": "function"},{  "constant": false,  "inputs": [    {"name": "_spender","type": "address"    },    {"name": "_value","type": "uint256"    }  ],  "name": "approve",  "outputs": [    {"name": "success","type": "bool"    }  ],  "payable": false,  "type": "function"},{  "constant": true,  "inputs": [],  "name": "totalSupply",  "outputs": [    {"name": "","type": "uint256"    }  ],  "payable": false,  "type": "function"},{  "constant": false,  "inputs": [    {"name": "_from","type": "address"    },    {"name": "_to","type": "address"    },    {"name": "_value","type": "uint256"    }  ],  "name": "transferFrom",  "outputs": [    {"name": "success","type": "bool"    }  ],  "payable": false,  "type": "function"},{  "constant": true,  "inputs": [],  "name": "decimals",  "outputs": [    {"name": "","type": "uint8"    }  ],  "payable": false,  "type": "function"},{  "constant": true,  "inputs": [],  "name": "version",  "outputs": [    {"name": "","type": "string"    }  ],  "payable": false,  "type": "function"},{  "constant": true,  "inputs": [    {"name": "_owner","type": "address"    }  ],  "name": "balanceOf",  "outputs": [    {"name": "balance","type": "uint256"    }  ],  "payable": false,  "type": "function"},{  "constant": true,  "inputs": [],  "name": "symbol",  "outputs": [    {"name": "","type": "string"    }  ],  "payable": false,  "type": "function"},{  "constant": false,  "inputs": [    {"name": "_to","type": "address"    },    {"name": "_value","type": "uint256"    }  ],  "name": "transfer",  "outputs": [    {"name": "success","type": "bool"    }  ],  "payable": false,  "type": "function"},{  "constant": false,  "inputs": [    {"name": "_spender","type": "address"    },    {"name": "_value","type": "uint256"    },    {"name": "_extraData","type": "bytes"    }  ],  "name": "approveAndCall",  "outputs": [    {"name": "success","type": "bool"    }  ],  "payable": false,  "type": "function"},{  "constant": true,  "inputs": [    {"name": "_owner","type": "address"    },    {"name": "_spender","type": "address"    }  ],  "name": "allowance",  "outputs": [    {"name": "remaining","type": "uint256"    }  ],  "payable": false,  "type": "function"},{  "inputs": [    {"name": "_initialAmount","type": "uint256"    },    {"name": "_tokenName","type": "string"    },    {"name": "_decimalUnits","type": "uint8"    },    {"name": "_tokenSymbol","type": "string"    }  ],  "type": "constructor"},{  "payable": false,  "type": "fallback"},{  "anonymous": false,  "inputs": [    {"indexed": true,"name": "_from","type": "address"    },    {"indexed": true,"name": "_to","type": "address"    },    {"indexed": false,"name": "_value","type": "uint256"    }  ],  "name": "Transfer",  "type": "event"},{  "anonymous": false,  "inputs": [    {"indexed": true,"name": "_owner","type": "address"    },    {"indexed": true,"name": "_spender","type": "address"    },    {"indexed": false,"name": "_value","type": "uint256"    }  ],  "name": "Approval",  "type": "event"},]
+const ETH_address = '0x0000000000000000000000000000000000000000';
 
 class MindmapPlot extends Component {
 
@@ -39,8 +40,13 @@ class MindmapPlot extends Component {
     
     web3.eth.net.isListening()
     .then(connected => {
-      let contractToken1 = new web3.eth.Contract(ERC20_abi, token1.address);
-      let contractToken2 = new web3.eth.Contract(ERC20_abi, token2.address);
+      let contractToken1;
+      let contractToken2;
+
+      if(token1.address !== ETH_address)
+        contractToken1 = new web3.eth.Contract(ERC20_abi, token1.address);
+      if(token2.address !== ETH_address)
+        contractToken2 = new web3.eth.Contract(ERC20_abi, token2.address);
       this.setState({web3: web3,
                      isConnected: connected,
                      contractToken1: contractToken1,
@@ -86,37 +92,35 @@ class MindmapPlot extends Component {
       nodeAdjacencyList[idMaker].push(txData);
     }
 
-    // console.log('Fetching Node Ether Balances');
-    // for(let i=0; i< nodeAddressList.length; i++) {
-    //   promisesBalance.push(
-    //     this.state.web3.eth.getBalance(nodeAddressList[i])
-    //     .then((balance) => {
-    //       nodeEtherBalanceList[i] = balance / 1e18;
-    //     })
-    //     .catch(error => {
-    //       console.log(error, 'Error at getting balance of node ', nodeAddressList[i], '. Retrying.')
-    //       this.state.web3.eth.getBalance(nodeAddressList[i])
-    //       .then((balance) => {
-    //         nodeEtherBalanceList[i] = balance / 1e18;
-    //       })
-    //     })
-    //   )
-    // }
-
-
     for(let i=0; i<nodeAddressList.length; i++) {
-      promisesBalance.push(
-        this.state.contractToken1.methods.balanceOf(nodeAddressList[i]).call()
-        .then((balance) => {
-          nodeToken1BalanceList[i] = balance / 10**this.props.token1.decimal;
-        })
-      )
-      promisesBalance.push(
-        this.state.contractToken2.methods.balanceOf(nodeAddressList[i]).call()
-        .then((balance) => {
-          nodeToken2BalanceList[i] = balance / 10**this.props.token2.decimal;
-        })
-      )
+      if(this.state.contractToken1)
+        promisesBalance.push(
+          this.state.contractToken1.methods.balanceOf(nodeAddressList[i]).call()
+          .then((balance) => {
+            nodeToken1BalanceList[i] = balance / 10**this.props.token1.decimal;
+          })
+        )
+      else
+        promisesBalance.push(
+          this.state.web3.eth.getBalance(nodeAddressList[i])
+          .then((balance) => {
+            nodeToken1BalanceList[i] = balance / 1e18;
+          })
+        )
+      if(this.state.contractToken2)
+        promisesBalance.push(
+          this.state.contractToken2.methods.balanceOf(nodeAddressList[i]).call()
+          .then((balance) => {
+            nodeToken2BalanceList[i] = balance / 10**this.props.token2.decimal;
+          })
+        )
+      else
+        promisesBalance.push(
+          this.state.web3.eth.getBalance(nodeAddressList[i])
+          .then((balance) => {
+            nodeToken2BalanceList[i] = balance / 1e18;
+          })
+        )
     }
 
     Promise.all(promisesBalance)

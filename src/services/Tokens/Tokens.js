@@ -105,6 +105,13 @@ const EthereumTokens = [
         "decimal": 18
     },
     {
+        "name": 'Ether',
+        "symbol": "ETH",
+        "address": '0x0000000000000000000000000000000000000000',
+        "logo": "ether.png",
+        "decimal": 18
+    },
+    {
         "name": 'FunFair',
         "symbol": "FUN",
         "address": '0x419d0d8bdd9af5e606ae2232ed285aff190e711b',
