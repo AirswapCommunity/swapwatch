@@ -99,8 +99,12 @@ class Markets extends React.Component {
   }
 
   combineMarkets = (token1address, token2address) => {
-    let selectedMarket = this.state.pairedTx[token1address][token2address];
-    let oppositeMarket = this.state.pairedTx[token2address][token1address];
+    let selectedMarket = [];
+    let oppositeMarket = [];
+    if (this.state.pairedTx[token1address] && this.state.pairedTx[token1address][token2address])
+      selectedMarket = this.state.pairedTx[token1address][token2address];
+    if (this.state.pairedTx[token2address] && this.state.pairedTx[token2address][token1address])
+      oppositeMarket = this.state.pairedTx[token2address][token1address];
 
     for (let tx of selectedMarket) {
       tx['volume'] = tx.makerAmount;
@@ -121,8 +125,12 @@ class Markets extends React.Component {
   getTokenPairTxList = () => {
     let token1address = this.state.selectedToken1.address;
     let token2address = this.state.selectedToken2.address;
-    if (this.state.pairedTx && this.state.pairedTx[token1address]
-      && this.state.pairedTx[token1address][token2address]) {
+    if (this.state.pairedTx && 
+        ((this.state.pairedTx[token1address]
+                 && this.state.pairedTx[token1address][token2address])
+         || (this.state.pairedTx[token2address]
+                 && this.state.pairedTx[token2address][token1address])
+         )) {
       let combinedMarket = this.combineMarkets(token1address, token2address);
       let ohlcData = this.convertToOHLC(combinedMarket);
       this.setState({
@@ -235,6 +243,7 @@ class Markets extends React.Component {
   render() {
     const data = [
       EthereumTokens.getTokenByName('AirSwap'),
+      EthereumTokens.getTokenByName('Ether'),
       EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
 
     var tabsBarElement = this.state.txList ? <TabsBar 
