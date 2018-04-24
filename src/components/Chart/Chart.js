@@ -61,7 +61,38 @@ class Chart extends React.Component {
     }
 
     onMouseMove() {
-        console.log(mouse(this.CursorGroup.node()));
+
+        if (this.chart) {
+            const coords = mouse(this.chart.cursorGroup.node());
+ 
+            const date = this.chart.xScale.invert(coords[0] + this.chart.axisLeftWidth);
+
+            let bisectDate = bisector(function (d) { return new Date(d.date); }).left;
+
+            const index = bisectDate(this.props.data, date, 1);
+
+            console.log(this.props.data[index]);
+
+            // Cursor lines
+            this.chart.cursorGroup.select("circle")
+                .attr("transform", `translate(${coords[0]}, ${coords[1]})`);
+
+            this.chart.cursorGroup.select(".x-hover-line")
+                .attr("x1", coords[0])
+                .attr("x2", coords[0])
+                .attr("y1", coords[1]);
+
+            this.chart.cursorGroup.select(".y-hover-line")
+                .attr("y1", coords[1])
+                .attr("y2", coords[1]);
+
+            // Tooltip
+            const ohlc = this.props.data[index];
+
+            this.chart.cursorGroup.select('.tooltip')
+            .attr('transform', `translate(${this.chart.xScale(date) - this.chart.axisLeftWidth}, ${this.chart.yScale(ohlc.high)})`);
+        }
+
         // let bisectDate = bisector(function(d) { return d.date; }).left;
 
         // const data = this.props.data;
@@ -111,7 +142,7 @@ class Chart extends React.Component {
             .domain([min(values) < 0 ? min(values) : 0, max(values)])
             .range([chartHeight, 0]);
 
-        //Y-Axis
+        // Y-Axis
         const y = select(node)
             .append('g')
             .attr('class', 'axis y1')
@@ -138,7 +169,7 @@ class Chart extends React.Component {
 
         const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
 
-        //X-Axis
+        // X-Axis
         const xScale = scaleTime()
             .domain([min(dates), max(dates)])
             .range([0, chartWidth]);
@@ -150,7 +181,7 @@ class Chart extends React.Component {
             .attr('transform', `translate(0, ${chartHeight})`)
             .call(axisBottom(xScale));
 
-        //Chart
+        // Chart
         const candleGroup = select(node)
             .append('g')
             .attr('transform', `translate(${yAxisOffsetLeft + 10}, 0)`)
@@ -168,7 +199,7 @@ class Chart extends React.Component {
             .attr('y1', d => yScale(d.low))
             .attr('style', d => `stroke:${d.close < d.open ? '#f54748' : '#34f493'};stroke-width:2`);
 
-        //Candles
+        // Candles
         candleGroup
             .selectAll('rect.candle')
             .data(data)
@@ -181,34 +212,60 @@ class Chart extends React.Component {
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
             .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
 
-
-        //Tooltip group/setup
+        // Tooltip group/setup
         select(node)
             .append("rect")
-            .attr("transform", "translate(" + yAxisOffsetLeft + "," + 0 + ")")
+            .attr("transform", "translate(" + yAxisOffsetLeft + 10 + "," + 0 + ")")
             .attr("style", "fill: none; pointer-events:all")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
-            .on("mouseover", function () { this.CursorGroup.style("display", null); }.bind(this))
-            .on("mouseout", function () { this.CursorGroup.style("display", "none"); }.bind(this))
+            .on("mouseover", function () { this.chart.cursorGroup.style("display", null); }.bind(this))
+            // .on("mouseout", function () { this.chart.cursorGroup.style("display", "none"); }.bind(this))
             .on("mousemove", this.onMouseMove.bind(this));
 
-        this.CursorGroup = select(node).append("g")
+        const cursor = select(node)
+            .append("g")
+            .attr("transform", "translate(" + yAxisOffsetLeft + 10 + "," + 0 + ")")
             .attr("class", "focus")
-            .style("display", "none");
-        this.CursorGroup.append("line")
+            .style("display", "none")
+            .attr('height', chartHeight);
+
+        cursor.append("line")
             .attr("class", "x-hover-line hover-line")
+            .attr("style", "stroke: #000; stroke-dasharray: 10,10")
             .attr("y1", 0)
             .attr("y2", chartHeight);
-        this.CursorGroup.append("line")
+
+        cursor.append("line")
             .attr("class", "y-hover-line hover-line")
-            .attr("x1", chartWidth)
-            .attr("x2", chartWidth);
-        this.CursorGroup.append("circle")
+            .attr("style", "stroke: #000; stroke-dasharray: 10,10")
+            .attr("x1", 2)
+            .attr("x2", chartWidth + 10);
+
+        cursor.append("circle")
             .attr("r", 7.5);
-        this.CursorGroup.append("text")
-            .attr("x", 15)
-            .attr("dy", ".31em");
+
+        const tooltip = cursor.append("g")
+            .attr("class", "tooltip")
+            .attr('style', 'pointer-events: none');
+
+        tooltip.append('rect')
+            .attr('rx', '20')
+            .attr('ry', '20')
+            .attr('width', '180')
+            .attr('height', '200')
+            .attr('style', 'fill:black;stroke:black;stroke-width:5;opacity:0.5');
+
+        this.chart = {
+            yScale,
+            xScale,
+            height: chartHeight,
+            width: chartWidth,
+            cursorGroup: cursor,
+            dates,
+            axisLeftWidth: yAxisOffsetLeft,
+            axisRightWidth: yAxisOffsetRight
+        }
     }
 
     render() {
