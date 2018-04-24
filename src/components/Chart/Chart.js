@@ -3,12 +3,12 @@ import styles from "./Chart.css";
 // import Auxilary from "../../hoc/Auxilary";
 
 import { scaleLinear, scaleTime } from "d3-scale";
-import { max, min } from 'd3-array';
+import { max, min, bisector } from 'd3-array';
 import { select } from 'd3-selection';
 import { timeParse } from "d3-time-format";
 import { fitDimensions } from "react-stockcharts/lib/helper";
 import { axisBottom, axisRight, axisLeft } from 'd3-axis';
-import { format } from 'd3';
+import { format, mouse } from 'd3';
 import { hexToRGBA } from "react-stockcharts/lib/utils";
 
 // import { AirSwap } from '../../services/AirSwap/AirSwap';
@@ -52,12 +52,47 @@ class Chart extends React.Component {
         select(this.node)
             .select(className)
             .selectAll('text')
-            .each(function() {
+            .each(function () {
                 if (this.getBBox().width > maxWidth)
                     maxWidth = this.getBBox().width;
             });
 
         return maxWidth;
+    }
+
+    onMouseMove() {
+        console.log(mouse(this.CursorGroup.node()));
+        // let bisectDate = bisector(function(d) { return d.date; }).left;
+
+        // const data = this.props.data;
+
+        // let chartHeight = this.maxHeight - this.marginBottom - this.bottomOffset;
+
+        // const dates = data.map(d => new Date(d.date));
+        // const values = data.map(d => d.high).concat(data.map(d => d.low)).concat(data.map(d => d.open)).concat(data.map(d => d.close));
+
+        // const yScale = scaleLinear()
+        //     .domain([min(values) < 0 ? min(values) : 0, max(values)])
+        //     .range([chartHeight, 0]);
+
+        // const yAxisOffsetLeft = this.measureAxis('.y1');
+        // const yAxisOffsetRight = this.measureAxis('.y2');
+
+        // const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
+
+        // const xScale = scaleTime()
+        //     .domain([min(dates), max(dates)])
+        //     .range([0, chartWidth]);
+
+        // var x0 = xScale.invert(mouse(this.CursorGroup.node())[0]),
+        //     i = bisectDate(data, x0, 1),
+        //     d0 = data[i - 1],
+        //     d1 = data[i],
+        //     d = x0 - d0.date > d1.date - x0 ? d1 : d0;
+        // this.CursorGroup.attr("transform", "translate(" + xScale(d.date) + "," + yScale(d.low) + ")");
+        // // focus.select("text").text(function () { return d.value; });
+        // this.CursorGroup.select(".x-hover-line").attr("y2", chartHeight - yScale(d.low));
+        // this.CursorGroup.select(".y-hover-line").attr("x2", chartWidth + chartWidth);
     }
 
     createChart() {
@@ -118,7 +153,7 @@ class Chart extends React.Component {
         //Chart
         const candleGroup = select(node)
             .append('g')
-            .attr('transform', `translate(${yAxisOffsetLeft + 10}, 0)`);
+            .attr('transform', `translate(${yAxisOffsetLeft + 10}, 0)`)
 
         // Wicks
         candleGroup
@@ -145,6 +180,35 @@ class Chart extends React.Component {
             .attr('x', d => xScale(d.date))
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
             .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
+
+
+        //Tooltip group/setup
+        select(node)
+            .append("rect")
+            .attr("transform", "translate(" + yAxisOffsetLeft + "," + 0 + ")")
+            .attr("style", "fill: none; pointer-events:all")
+            .attr("width", chartWidth)
+            .attr("height", chartHeight)
+            .on("mouseover", function () { this.CursorGroup.style("display", null); }.bind(this))
+            .on("mouseout", function () { this.CursorGroup.style("display", "none"); }.bind(this))
+            .on("mousemove", this.onMouseMove.bind(this));
+
+        this.CursorGroup = select(node).append("g")
+            .attr("class", "focus")
+            .style("display", "none");
+        this.CursorGroup.append("line")
+            .attr("class", "x-hover-line hover-line")
+            .attr("y1", 0)
+            .attr("y2", chartHeight);
+        this.CursorGroup.append("line")
+            .attr("class", "y-hover-line hover-line")
+            .attr("x1", chartWidth)
+            .attr("x2", chartWidth);
+        this.CursorGroup.append("circle")
+            .attr("r", 7.5);
+        this.CursorGroup.append("text")
+            .attr("x", 15)
+            .attr("dy", ".31em");
     }
 
     render() {
