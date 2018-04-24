@@ -64,14 +64,27 @@ class Chart extends React.Component {
 
         if (this.chart) {
             const coords = mouse(this.chart.cursorGroup.node());
- 
-            const date = this.chart.xScale.invert(coords[0] + this.chart.axisLeftWidth);
+
+            const date = this.chart.xScale.invert(coords[0]);
 
             let bisectDate = bisector(function (d) { return new Date(d.date); }).left;
 
-            const index = bisectDate(this.props.data, date, 1);
+            const sortedData = this.props.data.slice(0);
 
-            console.log(this.props.data[index]);
+            sortedData.sort((a, b) => {
+                return a.date > b.date ? 1 : a.date === b.date ? 0 : -1;
+            });
+
+            const index = bisectDate(sortedData, date);
+
+            let closest = sortedData[index];
+
+            if (index > 0) {
+                const smaller = sortedData[index - 1];
+                const larger = sortedData[index];
+    
+                closest = date - smaller.date < larger.date - date ? smaller : larger;    
+            }
 
             // Cursor lines
             this.chart.cursorGroup.select("circle")
@@ -87,43 +100,9 @@ class Chart extends React.Component {
                 .attr("y2", coords[1]);
 
             // Tooltip
-            const ohlc = this.props.data[index];
-
             this.chart.cursorGroup.select('.tooltip')
-            .attr('transform', `translate(${this.chart.xScale(date) - this.chart.axisLeftWidth}, ${this.chart.yScale(ohlc.high)})`);
+            .attr('transform', `translate(${this.chart.xScale(closest.date)}, ${this.chart.yScale(closest.high)})`);
         }
-
-        // let bisectDate = bisector(function(d) { return d.date; }).left;
-
-        // const data = this.props.data;
-
-        // let chartHeight = this.maxHeight - this.marginBottom - this.bottomOffset;
-
-        // const dates = data.map(d => new Date(d.date));
-        // const values = data.map(d => d.high).concat(data.map(d => d.low)).concat(data.map(d => d.open)).concat(data.map(d => d.close));
-
-        // const yScale = scaleLinear()
-        //     .domain([min(values) < 0 ? min(values) : 0, max(values)])
-        //     .range([chartHeight, 0]);
-
-        // const yAxisOffsetLeft = this.measureAxis('.y1');
-        // const yAxisOffsetRight = this.measureAxis('.y2');
-
-        // const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
-
-        // const xScale = scaleTime()
-        //     .domain([min(dates), max(dates)])
-        //     .range([0, chartWidth]);
-
-        // var x0 = xScale.invert(mouse(this.CursorGroup.node())[0]),
-        //     i = bisectDate(data, x0, 1),
-        //     d0 = data[i - 1],
-        //     d1 = data[i],
-        //     d = x0 - d0.date > d1.date - x0 ? d1 : d0;
-        // this.CursorGroup.attr("transform", "translate(" + xScale(d.date) + "," + yScale(d.low) + ")");
-        // // focus.select("text").text(function () { return d.value; });
-        // this.CursorGroup.select(".x-hover-line").attr("y2", chartHeight - yScale(d.low));
-        // this.CursorGroup.select(".y-hover-line").attr("x2", chartWidth + chartWidth);
     }
 
     createChart() {
@@ -168,6 +147,7 @@ class Chart extends React.Component {
         const yAxisOffsetRight = this.measureAxis('.y2');
 
         const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
+        const chartOffset = (yAxisOffsetLeft + 10);
 
         // X-Axis
         const xScale = scaleTime()
@@ -178,13 +158,14 @@ class Chart extends React.Component {
             .append('g')
             .attr('class', 'axis')
             .attr('font-family', 'Open Sans')
-            .attr('transform', `translate(0, ${chartHeight})`)
+            .attr('transform', `translate(${chartOffset}, ${chartHeight})`)
+            .attr('width', chartWidth)
             .call(axisBottom(xScale));
 
         // Chart
         const candleGroup = select(node)
             .append('g')
-            .attr('transform', `translate(${yAxisOffsetLeft + 10}, 0)`)
+            .attr('transform', `translate(${chartOffset}, 0)`)
 
         // Wicks
         candleGroup
@@ -215,7 +196,7 @@ class Chart extends React.Component {
         // Tooltip group/setup
         select(node)
             .append("rect")
-            .attr("transform", "translate(" + yAxisOffsetLeft + 10 + "," + 0 + ")")
+            .attr("transform", "translate(" + chartOffset + "," + 0 + ")")
             .attr("style", "fill: none; pointer-events:all")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
@@ -225,7 +206,7 @@ class Chart extends React.Component {
 
         const cursor = select(node)
             .append("g")
-            .attr("transform", "translate(" + yAxisOffsetLeft + 10 + "," + 0 + ")")
+            .attr("transform", "translate(" + chartOffset + "," + 0 + ")")
             .attr("class", "focus")
             .style("display", "none")
             .attr('height', chartHeight);
@@ -239,7 +220,7 @@ class Chart extends React.Component {
         cursor.append("line")
             .attr("class", "y-hover-line hover-line")
             .attr("style", "stroke: #000; stroke-dasharray: 10,10")
-            .attr("x1", 2)
+            .attr("x1", -8)
             .attr("x2", chartWidth + 10);
 
         cursor.append("circle")
