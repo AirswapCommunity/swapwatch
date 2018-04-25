@@ -82,8 +82,8 @@ class Chart extends React.Component {
             if (index > 0) {
                 const smaller = sortedData[index - 1];
                 const larger = sortedData[index];
-    
-                closest = date - smaller.date < larger.date - date ? smaller : larger;    
+
+                closest = date - smaller.date < larger.date - date ? smaller : larger;
             }
 
             // Cursor lines
@@ -101,7 +101,10 @@ class Chart extends React.Component {
 
             // Tooltip
             this.chart.cursorGroup.select('.tooltip')
-            .attr('transform', `translate(${this.chart.xScale(closest.date)}, ${this.chart.yScale(closest.high)})`);
+                .attr('transform',
+                    `translate(${(this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5}, 
+                    ${this.chart.yScale(closest.high) - (this.chart.tooltipHeight + 10)})`);
+                    
         }
     }
 
@@ -235,7 +238,12 @@ class Chart extends React.Component {
             .attr('ry', '20')
             .attr('width', '180')
             .attr('height', '200')
-            .attr('style', 'fill:black;stroke:black;stroke-width:5;opacity:0.5');
+            .attr('style', 'fill:black;stroke:black;stroke-width:1;opacity:0.75');
+
+        tooltip.append('path')
+            .attr('class', 'arrow')
+            .attr('d', 'm 80,200.25 l 10,10 l 10,-10')
+            .attr('style', 'fill:black;opacity:0.75');
 
         this.chart = {
             yScale,
@@ -245,7 +253,9 @@ class Chart extends React.Component {
             cursorGroup: cursor,
             dates,
             axisLeftWidth: yAxisOffsetLeft,
-            axisRightWidth: yAxisOffsetRight
+            axisRightWidth: yAxisOffsetRight,
+            tooltipWidth: 180,
+            tooltipHeight: 200
         }
     }
 
