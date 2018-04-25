@@ -365,7 +365,7 @@ var addTokenByAddress = (address) => {
             "logo": "",
             "decimal": parseInt(response.decimals, 10)
         })
-        console.log('pushed');
+        console.log('Added ' + response.name + ' to Token list using data from Ethplorer.');
     })
 }
 

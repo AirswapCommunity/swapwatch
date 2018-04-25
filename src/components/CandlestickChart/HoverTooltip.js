@@ -186,8 +186,15 @@ function tooltipCanvas({ fontFamily, fontSize, fontFill, token1, token2 },
   let imgSpacing = bgSize.width - 2*28 - 2*X; // 28 img width, left right margin
   let widthIn = ctx.measureText('in').width;
   
-  ctx.drawImage(imgToken1, X, Y);
-  ctx.drawImage(imgToken2, X + 28 + imgSpacing, Y);
+  if(token1.logo !== "")
+    ctx.drawImage(imgToken1, X, Y);
+  else
+    ctx.fillText(token1.symbol, X, Y+(28+fontSize)/2);
+
+  if(token2.logo !== "")
+    ctx.drawImage(imgToken2, X + 28 + imgSpacing, Y);
+  else
+    ctx.fillText(token2.symbol, X + 10 + imgSpacing, Y+(28+fontSize)/2);
 
   ctx.fillText('in', X + 28 + (imgSpacing-widthIn)/2, Y + (28+fontSize)/2);
 
