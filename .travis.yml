@@ -1,7 +1,11 @@
 language: node_js
 node_js:
 - node
+env:
+- NODE_ENV=production
 cache: pip
+before_install:
+- npm i -g npm@latest
 install:
 - npm i
 script:
