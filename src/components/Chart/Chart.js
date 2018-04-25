@@ -108,10 +108,12 @@ class Chart extends React.Component {
             let arrowOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5;
 
             if (xOffset < 0) {
-                xOffset = 0;
+                xOffset = -5;
+                arrowOffset += 5;
             } else if (xOffset + this.chart.tooltipWidth > this.chart.width) {
-                xOffset = this.chart.width - this.chart.tooltipWidth;
+                xOffset = this.chart.width - this.chart.tooltipWidth + 10;
                 arrowOffset = xOffset - arrowOffset;
+                //xOffset = arrowOffset - (this.chart.tooltipWidth - 10);
             } else {
                 arrowOffset = 0;
             }
@@ -274,8 +276,8 @@ class Chart extends React.Component {
             .attr('style', 'pointer-events: none');
 
         tooltip.append('rect')
-            .attr('rx', '20')
-            .attr('ry', '20')
+            // .attr('rx', '20')
+            // .attr('ry', '20')
             .attr('width', '180')
             .attr('height', '200')
             .attr('fill', 'black')
