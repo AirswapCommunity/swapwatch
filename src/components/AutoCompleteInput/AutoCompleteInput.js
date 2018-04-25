@@ -162,7 +162,13 @@ class AutoCompleteInput extends Component {
 
                     if (this.props.imageField) {
                         var path = `/tokens/${item[this.props.imageField]}`;
-                        element = <div className={cssStyles.ComplexItemWrapper}><img src={path} alt='token logo' className={cssStyles.ItemImageField} /><div className={cssStyles.ItemDisplayField}>{displayValue}</div><div className={cssStyles.ItemSecondaryField}>{secondaryValue}</div></div>;
+                        element = (<div className={cssStyles.ComplexItemWrapper}>
+                            <img src={path} 
+                                 alt={secondaryValue} 
+                                 className={cssStyles.ItemImageField} />
+                            <div className={cssStyles.ItemDisplayField}>{displayValue}</div>
+                            <div className={cssStyles.ItemSecondaryField}>{secondaryValue}</div>
+                        </div>);
                     }
 
                     return <MenuItem key={i}

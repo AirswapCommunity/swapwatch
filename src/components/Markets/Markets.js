@@ -31,7 +31,8 @@ class Markets extends React.Component {
         'BollingerBand': true,
         'EMA': true,
         'Volume': true,
-      }
+      },
+      'TokenList': null
     }
     this.toggleIndicator = this.toggleIndicator.bind(this);
     this.toggleViewElement = this.toggleViewElement.bind(this);
@@ -47,6 +48,9 @@ class Markets extends React.Component {
 
   evalAirSwapDEXFilledEventLogs = (rawTxList) => {
     let newPairedTx = this.state.pairedTx ? this.state.pairedTx : {};
+
+    let trades = [];
+    // Step 1: Read all transactions and do some first transformations
     for (let txData of rawTxList) {
       // from AirSwapDEX contract:
       // event Filled(address indexed makerAddress,
@@ -71,31 +75,69 @@ class Markets extends React.Component {
       }
       trade["gasCost"] = trade.gasPrice * trade.gasUsed / 1e18;
 
-      let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-      let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
-
-      trade["makerSymbol"] = makerProps.symbol;
-      trade["takerSymbol"] = takerProps.symbol;
-
-      trade.makerAmount /= 10 ** makerProps.decimal;
-      trade.takerAmount /= 10 ** takerProps.decimal;
-
-      trade["price"] = trade.takerAmount / trade.makerAmount;
-
-      if (!newPairedTx[trade.makerToken]) {
-        newPairedTx[trade.makerToken] = {};
-      }
-
-      if (!newPairedTx[trade.makerToken][trade.takerToken]) {
-        newPairedTx[trade.makerToken][trade.takerToken] = [];
-      }
-
-      newPairedTx[trade.makerToken][trade.takerToken].push(trade);
+      trades.push(trade);
     }
-    this.setState({
-      pairedTx: newPairedTx,
-      statusMessage: null
-    }, this.checkStatus)
+
+    // Step 2: Check all tokens whether they are in the tokenlist. Otherwise
+    // get their information from a public library
+    let promiseListTokensLoaded = [];
+    let loadedTokens = [];
+    for (let trade of trades) {      
+      if (!loadedTokens.includes(trade.makerToken)) {
+        loadedTokens.push(trade.makerToken);
+        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+        if(!makerProps) {
+          promiseListTokensLoaded.push(
+            EthereumTokens.addTokenByAddress(trade.makerToken));
+        }
+      }
+
+      if (!loadedTokens.includes(trade.takerToken)) {
+        loadedTokens.push(trade.takerToken);
+        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+        if(!takerProps) {
+          promiseListTokensLoaded.push(
+            EthereumTokens.addTokenByAddress(trade.takerToken));
+        }
+      }
+    }
+    Promise.all(promiseListTokensLoaded)
+    .then(() => {
+      
+      let TokenList = [];
+      for (let trade of trades) {
+        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+        
+        if(!TokenList.includes(makerProps.name))
+          TokenList.push(makerProps.name);
+        if(!TokenList.includes(takerProps.name))
+          TokenList.push(takerProps.name);
+        
+        trade["makerSymbol"] = makerProps.symbol;
+        trade["takerSymbol"] = takerProps.symbol;
+        
+        trade.makerAmount /= 10 ** makerProps.decimal;
+        trade.takerAmount /= 10 ** takerProps.decimal;
+
+        trade["price"] = trade.takerAmount / trade.makerAmount;
+
+        if (!newPairedTx[trade.makerToken]) {
+          newPairedTx[trade.makerToken] = {};
+        }
+
+        if (!newPairedTx[trade.makerToken][trade.takerToken]) {
+          newPairedTx[trade.makerToken][trade.takerToken] = [];
+        }
+
+        newPairedTx[trade.makerToken][trade.takerToken].push(trade);
+      }
+      this.setState({
+        pairedTx: newPairedTx,
+        statusMessage: null,
+        TokenList: TokenList
+      }, this.checkStatus)
+    })
   }
 
   combineMarkets = (token1address, token2address) => {
@@ -199,11 +241,11 @@ class Markets extends React.Component {
 
   componentWillMount() {
     AirSwap.getLogs()
-      .then(x => {
-        this.evalAirSwapDEXFilledEventLogs(x);
-        // this.handleToken1Selected(data[0]);
-        // this.handleToken2Selected(data[1]);
-      });
+    .then(x => {
+      this.evalAirSwapDEXFilledEventLogs(x);
+      // this.handleToken1Selected(data[0]);
+      // this.handleToken2Selected(data[1]);
+    });
     this.checkStatus();
   }
 
@@ -241,10 +283,16 @@ class Markets extends React.Component {
   }
 
   render() {
-    const data = [
-      EthereumTokens.getTokenByName('AirSwap'),
-      EthereumTokens.getTokenByName('Ether'),
-      EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
+    let data = [];
+    if(this.state.TokenList) {
+      for(let token of this.state.TokenList) {
+        data.push(EthereumTokens.getTokenByName(token));
+      }
+    }
+    // const data = [
+    //   EthereumTokens.getTokenByName('AirSwap'),
+    //   EthereumTokens.getTokenByName('Ether'),
+    //   EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
 
     var tabsBarElement = this.state.txList ? <TabsBar 
       toggleState={this.toggleViewElement}
