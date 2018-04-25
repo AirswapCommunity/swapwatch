@@ -113,7 +113,6 @@ class Chart extends React.Component {
             } else if (xOffset + this.chart.tooltipWidth > this.chart.width) {
                 xOffset = this.chart.width - this.chart.tooltipWidth + 10;
                 arrowOffset = xOffset - arrowOffset;
-                //xOffset = arrowOffset - (this.chart.tooltipWidth - 10);
             } else {
                 arrowOffset = 0;
             }
@@ -146,7 +145,7 @@ class Chart extends React.Component {
             this.chart.cursorGroup.select('.tooltip')
                 .select('path')
                 .attr('fill', closest.close < closest.open ? '#f54748' : '#34f493')
-                .attr('transform', `rotate(${rotate}, 90, 100) translate(${-arrowOffset}, 0)`);
+                .attr('transform', `rotate(${rotate}, ${this.chart.tooltipWidth / 2}, ${this.chart.tooltipHeight / 2}) translate(${-arrowOffset}, 0)`);
         }
     }
 
