@@ -9,6 +9,7 @@ import TradingDataTable from "../TradingDataTable/TradingDataTable";
 import { timeParse } from "d3-time-format";
 
 import { AirSwap } from '../../services/AirSwap/AirSwap';
+import { Stats } from '../../services/Stats/Stats';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 import OptionsMenu from './OptionsMenu';
@@ -34,6 +35,7 @@ class Markets extends React.Component {
         'EMA': true,
         'Volume': true,
       },
+      'totalVolume': 0,
     }
     this.toggleIndicator = this.toggleIndicator.bind(this);
     this.toggleViewElement = this.toggleViewElement.bind(this);
@@ -146,6 +148,7 @@ class Markets extends React.Component {
         trade.takerAmount /= 10 ** takerProps.decimal;
 
         trade["price"] = trade.takerAmount / trade.makerAmount;
+        
 
         if (!newPairedTx[trade.makerToken]) {
           newPairedTx[trade.makerToken] = {};
@@ -157,11 +160,14 @@ class Markets extends React.Component {
 
         newPairedTx[trade.makerToken][trade.takerToken].push(trade);
       }
+      let volume = Stats.getEthVolume(trades)
+      console.log(volume);
       this.setState({
         pairedTx: newPairedTx,
         statusMessage: null,
         TokenList: TokenList,
-        TokenPairList: TokenPairList
+        TokenPairList: TokenPairList,
+        totalVolume: volume
       }, this.checkStatus)
     })
   }
