@@ -3,7 +3,14 @@ node_js:
 - node
 env:
 - NODE_ENV=production
+- CXX=g++-4.8
 cache: pip
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-4.8
 before_install:
 - npm i -g npm@latest
 install:
