@@ -22,6 +22,8 @@ class Markets extends React.Component {
       'hasLoadedData': false,
       'pairedTx': null, // loaded TX of AirSwapDEX sorted as [makerAddress][takerAddress]
       'txList': null, // List containing selected transactions for display
+      'TokenList': null,
+      'TokenPairList': null,
       'ohlcData': null, // Data transformed to OHLC format
       'selectedToken1': null, // currently selected token 1
       'selectedToken2': null, // currently selected token 2
@@ -31,7 +33,7 @@ class Markets extends React.Component {
         'BollingerBand': true,
         'EMA': true,
         'Volume': true,
-      }
+      },
     }
     this.toggleIndicator = this.toggleIndicator.bind(this);
     this.toggleViewElement = this.toggleViewElement.bind(this);
@@ -47,6 +49,9 @@ class Markets extends React.Component {
 
   evalAirSwapDEXFilledEventLogs = (rawTxList) => {
     let newPairedTx = this.state.pairedTx ? this.state.pairedTx : {};
+
+    let trades = [];
+    // Step 1: Read all transactions and do some first transformations
     for (let txData of rawTxList) {
       // from AirSwapDEX contract:
       // event Filled(address indexed makerAddress,
@@ -71,31 +76,94 @@ class Markets extends React.Component {
       }
       trade["gasCost"] = trade.gasPrice * trade.gasUsed / 1e18;
 
-      let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-      let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
-
-      trade["makerSymbol"] = makerProps.symbol;
-      trade["takerSymbol"] = takerProps.symbol;
-
-      trade.makerAmount /= 10 ** makerProps.decimal;
-      trade.takerAmount /= 10 ** takerProps.decimal;
-
-      trade["price"] = trade.takerAmount / trade.makerAmount;
-
-      if (!newPairedTx[trade.makerToken]) {
-        newPairedTx[trade.makerToken] = {};
-      }
-
-      if (!newPairedTx[trade.makerToken][trade.takerToken]) {
-        newPairedTx[trade.makerToken][trade.takerToken] = [];
-      }
-
-      newPairedTx[trade.makerToken][trade.takerToken].push(trade);
+      trades.push(trade);
     }
-    this.setState({
-      pairedTx: newPairedTx,
-      statusMessage: null
-    }, this.checkStatus)
+
+    // Step 2: Check all tokens whether they are in the tokenlist. Otherwise
+    // get their information from a public library
+    let promiseListTokensLoaded = [];
+    let loadedToken = [];
+    for (let trade of trades) {
+      if (!loadedToken.includes(trade.makerToken)) {
+        loadedToken.push(trade.makerToken);
+        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+        if(!makerProps) {
+          promiseListTokensLoaded.push(
+            EthereumTokens.addTokenByAddress(trade.makerToken));
+        }
+      }
+
+      if (!loadedToken.includes(trade.takerToken)) {
+        loadedToken.push(trade.takerToken);
+        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+        if(!takerProps) {
+          promiseListTokensLoaded.push(
+            EthereumTokens.addTokenByAddress(trade.takerToken));
+        }
+      }
+    }
+
+    // Once all tokens have been checked to be available. Add their
+    // information to the transactions
+    Promise.all(promiseListTokensLoaded)
+    .then(() => {
+      let tokenInList = [];
+      let TokenList = [];
+      let tokenPairInList = {};
+      let TokenPairList = {};
+
+      for (let trade of trades) {
+        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+
+        if(!tokenInList.includes(makerProps.name)) {
+          tokenInList.push(makerProps.name);
+          TokenList.push(makerProps);
+          
+          tokenPairInList[makerProps.name] = [];
+          TokenPairList[makerProps.name] = [];
+        }
+        if(!tokenPairInList[makerProps.name].includes(takerProps.name)) {
+          tokenPairInList[makerProps.name].push(takerProps.name);
+          TokenPairList[makerProps.name].push(takerProps);
+        }
+        if(!tokenInList.includes(takerProps.name)) {
+          tokenInList.push(takerProps.name);
+          TokenList.push(takerProps);
+          
+          tokenPairInList[takerProps.name] = [];
+          TokenPairList[takerProps.name] = [];
+        }
+        if(!tokenPairInList[takerProps.name].includes(makerProps.name)) {
+          tokenPairInList[takerProps.name].push(makerProps.name);
+          TokenPairList[takerProps.name].push(makerProps);
+        }
+        
+        trade["makerSymbol"] = makerProps.symbol;
+        trade["takerSymbol"] = takerProps.symbol;
+        
+        trade.makerAmount /= 10 ** makerProps.decimal;
+        trade.takerAmount /= 10 ** takerProps.decimal;
+
+        trade["price"] = trade.takerAmount / trade.makerAmount;
+
+        if (!newPairedTx[trade.makerToken]) {
+          newPairedTx[trade.makerToken] = {};
+        }
+
+        if (!newPairedTx[trade.makerToken][trade.takerToken]) {
+          newPairedTx[trade.makerToken][trade.takerToken] = [];
+        }
+
+        newPairedTx[trade.makerToken][trade.takerToken].push(trade);
+      }
+      this.setState({
+        pairedTx: newPairedTx,
+        statusMessage: null,
+        TokenList: TokenList,
+        TokenPairList: TokenPairList
+      }, this.checkStatus)
+    })
   }
 
   combineMarkets = (token1address, token2address) => {
@@ -133,6 +201,12 @@ class Markets extends React.Component {
          )) {
       let combinedMarket = this.combineMarkets(token1address, token2address);
       let ohlcData = this.convertToOHLC(combinedMarket);
+
+      if (ohlcData.length === 1) { 
+      // little patchwork: if only a single data point, the candlestick
+      // chart doesn't plot... so that point is just doubled in this case
+        ohlcData.push(ohlcData[0]);
+      }
       this.setState({
         txList: combinedMarket,
         ohlcData: ohlcData
@@ -199,11 +273,11 @@ class Markets extends React.Component {
 
   componentWillMount() {
     AirSwap.getLogs()
-      .then(x => {
-        this.evalAirSwapDEXFilledEventLogs(x);
-        // this.handleToken1Selected(data[0]);
-        // this.handleToken2Selected(data[1]);
-      });
+    .then(x => {
+      this.evalAirSwapDEXFilledEventLogs(x);
+      // this.handleToken1Selected(data[0]);
+      // this.handleToken2Selected(data[1]);
+    });
     this.checkStatus();
   }
 
@@ -240,12 +314,25 @@ class Markets extends React.Component {
     })
   }
 
-  render() {
-    const data = [
-      EthereumTokens.getTokenByName('AirSwap'),
-      EthereumTokens.getTokenByName('Ether'),
-      EthereumTokens.getTokenByName('Wrapped Ether')] // which tokens to display in dropdown
+  getToken1List() {
+    if(this.state.TokenPairList && 
+       this.state.selectedToken2 && 
+       this.state.TokenPairList[this.state.selectedToken2.name])
+      return this.state.TokenPairList[this.state.selectedToken2.name];
+    else
+      return this.state.TokenList;
+  }
 
+  getToken2List() {
+    if(this.state.TokenPairList && 
+       this.state.selectedToken1 && 
+       this.state.TokenPairList[this.state.selectedToken1.name])
+      return this.state.TokenPairList[this.state.selectedToken1.name];
+    else
+      return this.state.TokenList;
+  }
+
+  render() {
     var tabsBarElement = this.state.txList ? <TabsBar 
       toggleState={this.toggleViewElement}
       /> : null;
@@ -289,7 +376,7 @@ class Markets extends React.Component {
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
     var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
-
+    
     return (
       <Auxilary>
         <div className={styles.Outer}>
@@ -305,7 +392,7 @@ class Markets extends React.Component {
                   excludeItem={this.state.selectedToken2}
                   cleared={this.handleToken1Selected}
                   zIndex='20'>
-                  {data}
+                  {this.getToken1List()}
                 </AutoCompleteInput>
               </div>
               <div className={styles.AutoCompleteContainerRight}>
@@ -318,7 +405,7 @@ class Markets extends React.Component {
                   itemSelected={this.handleToken2Selected}
                   cleared={this.handleToken2Selected}
                   zIndex='10'>
-                  {data}
+                  {this.getToken2List()}
                 </AutoCompleteInput>
               </div>
             </div>
