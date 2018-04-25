@@ -83,6 +83,10 @@ class Chart extends React.Component {
                 const smaller = sortedData[index - 1];
                 const larger = sortedData[index];
 
+                if (!smaller || !larger) {
+                    return;
+                }
+
                 closest = date - smaller.date < larger.date - date ? smaller : larger;
             }
 
@@ -100,11 +104,47 @@ class Chart extends React.Component {
                 .attr("y2", coords[1]);
 
             // Tooltip
+            let xOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5;
+            let arrowOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5;
+
+            if (xOffset < 0) {
+                xOffset = 0;
+            } else if (xOffset + this.chart.tooltipWidth > this.chart.width) {
+                xOffset = this.chart.width - this.chart.tooltipWidth;
+                arrowOffset = xOffset - arrowOffset;
+            } else {
+                arrowOffset = 0;
+            }
+
+            let rotate = 0;
+
+            let yOffset = this.chart.yScale(closest.high) - (this.chart.tooltipHeight + this.chart.tooltipArrowHeight);
+
+            if (yOffset < 0) {
+                yOffset = this.chart.yScale(closest.low) + this.chart.tooltipArrowHeight;
+                rotate = 180;
+
+                if (xOffset > 0) {
+                    arrowOffset = -arrowOffset;
+                }
+            }
+
+            if (yOffset + this.chart.tooltipHeight + this.tooltipArrowHeight > this.chart.height) {
+                yOffset = this.chart.height - this.tooltipHeight + this.tooltipArrowHeight;
+            }
+
             this.chart.cursorGroup.select('.tooltip')
                 .attr('transform',
-                    `translate(${(this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5}, 
-                    ${this.chart.yScale(closest.high) - (this.chart.tooltipHeight + 10)})`);
-                    
+                    `translate(${xOffset}, ${yOffset})`);
+
+            this.chart.cursorGroup.select('.tooltip')
+                .select('rect')
+                .attr('stroke', closest.close < closest.open ? '#f54748' : '#34f493');
+
+            this.chart.cursorGroup.select('.tooltip')
+                .select('path')
+                .attr('fill', closest.close < closest.open ? '#f54748' : '#34f493')
+                .attr('transform', `rotate(${rotate}, 90, 100) translate(${-arrowOffset}, 0)`);
         }
     }
 
@@ -238,12 +278,16 @@ class Chart extends React.Component {
             .attr('ry', '20')
             .attr('width', '180')
             .attr('height', '200')
-            .attr('style', 'fill:black;stroke:black;stroke-width:1;opacity:0.75');
+            .attr('fill', 'black')
+            .attr('stroke', 'black')
+            .attr('stroke-width', '4')
+            .attr('opacity', '0.75');
 
         tooltip.append('path')
             .attr('class', 'arrow')
             .attr('d', 'm 80,200.25 l 10,10 l 10,-10')
-            .attr('style', 'fill:black;opacity:0.75');
+            .attr('fill', 'black')
+            .attr('opacity', '0.75');
 
         this.chart = {
             yScale,
@@ -255,7 +299,8 @@ class Chart extends React.Component {
             axisLeftWidth: yAxisOffsetLeft,
             axisRightWidth: yAxisOffsetRight,
             tooltipWidth: 180,
-            tooltipHeight: 200
+            tooltipHeight: 200,
+            tooltipArrowHeight: 10
         }
     }
 
