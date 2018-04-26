@@ -104,12 +104,12 @@ class Chart extends React.Component {
                 .attr("y2", coords[1]);
 
             // Tooltip
-            let xOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5;
-            let arrowOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + 2.5;
+            let xOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + (this.chart.candleWidth / 2);
+            let arrowOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + (this.chart.candleWidth / 2);
 
             if (xOffset < 0) {
-                xOffset = -5;
-                arrowOffset += 5;
+                xOffset = 0;//-5;
+                // arrowOffset += 5;
             } else if (xOffset + this.chart.tooltipWidth > this.chart.width) {
                 xOffset = this.chart.width - this.chart.tooltipWidth + 10;
                 arrowOffset = xOffset - arrowOffset;
@@ -193,6 +193,15 @@ class Chart extends React.Component {
         const chartWidth = this.maxWidth - (yAxisOffsetLeft + yAxisOffsetRight + 20);
         const chartOffset = (yAxisOffsetLeft + 10);
 
+        const candleMargin = 2;
+        let candleWidth = (chartWidth - (data.length * (candleMargin * 2))) / data.length;
+
+        if (candleWidth < 1) {
+            candleWidth = 1;
+        }
+
+        console.log(candleWidth);
+
         // X-Axis
         const xScale = scaleTime()
             .domain([min(dates), max(dates)])
@@ -218,8 +227,8 @@ class Chart extends React.Component {
             .enter()
             .append('line')
             .attr('class', 'wick')
-            .attr('x1', d => xScale(d.date) + ((chartWidth / data.length) - 10) / 2)
-            .attr('x2', d => xScale(d.date) + ((chartWidth / data.length) - 10) / 2)
+            .attr('x1', d => xScale(d.date) + candleWidth / 2)
+            .attr('x2', d => xScale(d.date) + candleWidth / 2)
             .attr('y2', d => yScale(d.high))
             .attr('y1', d => yScale(d.low))
             .attr('style', d => `stroke:${d.close < d.open ? '#f54748' : '#34f493'};stroke-width:2`);
@@ -231,7 +240,7 @@ class Chart extends React.Component {
             .enter()
             .append('rect')
             .attr('class', 'candle')
-            .attr('width', (chartWidth / data.length) - 10)
+            .attr('width', candleWidth)
             .attr('height', d => Math.abs(yScale(d.open) - yScale(d.close)))
             .attr('x', d => xScale(d.date))
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
@@ -301,7 +310,8 @@ class Chart extends React.Component {
             axisRightWidth: yAxisOffsetRight,
             tooltipWidth: 180,
             tooltipHeight: 200,
-            tooltipArrowHeight: 10
+            tooltipArrowHeight: 10,
+            candleWidth
         }
     }
 
