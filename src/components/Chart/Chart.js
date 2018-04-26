@@ -146,10 +146,24 @@ class Chart extends React.Component {
                 .select('path')
                 .attr('fill', closest.close < closest.open ? '#f54748' : '#34f493')
                 .attr('transform', `rotate(${rotate}, ${this.chart.tooltipWidth / 2}, ${this.chart.tooltipHeight / 2}) translate(${-arrowOffset}, 0)`);
+
+            // this.chart.cursorGroup.select('.tooltip')
+            //     // .select('.contentarea')
+            //     .selectAll('div')
+            //     .data(Object.entries(closest))
+            //     .enter()
+            //     .append('div')
+            //     .append('p')
+            //     .text(d => { return d[0]; })
+            //     .attr("font-family", "sans-serif")
+            //     .attr("font-size", "20px")
+            //     .attr("fill", "red");
         }
     }
 
     createChart() {
+        select(this.node).selectAll('*').remove();
+
         console.log(this.props.data);
 
         let chartHeight = this.maxHeight - this.marginBottom - this.bottomOffset;
@@ -200,8 +214,6 @@ class Chart extends React.Component {
             candleWidth = 1;
         }
 
-        console.log(candleWidth);
-
         // X-Axis
         const xScale = scaleTime()
             .domain([min(dates), max(dates)])
@@ -244,6 +256,7 @@ class Chart extends React.Component {
             .attr('height', d => Math.abs(yScale(d.open) - yScale(d.close)))
             .attr('x', d => xScale(d.date))
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
+            .attr('filter', 'url(#f1)')
             .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
 
         // Tooltip group/setup
@@ -279,11 +292,38 @@ class Chart extends React.Component {
         cursor.append("circle")
             .attr("r", 7.5);
 
+        // Drop Shadow
+        const filter = select(node)
+            .append('defs')
+            .append('filter')
+            .attr('id', 'f1')
+            .attr('x', '0')
+            .attr('y', '0')
+            .attr('width', '200%')
+            .attr('height', '200%');
+
+        filter.append('feOffset')
+            .attr('result', 'offOut')
+            .attr('in', 'SourceAlpha')
+            .attr('dx', '0')
+            .attr('dy', '0');
+
+        filter.append('feGaussianBlur')
+            .attr('result', 'blurOut')
+            .attr('in', 'offOut')
+            .attr('stdDeviation', '2');
+
+        filter.append('feBlend')
+            .attr('in', 'SourceGraphic')
+            .attr('in2', 'blurOut')
+            .attr('mode', 'normal');
+
         const tooltip = cursor.append("g")
             .attr("class", "tooltip")
             .attr('style', 'pointer-events: none');
 
         tooltip.append('rect')
+            .attr('class', 'contentarea')
             // .attr('rx', '20')
             // .attr('ry', '20')
             .attr('width', '180')
@@ -291,13 +331,13 @@ class Chart extends React.Component {
             .attr('fill', 'black')
             .attr('stroke', 'black')
             .attr('stroke-width', '4')
-            .attr('opacity', '0.75');
+            .attr('fill-opacity', '0.75');
 
         tooltip.append('path')
             .attr('class', 'arrow')
             .attr('d', 'm 80,200.25 l 10,10 l 10,-10')
-            .attr('fill', 'black')
-            .attr('opacity', '0.75');
+            .attr('fill', 'black');
+        // .attr('fill-opacity', '0.75');
 
         this.chart = {
             yScale,
