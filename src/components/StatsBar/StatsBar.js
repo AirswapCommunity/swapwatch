@@ -10,10 +10,10 @@ class StatsBar extends Component {
     let {totalVolume} = this.props
     let volumeString = '... Loading ...';
     if(totalVolume) volumeString = numberFormat(totalVolume) + ' ETH';
-    return (
-      <ul className={styles.StatsBar}>
-        24h Swap Volume: {volumeString}
-      </ul>
+	return (
+      <div className={styles.StatsBarContainer}>
+        <span className={styles.StatsBarText}>24h Swap Volume: {volumeString}</span>
+      </div>
     );
   }
 };
