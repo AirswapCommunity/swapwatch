@@ -11,18 +11,46 @@
 
   .TooltipDiv {
     position: absolute;
-    /* text-align: center; */
-    width: 180px;
-    height: 200px;
-    border-width: 0px;
-    padding: 0px;
+    width: 152px;
+    height: 172px;
+    padding: 10px;
     font-family: 'Open Sans';
     font-size: 11pt;
     color: whitesmoke;
-    background: rgba(0, 0, 0, 0.5);
+    /* background: rgba(0, 0, 0, 0.5); */
     pointer-events: none;
+    display: list-item;
+    margin: 4px;
   }
 
   .ChartContainer {
       position: relative;
   }
+
+  .TooltipHeader {
+    text-align: center;
+    margin: 0px 0px 10px 0px;
+  }
+
+  .TokenLogo {
+    margin: 0px 15px;
+  }
+
+  :global(.chartTooltipRowContainer) {
+    display: flow-root;
+    margin: 4px 10px;
+  }
+
+  :global(.chartTooltipLabel) {
+    float:left;
+    text-transform: capitalize;
+  }
+
+  :global(.chartTooltipValue) {
+      float:right;
+  }
+
+  :global(.chartTooltipValueCentered) {
+    text-align: center;
+    margin-bottom: 10px;
+}

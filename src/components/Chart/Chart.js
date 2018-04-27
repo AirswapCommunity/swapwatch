@@ -143,24 +143,41 @@ class Chart extends React.Component {
                 .attr('fill', closest.close < closest.open ? '#f54748' : '#34f493')
                 .attr('transform', `rotate(${rotate}, ${this.chart.tooltipWidth / 2}, ${this.chart.tooltipHeight / 2}) translate(${-arrowOffset}, 0)`);
 
+            // Tooltip data
+            let formatNumber = format(".5f");
+
+            let tooltipData = {
+                date: closest.date.toLocaleDateString({}, { year: 'numeric', month: 'long', day: 'numeric' }),
+                open: closest.open,
+                high: closest.high,
+                low: closest.low,
+                close: closest.close
+            };
+
+            select(this.tooltipDiv).selectAll('div').remove();
+
             const tooltip = select(this.tooltipDiv)
                 .style('left', `${xOffset + this.chart.axisLeftWidth + 10}px`)
                 .style('top', `${yOffset}px`)
                 .selectAll('div')
-                .data(Object.entries(closest));
+                .data(Object.entries(tooltipData));
 
-            tooltip.text(d => { return `${d[0]}: ${d[1]}`; });
-
-            tooltip.enter()
+            let rows = tooltip.enter()
                 .append('div')
-                .text(d => { return `${d[0]}: ${d[1]}`; });
+                .attr('class', 'chartTooltipRowContainer');
+            rows.append('div')
+                .attr('class', 'chartTooltipLabel')
+                .text(d => d[0] === 'date' ? '' : d[0]);
+            rows.append('div')
+                .attr('class', d => d[0] === 'date' ? 'chartTooltipValueCentered' : 'chartTooltipValue')
+                .text(d => { return isNaN(d[1]) ? d[1] : formatNumber(d[1]); });
         }
     }
 
     createChart() {
         select(this.node).selectAll('*').remove();
 
-        console.log(this.props.data);
+        console.log(this.props.makerToken);
 
         let chartHeight = this.maxHeight - this.marginBottom - this.bottomOffset;
         let formatNumber = format(".5f");
@@ -352,6 +369,8 @@ class Chart extends React.Component {
     }
 
     render() {
+        var makerTokenLogo = `/tokens/${this.props.makerToken.logo}`;
+        var takerTokenLogo = `/tokens/${this.props.takerToken.logo}`;
 
         return (
             <div className={styles.ChartContainer}>
@@ -359,6 +378,11 @@ class Chart extends React.Component {
                     width={this.props.width} height={this.maxHeight - this.marginBottom}>
                 </svg>
                 <div className={styles.TooltipDiv} ref={node => this.tooltipDiv = node}>
+                    <p className={styles.TooltipHeader}>
+                        <img className={styles.TokenLogo} src={makerTokenLogo} alt='token logo' style={{ width: '24px' }} />
+                        <span>in</span>
+                        <img className={styles.TokenLogo} src={takerTokenLogo} alt='token logo' style={{ width: '24px' }} />
+                    </p>
                 </div>
             </div>);
     }
