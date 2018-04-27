@@ -4,6 +4,8 @@ node_js:
 env:
 - NODE_ENV=production
 cache: pip
+before_install:
+- npm i -g npm@latest
 install:
 - npm i
 script:
