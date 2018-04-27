@@ -9,14 +9,20 @@
       font-weight: 700;
   }
 
-  .tooltip {
+  .TooltipDiv {
     position: absolute;
-    text-align: center;
+    /* text-align: center; */
     width: 180px;
     height: 200px;
-    padding: 8px;
+    border-width: 0px;
+    padding: 0px;
     font-family: 'Open Sans';
-    font-size: 10px;
+    font-size: 11pt;
+    color: whitesmoke;
     background: rgba(0, 0, 0, 0.5);
     pointer-events: none;
+  }
+
+  .ChartContainer {
+      position: relative;
   }

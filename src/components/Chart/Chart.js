@@ -1,25 +1,19 @@
 import React from "react";
 import styles from "./Chart.css";
-// import Auxilary from "../../hoc/Auxilary";
 
 import { scaleLinear, scaleTime } from "d3-scale";
 import { max, min, bisector } from 'd3-array';
 import { select } from 'd3-selection';
-import { timeParse } from "d3-time-format";
 import { fitDimensions } from "react-stockcharts/lib/helper";
 import { axisBottom, axisRight, axisLeft } from 'd3-axis';
 import { format, mouse } from 'd3';
 import { hexToRGBA } from "react-stockcharts/lib/utils";
-
-// import { AirSwap } from '../../services/AirSwap/AirSwap';
-// import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 class Chart extends React.Component {
     constructor(props) {
         super(props);
 
         this.state = {
-
         };
 
         this.maxHeight = props.height;
@@ -35,6 +29,8 @@ class Chart extends React.Component {
     }
 
     componentDidUpdate() {
+        this.maxHeight = this.props.height;
+        this.maxWidth = this.props.width - 10;
         this.createChart()
     }
 
@@ -147,17 +143,17 @@ class Chart extends React.Component {
                 .attr('fill', closest.close < closest.open ? '#f54748' : '#34f493')
                 .attr('transform', `rotate(${rotate}, ${this.chart.tooltipWidth / 2}, ${this.chart.tooltipHeight / 2}) translate(${-arrowOffset}, 0)`);
 
-            // this.chart.cursorGroup.select('.tooltip')
-            //     // .select('.contentarea')
-            //     .selectAll('div')
-            //     .data(Object.entries(closest))
-            //     .enter()
-            //     .append('div')
-            //     .append('p')
-            //     .text(d => { return d[0]; })
-            //     .attr("font-family", "sans-serif")
-            //     .attr("font-size", "20px")
-            //     .attr("fill", "red");
+            const tooltip = select(this.tooltipDiv)
+                .style('left', `${xOffset + this.chart.axisLeftWidth + 10}px`)
+                .style('top', `${yOffset}px`)
+                .selectAll('div')
+                .data(Object.entries(closest));
+
+            tooltip.text(d => { return `${d[0]}: ${d[1]}`; });
+
+            tooltip.enter()
+                .append('div')
+                .text(d => { return `${d[0]}: ${d[1]}`; });
         }
     }
 
@@ -330,7 +326,7 @@ class Chart extends React.Component {
             .attr('height', '200')
             .attr('fill', 'black')
             .attr('stroke', 'black')
-            .attr('stroke-width', '4')
+            .attr('stroke-width', '6')
             .attr('fill-opacity', '0.75');
 
         tooltip.append('path')
@@ -357,9 +353,14 @@ class Chart extends React.Component {
 
     render() {
 
-        return <svg ref={node => this.node = node}
-            width={this.props.width} height={this.maxHeight - this.marginBottom}>
-        </svg>
+        return (
+            <div className={styles.ChartContainer}>
+                <svg ref={node => this.node = node}
+                    width={this.props.width} height={this.maxHeight - this.marginBottom}>
+                </svg>
+                <div className={styles.TooltipDiv} ref={node => this.tooltipDiv = node}>
+                </div>
+            </div>);
     }
 }
 
