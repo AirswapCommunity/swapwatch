@@ -91,6 +91,13 @@ const EthereumTokens = [
         "decimal": 18
     },
     {
+        "name": 'Digix DAO',
+        "symbol": "DGD",
+        "address": '0xe0b7927c4af23765cb51314a0e0521a9645f0e2a',
+        "logo": "digix.png",
+        "decimal": 9
+    },
+    {
         "name": 'ELF',
         "symbol": "ELF",
         "address": '0xbf2179859fc6d5bee9bf9158632dc51678a4100e',
@@ -288,6 +295,7 @@ const EthereumTokens = [
     },
 ]
 
+
 let EthereumTokensSN = EthereumTokens.slice(0);
 
 EthereumTokensSN.sort((a, b) => {
@@ -347,12 +355,49 @@ var getTokenByAddress = (address) => {
         } else {
             h = m - 1;
         }
-    }
+    }    
+    // if this point is reached, the token was not found in the list
     return undefined;
+}
+
+var addTokenByAddress = (address) => {
+    return fetch(`https://api.ethplorer.io/getTokenInfo/`+address+
+          `?apiKey=freekey`)
+    .then(res => res.json())
+    .then(response => {
+        addAndUpdateTokenLists({
+            "name": response.name,
+            "symbol": response.symbol,
+            "address": address,
+            "logo": "",
+            "decimal": parseInt(response.decimals, 10)
+        })
+        console.log('Added ' + response.name + ' to Token list using data from Ethplorer.');
+    })
+}
+
+var addAndUpdateTokenLists = (newToken) => {
+    EthereumTokensSA.push(newToken);
+    EthereumTokensSA.sort((a, b) => {
+        let aLow = a.address.toLocaleLowerCase();
+        let bLow = b.address.toLocaleLowerCase();
+
+        return aLow < bLow ? -1 : aLow === bLow ? 0 : 1;
+    });
+
+    EthereumTokensSN.push(newToken);
+    EthereumTokensSN.sort((a, b) => {
+        let aLow = a.name.toLocaleLowerCase();
+        let bLow = b.name.toLocaleLowerCase();
+
+        return aLow < bLow ? -1 : aLow === bLow ? 0 : 1;
+    });
+
 }
 
 module.exports.EthereumTokens = {
     AllTokens: EthereumTokens,
     getTokenByName,
     getTokenByAddress,
+    addTokenByAddress
 }

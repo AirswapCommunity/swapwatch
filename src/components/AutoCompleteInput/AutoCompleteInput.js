@@ -162,7 +162,13 @@ class AutoCompleteInput extends Component {
 
                     if (this.props.imageField) {
                         var path = `/tokens/${item[this.props.imageField]}`;
-                        element = <div className={cssStyles.ComplexItemWrapper}><img src={path} alt='token logo' className={cssStyles.ItemImageField} /><div className={cssStyles.ItemDisplayField}>{displayValue}</div><div className={cssStyles.ItemSecondaryField}>{secondaryValue}</div></div>;
+                        element = (<div className={cssStyles.ComplexItemWrapper}>
+                            <img src={path} 
+                                 alt=""
+                                 className={cssStyles.ItemImageField} />
+                            <div className={cssStyles.ItemDisplayField}>{displayValue}</div>
+                            <div className={cssStyles.ItemSecondaryField}>{secondaryValue}</div>
+                        </div>);
                     }
 
                     return <MenuItem key={i}
@@ -198,7 +204,7 @@ class AutoCompleteInput extends Component {
             var path = `/tokens/${this.state.selectedItem[this.props.imageField]}`;
 
             adorner = <InputAdornment position="start">
-                <img src={path} alt='token logo' style={{ width: '24px' }} />
+                <img src={path} alt="" style={{ width: '24px' }} />
             </InputAdornment>;
         }
 

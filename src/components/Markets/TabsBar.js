@@ -31,7 +31,7 @@ class TabsBar extends React.Component {
         value={this.state.value}
         onChange={this.handleChange}
         textColor="inherit"
-        indicatorColor={"#4FC0FF"}
+        indicatorColor='primary'
       >
         <Tab icon={<i className="fa fa-line-chart"></i>} />
         <Tab icon={<i className="fa fa-sitemap"></i>} />

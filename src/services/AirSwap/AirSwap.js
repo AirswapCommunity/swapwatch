@@ -1,7 +1,8 @@
 
 // const AirSwapTokenAddress = '0x27054b13b1b798b345b591a4d22e6562d47ea75a';
 const AirSwapDEX = '0x8fd3121013a07c57f0d69646e86e7a4880b467b7';
-const AirSwapFilledEvent = '0xe59c5e56d85b2124f5e7f82cb5fcc6d28a4a241a9bdd732704ac9d3b6bfc98ab';
+const AirSwapFilledEvent = 
+  '0xe59c5e56d85b2124f5e7f82cb5fcc6d28a4a241a9bdd732704ac9d3b6bfc98ab';
 const EtherscanAPIKey = 'VR4UPKI119TYM93ZV47GXTTGFSMRRDEVGZ';
 
 const cacheDelay = 60000;
@@ -43,8 +44,22 @@ var getTokenList = () => {
 // }
 
 var getLogs = (startBlock, endBlock) => {
+  if(localStorage.getItem('txLogs')) {
+    let storageLogs = JSON.parse(localStorage.getItem('txLogs'));
+    // if previously added logs are within the local storage
+    // check if logs are loaded already and if
+    // the localStorage timestamp is newer than the currently set logs
+    if(storageLogs.timestamp && 
+       !(Logs.timestamp && (Logs.timestamp >= storageLogs.timestamp)) ) {
+      Logs.entries = storageLogs.entries;
+      Logs.timestamp = storageLogs.timestamp;
+      Logs.startBlock = storageLogs.startBlock;
+      Logs.latestBlock = storageLogs.latestBlock;
+    }
+  }
+
   if (Logs.timestamp && Date.now() - Logs.timestamp <= cacheDelay) {
-    console.log('getting cached version');
+    console.log('Getting cached data');
     return new Promise((resolve, reject) => resolve(Logs.entries));
   }
 
@@ -56,7 +71,8 @@ var getLogs = (startBlock, endBlock) => {
     if (endBlock > 0) {
       resolve(endBlock);
     } else {
-      fetch(`https://api.etherscan.io/api?module=proxy&action=eth_blockNumber&apikey=${EtherscanAPIKey}`)
+      fetch(`https://api.etherscan.io/api?module=proxy&action=eth_blockNumber`+
+            `&apikey=${EtherscanAPIKey}`)
       .then(res => res.json())
       .then(response => {
         resolve(parseInt(response.result, 16));
@@ -89,7 +105,8 @@ var getLogs = (startBlock, endBlock) => {
   }).then(res => res.json())
   .then(response => {
     if (response.status === '0') {
-      // response is empty or something went wrong... try again from latest fetched Block just in case
+      // response is empty or something went wrong... 
+      // try again from latest fetched Block just in case
       let lastLogsEntry;
       let lastLoadedBlocknumber;
       if(Logs.entries && Logs.entries.length > 0) {
@@ -116,7 +133,8 @@ var getLogs = (startBlock, endBlock) => {
            newEntries[0].transactionHash === lastLogsEntry.transactionHash) 
           newEntries.splice(0,1);
 
-        // another check needed for entries in same timestamp or secured by natural order given from etherscan?
+        // another check needed for entries in same timestamp or secured by 
+        // natural order given from etherscan?
       }
       Logs.entries = Logs.entries.concat(newEntries);
     } 
@@ -128,6 +146,8 @@ var getLogs = (startBlock, endBlock) => {
       return getLogs(lastLoadedBlocknumber, toBlock)
     } else {
       Logs.timestamp = Date.now();
+      // store logs to local storage
+      localStorage.setItem('txLogs', JSON.stringify(Logs));
       return Logs.entries; 
     }
   });
