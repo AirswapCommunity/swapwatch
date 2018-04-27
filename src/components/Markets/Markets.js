@@ -43,7 +43,7 @@ class Markets extends React.Component {
 
 
   }
-  
+
   removeLeadingZeros = (data) => {
     let cleaned_string = data.replace(/0x0*/, '0x');
     while (cleaned_string.length < 42) cleaned_string = cleaned_string.replace('0x', '0x0')
@@ -55,7 +55,7 @@ class Markets extends React.Component {
 
     let trades = [];
     let wethAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
-    let ethAddress =  '0x0000000000000000000000000000000000000000';
+    let ethAddress = '0x0000000000000000000000000000000000000000';
     // Step 1: Read all transactions and do some first transformations
     for (let txData of rawTxList) {
       // from AirSwapDEX contract:
@@ -79,9 +79,9 @@ class Markets extends React.Component {
         "gasPrice": parseInt(txData.gasPrice, 16),
         "timestamp": parseInt(txData.timeStamp, 16),
       }
-      if(trade['makerToken'] === wethAddress) 
+      if (trade['makerToken'] === wethAddress)
         trade['makerToken'] = ethAddress
-      if(trade['takerToken'] === wethAddress) 
+      if (trade['takerToken'] === wethAddress)
         trade['takerToken'] = ethAddress
 
       trade["gasCost"] = trade.gasPrice * trade.gasUsed / 1e18;
@@ -97,7 +97,7 @@ class Markets extends React.Component {
       if (!loadedToken.includes(trade.makerToken)) {
         loadedToken.push(trade.makerToken);
         let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-        if(!makerProps) {
+        if (!makerProps) {
           promiseListTokensLoaded.push(
             EthereumTokens.addTokenByAddress(trade.makerToken));
         }
@@ -106,7 +106,7 @@ class Markets extends React.Component {
       if (!loadedToken.includes(trade.takerToken)) {
         loadedToken.push(trade.takerToken);
         let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
-        if(!takerProps) {
+        if (!takerProps) {
           promiseListTokensLoaded.push(
             EthereumTokens.addTokenByAddress(trade.takerToken));
         }
@@ -116,68 +116,68 @@ class Markets extends React.Component {
     // Once all tokens have been checked to be available. Add their
     // information to the transactions
     Promise.all(promiseListTokensLoaded)
-    .then(() => {
-      let tokenInList = [];
-      let TokenList = [];
-      let tokenPairInList = {};
-      let TokenPairList = {};
+      .then(() => {
+        let tokenInList = [];
+        let TokenList = [];
+        let tokenPairInList = {};
+        let TokenPairList = {};
 
-      for (let trade of trades) {
-        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+        for (let trade of trades) {
+          let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+          let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
 
-        if(!tokenInList.includes(makerProps.name)) {
-          tokenInList.push(makerProps.name);
-          TokenList.push(makerProps);
-          
-          tokenPairInList[makerProps.name] = [];
-          TokenPairList[makerProps.name] = [];
-        }
-        if(!tokenPairInList[makerProps.name].includes(takerProps.name)) {
-          tokenPairInList[makerProps.name].push(takerProps.name);
-          TokenPairList[makerProps.name].push(takerProps);
-        }
-        if(!tokenInList.includes(takerProps.name)) {
-          tokenInList.push(takerProps.name);
-          TokenList.push(takerProps);
-          
-          tokenPairInList[takerProps.name] = [];
-          TokenPairList[takerProps.name] = [];
-        }
-        if(!tokenPairInList[takerProps.name].includes(makerProps.name)) {
-          tokenPairInList[takerProps.name].push(makerProps.name);
-          TokenPairList[takerProps.name].push(makerProps);
-        }
-        
-        trade["makerSymbol"] = makerProps.symbol;
-        trade["takerSymbol"] = takerProps.symbol;
-        
-        trade.makerAmount /= 10 ** makerProps.decimal;
-        trade.takerAmount /= 10 ** takerProps.decimal;
+          if (!tokenInList.includes(makerProps.name)) {
+            tokenInList.push(makerProps.name);
+            TokenList.push(makerProps);
 
-        trade["price"] = trade.takerAmount / trade.makerAmount;
-        
+            tokenPairInList[makerProps.name] = [];
+            TokenPairList[makerProps.name] = [];
+          }
+          if (!tokenPairInList[makerProps.name].includes(takerProps.name)) {
+            tokenPairInList[makerProps.name].push(takerProps.name);
+            TokenPairList[makerProps.name].push(takerProps);
+          }
+          if (!tokenInList.includes(takerProps.name)) {
+            tokenInList.push(takerProps.name);
+            TokenList.push(takerProps);
 
-        if (!newPairedTx[trade.makerToken]) {
-          newPairedTx[trade.makerToken] = {};
+            tokenPairInList[takerProps.name] = [];
+            TokenPairList[takerProps.name] = [];
+          }
+          if (!tokenPairInList[takerProps.name].includes(makerProps.name)) {
+            tokenPairInList[takerProps.name].push(makerProps.name);
+            TokenPairList[takerProps.name].push(makerProps);
+          }
+
+          trade["makerSymbol"] = makerProps.symbol;
+          trade["takerSymbol"] = takerProps.symbol;
+
+          trade.makerAmount /= 10 ** makerProps.decimal;
+          trade.takerAmount /= 10 ** takerProps.decimal;
+
+          trade["price"] = trade.takerAmount / trade.makerAmount;
+
+
+          if (!newPairedTx[trade.makerToken]) {
+            newPairedTx[trade.makerToken] = {};
+          }
+
+          if (!newPairedTx[trade.makerToken][trade.takerToken]) {
+            newPairedTx[trade.makerToken][trade.takerToken] = [];
+          }
+
+          newPairedTx[trade.makerToken][trade.takerToken].push(trade);
         }
-
-        if (!newPairedTx[trade.makerToken][trade.takerToken]) {
-          newPairedTx[trade.makerToken][trade.takerToken] = [];
-        }
-
-        newPairedTx[trade.makerToken][trade.takerToken].push(trade);
-      }
-      let volume = Stats.getEthVolume(trades)
-      console.log(volume);
-      this.setState({
-        pairedTx: newPairedTx,
-        statusMessage: null,
-        TokenList: TokenList,
-        TokenPairList: TokenPairList,
-        totalVolume: volume
-      }, this.checkStatus)
-    })
+        let volume = Stats.getEthVolume(trades)
+        console.log(volume);
+        this.setState({
+          pairedTx: newPairedTx,
+          statusMessage: null,
+          TokenList: TokenList,
+          TokenPairList: TokenPairList,
+          totalVolume: volume
+        }, this.checkStatus)
+      })
   }
 
   combineMarkets = (token1address, token2address) => {
@@ -207,18 +207,18 @@ class Markets extends React.Component {
   getTokenPairTxList = () => {
     let token1address = this.state.selectedToken1.address;
     let token2address = this.state.selectedToken2.address;
-    if (this.state.pairedTx && 
-        ((this.state.pairedTx[token1address]
-                 && this.state.pairedTx[token1address][token2address])
-         || (this.state.pairedTx[token2address]
-                 && this.state.pairedTx[token2address][token1address])
-         )) {
+    if (this.state.pairedTx &&
+      ((this.state.pairedTx[token1address]
+        && this.state.pairedTx[token1address][token2address])
+        || (this.state.pairedTx[token2address]
+          && this.state.pairedTx[token2address][token1address])
+      )) {
       let combinedMarket = this.combineMarkets(token1address, token2address);
       let ohlcData = this.convertToOHLC(combinedMarket);
 
-      if (ohlcData.length === 1) { 
-      // little patchwork: if only a single data point, the candlestick
-      // chart doesn't plot... so that point is just doubled in this case
+      if (ohlcData.length === 1) {
+        // little patchwork: if only a single data point, the candlestick
+        // chart doesn't plot... so that point is just doubled in this case
         ohlcData.push(ohlcData[0]);
       }
       this.setState({
@@ -287,17 +287,17 @@ class Markets extends React.Component {
 
   componentWillMount() {
     AirSwap.getLogs()
-    .then(x => {
-      this.evalAirSwapDEXFilledEventLogs(x);
-      // this.handleToken1Selected(data[0]);
-      // this.handleToken2Selected(data[1]);
-    });
+      .then(x => {
+        this.evalAirSwapDEXFilledEventLogs(x);
+        // this.handleToken1Selected(data[0]);
+        // this.handleToken2Selected(data[1]);
+      });
     this.checkStatus();
   }
 
   checkStatus() {
     let statusMsg;
-    let hasLoadedData=true;
+    let hasLoadedData = true;
     if (!this.state.pairedTx) {
       statusMsg = 'Standby. Fetching AirSwap transactions from Etherscan...';
       hasLoadedData = false;
@@ -308,12 +308,14 @@ class Markets extends React.Component {
         statusMsg = 'Please select a token pair';
       }
     }
-    this.setState({ hasLoadedData: hasLoadedData,
-                    statusMessage: statusMsg });
+    this.setState({
+      hasLoadedData: hasLoadedData,
+      statusMessage: statusMsg
+    });
   }
 
   toggleIndicator(ind) {
-    if(ind) {
+    if (ind) {
       var newIndicator = this.state.indicator;
       newIndicator[ind] = !newIndicator[ind]
       this.setState({
@@ -329,45 +331,45 @@ class Markets extends React.Component {
   }
 
   getToken1List() {
-    if(this.state.TokenPairList && 
-       this.state.selectedToken2 && 
-       this.state.TokenPairList[this.state.selectedToken2.name])
+    if (this.state.TokenPairList &&
+      this.state.selectedToken2 &&
+      this.state.TokenPairList[this.state.selectedToken2.name])
       return this.state.TokenPairList[this.state.selectedToken2.name];
     else
       return this.state.TokenList;
   }
 
   getToken2List() {
-    if(this.state.TokenPairList && 
-       this.state.selectedToken1 && 
-       this.state.TokenPairList[this.state.selectedToken1.name])
+    if (this.state.TokenPairList &&
+      this.state.selectedToken1 &&
+      this.state.TokenPairList[this.state.selectedToken1.name])
       return this.state.TokenPairList[this.state.selectedToken1.name];
     else
       return this.state.TokenList;
   }
 
   render() {
-    var tabsBarElement = this.state.txList ? <TabsBar 
+    var tabsBarElement = this.state.txList ? <TabsBar
       toggleState={this.toggleViewElement}
-      /> : null;
-    
-    var candlestickElement =  <CandlestickChart 
-                                data={this.state.ohlcData}
-                                token1={this.state.selectedToken1}
-                                token2={this.state.selectedToken2}
-                                indicator={this.state.indicator}
-                              />;
+    /> : null;
+
+    var candlestickElement = <CandlestickChart
+      data={this.state.ohlcData}
+      token1={this.state.selectedToken1}
+      token2={this.state.selectedToken2}
+      indicator={this.state.indicator}
+    />;
     var mindmapElement = <MindmapPlot
-                          txList={this.state.txList}
-                          token1={this.state.selectedToken1}
-                          token2={this.state.selectedToken2}
-                         />;
+      txList={this.state.txList}
+      token1={this.state.selectedToken1}
+      token2={this.state.selectedToken2}
+    />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
 
     var viewElement;
     if (!this.state.txList) viewElement = null;
     else {
-      switch(this.state.viewElement) {
+      switch (this.state.viewElement) {
         case 'Candlestick':
           viewElement = candlestickElement;
           break;
@@ -383,20 +385,18 @@ class Markets extends React.Component {
     }
 
     var menuElement = (viewElement &&
-                      this.state.viewElement === 'Candlestick') ? <OptionsMenu 
-      indicator={this.state.indicator}
-      toggleIndicator={this.toggleIndicator}
+      this.state.viewElement === 'Candlestick') ? <OptionsMenu
+        indicator={this.state.indicator}
+        toggleIndicator={this.toggleIndicator}
       /> : null;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign:"center", marginTop:'20px', color:'rgba(0,0,0,0.6)'}}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
-    
+    var spinnerElement = !this.state.hasLoadedData ? <div style={{ textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
+
     return (
       <Auxilary>
+        <StatsBar totalVolume={this.state.totalVolume} />
         <div className={styles.Outer}>
-          <StatsBar 
-              totalVolume={this.state.totalVolume}
-            />
           <div className={styles.PageContainer}>
             <div>
               <div className={styles.AutoCompleteContainer}>
