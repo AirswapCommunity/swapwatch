@@ -1,13 +1,10 @@
 language: node_js
 node_js:
 - node
+- "8"
 env:
 - NODE_ENV=production
 cache: pip
-before_install:
-- npm i -g npm@latest
-- npm install -g n
-- n 9.4.0
 install:
 - npm i
 script:
