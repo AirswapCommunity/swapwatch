@@ -54,6 +54,8 @@ class Markets extends React.Component {
     let newPairedTx = this.state.pairedTx ? this.state.pairedTx : {};
 
     let trades = [];
+    let wethAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
+    let ethAddress =  '0x0000000000000000000000000000000000000000';
     // Step 1: Read all transactions and do some first transformations
     for (let txData of rawTxList) {
       // from AirSwapDEX contract:
@@ -77,6 +79,11 @@ class Markets extends React.Component {
         "gasPrice": parseInt(txData.gasPrice, 16),
         "timestamp": parseInt(txData.timeStamp, 16),
       }
+      if(trade['makerToken'] === wethAddress) 
+        trade['makerToken'] = ethAddress
+      if(trade['takerToken'] === wethAddress) 
+        trade['takerToken'] = ethAddress
+
       trade["gasCost"] = trade.gasPrice * trade.gasUsed / 1e18;
 
       trades.push(trade);
