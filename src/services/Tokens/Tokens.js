@@ -91,6 +91,13 @@ const EthereumTokens = [
         "decimal": 18
     },
     {
+        "name": 'Digix DAO',
+        "symbol": "DGD",
+        "address": '0xe0b7927c4af23765cb51314a0e0521a9645f0e2a',
+        "logo": "digix.png",
+        "decimal": 9
+    },
+    {
         "name": 'ELF',
         "symbol": "ELF",
         "address": '0xbf2179859fc6d5bee9bf9158632dc51678a4100e',
