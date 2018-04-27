@@ -8,10 +8,11 @@ const numberFormat = format(".2s");
 class StatsBar extends Component {
   render() {
     let {totalVolume} = this.props
-    if(!totalVolume) totalVolume = 0;
+    let volumeString = '... Loading ...';
+    if(totalVolume) volumeString = numberFormat(totalVolume) + ' ETH';
     return (
       <ul className={styles.StatsBar}>
-        24h Swap Volume: {numberFormat(totalVolume)} ETH
+        24h Swap Volume: {volumeString}
       </ul>
     );
   }
