@@ -6,8 +6,8 @@ env:
 cache: pip
 before_install:
 - npm i -g npm@latest
-- sudo npm install -g n
-- sudo n 9.4.0
+- npm install -g n
+- n 9.4.0
 install:
 - npm i
 script:
