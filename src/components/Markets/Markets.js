@@ -14,6 +14,7 @@ import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 import OptionsMenu from './OptionsMenu';
 import TabsBar from './TabsBar';
+import StatsBar from '../StatsBar/StatsBar';
 
 class Markets extends React.Component {
 
@@ -386,6 +387,9 @@ class Markets extends React.Component {
     return (
       <Auxilary>
         <div className={styles.Outer}>
+          <StatsBar 
+              totalVolume={this.state.totalVolume}
+            />
           <div className={styles.PageContainer}>
             <div>
               <div className={styles.AutoCompleteContainer}>
