@@ -207,6 +207,7 @@ class Markets extends React.Component {
   getTokenPairTxList = () => {
     let token1address = this.state.selectedToken1.address;
     let token2address = this.state.selectedToken2.address;
+
     if (this.state.pairedTx &&
       ((this.state.pairedTx[token1address]
         && this.state.pairedTx[token1address][token2address])
