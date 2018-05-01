@@ -6,7 +6,7 @@ import { max, min, bisector } from 'd3-array';
 import { select } from 'd3-selection';
 import { fitDimensions } from "react-stockcharts/lib/helper";
 import { axisBottom, axisRight, axisLeft } from 'd3-axis';
-import { format, mouse } from 'd3';
+import { format, mouse, line, area } from 'd3';
 import { hexToRGBA } from "react-stockcharts/lib/utils";
 
 class Chart extends React.Component {
@@ -174,6 +174,28 @@ class Chart extends React.Component {
         }
     }
 
+    calculateBollingerBands(values) {
+        const period = 20;
+        let bb = [];
+
+        for (let i = 19; i < values.length; i++) {
+            let div = period;
+
+            if (i - period < 0) {
+                div = i;
+            }
+
+            let data = values.map(d => d.close).slice(i - div, i);
+
+            let mean = data.reduce((t, v) => t + v) / data.length;
+            let stdDev = Math.sqrt(data.map(v => (v - mean) * (v - mean)).reduce((t, v) => t + v) / data.length);
+
+            bb.push({ date: new Date(values[i].date), sma: mean, upper: mean + (stdDev * 2), lower: mean - (stdDev * 2) });
+        }
+
+        return bb;
+    }
+
     createChart() {
         select(this.node).selectAll('*').remove();
 
@@ -187,6 +209,8 @@ class Chart extends React.Component {
 
         const dates = data.map(d => new Date(d.date));
         const values = data.map(d => d.high).concat(data.map(d => d.low)).concat(data.map(d => d.open)).concat(data.map(d => d.close));
+
+        const bb = this.calculateBollingerBands(data.map(d => { return { date: d.date, close: d.close } }));
 
         const yScale = scaleLinear()
             .domain([min(values) < 0 ? min(values) : 0, max(values)])
@@ -271,6 +295,38 @@ class Chart extends React.Component {
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
             .attr('filter', 'url(#f1)')
             .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
+
+        // Bollinger Bands
+        const bollingerGroup = select(node)
+            .append('g')
+            .attr('transform', `translate(${chartOffset}, 0)`)
+
+        // SMA Line
+        const smaLine = line()
+            .x(d => xScale(d.date))
+            .y(d => yScale(d.sma));
+
+        bollingerGroup
+            .append('path')
+            .datum(bb)
+            .attr('class', 'sma')
+            .attr('fill', 'none')
+            .attr('stroke', '#000')
+            .attr('d', smaLine);
+
+        // Std Deviation and Fill
+        const bbArea = area()
+            .x(d => xScale(d.date))
+            .y0(d => yScale(d.upper))
+            .y1(d => yScale(d.lower));
+
+        bollingerGroup
+            .append('path')
+            .datum(bb)
+            .attr('class', 'bbArea')
+            .attr('fill', 'rgba(0, 142, 255, 0.1)')
+            .attr('stroke', '#008eff')
+            .attr('d', bbArea);
 
         // Tooltip group/setup
         select(node)
