@@ -119,6 +119,20 @@ const EthereumTokens = [
         "decimal": 18
     },
     {
+        "name": 'Dai Stablecoin v1.0',
+        "symbol": "DAI",
+        "address": '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359',
+        "logo": "dai_stablecoin.png",
+        "decimal": 18
+    },
+    {
+        "name": 'Enigma Token',
+        "symbol": "ENG",
+        "address": '0xf0ee6b27b759c9893ce4f094b49ad28fd15a23e4',
+        "logo": "enigma.png",
+        "decimal": 8
+    },
+    {
         "name": 'FunFair',
         "symbol": "FUN",
         "address": '0x419d0d8bdd9af5e606ae2232ed285aff190e711b',
@@ -236,6 +250,13 @@ const EthereumTokens = [
         "address": '0x3d1ba9be9f66b8ee101911bc36d3fb562eac2244',
         "logo": "rivet.png",
         "decimal": 18
+    },
+    {
+        "name": 'Salt',
+        "symbol": "SALT",
+        "address": '0x4156d3342d5c385a87d264f90653733592000581',
+        "logo": "salt.png",
+        "decimal": 8
     },
     {
         "name": 'Santiment',
