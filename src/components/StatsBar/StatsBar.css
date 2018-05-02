@@ -11,3 +11,9 @@
 .StatsBarContainer > .StatsBarText {
 	font-weight: bold;	
 }
+
+@media only screen and (max-width: 600px) {
+  .StatsBarContainer {  
+    display: none;
+  }
+}
