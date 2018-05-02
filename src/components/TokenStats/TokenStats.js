@@ -18,6 +18,8 @@ class TokenStats extends Component {
     let stringOfTokens = ''
     let tokenVolume = {};
     let tokenVolumeInUSD = {};
+  
+    let twentyFourHoursAgo = Date.now() / 1000 - 24*60*60;
 
     for (let token in txList) {
       let tokenProps = EthereumTokens.getTokenByAddress(token)
@@ -27,6 +29,7 @@ class TokenStats extends Component {
     for (let token in txList) {
       for(let token2 in txList[token]) {
         for(let trade of txList[token][token2]) {
+          if(trade.timestamp < twentyFourHoursAgo) continue;
           tokenVolume[trade.makerSymbol] += trade.makerAmount;
           tokenVolume[trade.takerSymbol] += trade.takerAmount;
         }
