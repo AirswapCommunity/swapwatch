@@ -15,6 +15,7 @@ import { EthereumTokens } from '../../services/Tokens/Tokens';
 import OptionsMenu from './OptionsMenu';
 import TabsBar from './TabsBar';
 import StatsBar from '../StatsBar/StatsBar';
+import TokenStats from '../TokenStats/TokenStats'
 
 class Markets extends React.Component {
 
@@ -169,13 +170,13 @@ class Markets extends React.Component {
           newPairedTx[trade.makerToken][trade.takerToken].push(trade);
         }
         let volume = Stats.getEthVolume(trades)
-        console.log(volume);
+        
         this.setState({
           pairedTx: newPairedTx,
           statusMessage: null,
           TokenList: TokenList,
           TokenPairList: TokenPairList,
-          totalVolume: volume
+          totalVolume: volume,
         }, this.checkStatus)
       })
   }
@@ -366,7 +367,8 @@ class Markets extends React.Component {
       token2={this.state.selectedToken2}
     />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
-
+    var tokenStatsElement = this.state.pairedTx ? <TokenStats txList={this.state.pairedTx} /> : null;
+    
     var viewElement;
     if (!this.state.txList) viewElement = null;
     else {
@@ -392,7 +394,7 @@ class Markets extends React.Component {
       /> : null;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <div style={{ textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
+    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
 
     return (
       <Auxilary>
@@ -426,6 +428,9 @@ class Markets extends React.Component {
                   {this.getToken2List()}
                 </AutoCompleteInput>
               </div>
+              <div className={styles.StatsButton}>
+                <i className="fa fa-pie-chart fa-2x"></i>
+              </div>
             </div>
             <div className={styles.TabsBarContainer}>
               {tabsBarElement}
@@ -435,6 +440,7 @@ class Markets extends React.Component {
             </div>
             <div>{statusMessageElement}</div>
             <div>{spinnerElement}</div>
+            <div>{tokenStatsElement}</div>
             <div className={styles.TableContainer}>
               {viewElement}
             </div>
