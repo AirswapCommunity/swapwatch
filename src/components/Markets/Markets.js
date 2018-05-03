@@ -17,6 +17,7 @@ import TabsBar from './TabsBar';
 import StatsBar from '../StatsBar/StatsBar';
 import TokenStats from '../TokenStats/TokenStats'
 
+
 class Markets extends React.Component {
 
   constructor(props) {
@@ -170,7 +171,7 @@ class Markets extends React.Component {
           newPairedTx[trade.makerToken][trade.takerToken].push(trade);
         }
         let volume = Stats.getEthVolume(trades)
-        
+
         this.setState({
           pairedTx: newPairedTx,
           statusMessage: null,
