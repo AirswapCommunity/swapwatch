@@ -36,6 +36,9 @@
     margin: auto;
 
 }
+.StatsButton {
+    display: none;
+}
 
 @media only screen and (min-width: 600px) {
     .AutoCompleteContainer {
@@ -47,7 +50,13 @@
         float: right;
         width: 40%;
     }
-
+    
+    .StatsButton {
+        display: block;
+        margin:0 40% 0 40%;
+        text-align: center;
+    }
+    
     .TabsBarContainer {
         padding-top: 10px;
         padding-bottom: 10px;

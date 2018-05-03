@@ -15,6 +15,8 @@ import { EthereumTokens } from '../../services/Tokens/Tokens';
 import OptionsMenu from './OptionsMenu';
 import TabsBar from './TabsBar';
 import StatsBar from '../StatsBar/StatsBar';
+import TokenStats from '../TokenStats/TokenStats'
+
 
 class Markets extends React.Component {
 
@@ -169,13 +171,13 @@ class Markets extends React.Component {
           newPairedTx[trade.makerToken][trade.takerToken].push(trade);
         }
         let volume = Stats.getEthVolume(trades)
-        console.log(volume);
+
         this.setState({
           pairedTx: newPairedTx,
           statusMessage: null,
           TokenList: TokenList,
           TokenPairList: TokenPairList,
-          totalVolume: volume
+          totalVolume: volume,
         }, this.checkStatus)
       })
   }
@@ -306,7 +308,7 @@ class Markets extends React.Component {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
         statusMsg = 'No data found for the selected token pair';
       } else {
-        statusMsg = 'Please select a token pair';
+        statusMsg = null//'Please select a token pair';
       }
     }
     this.setState({
@@ -366,7 +368,10 @@ class Markets extends React.Component {
       token2={this.state.selectedToken2}
     />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
-
+    var tokenStatsElement = ((this.state.pairedTx && !this.state.txList) ? 
+                             <TokenStats txList={this.state.pairedTx} /> : 
+                             null);
+    
     var viewElement;
     if (!this.state.txList) viewElement = null;
     else {
@@ -392,7 +397,7 @@ class Markets extends React.Component {
       /> : null;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <div style={{ textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
+    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
 
     return (
       <Auxilary>
@@ -436,6 +441,7 @@ class Markets extends React.Component {
             <div>{statusMessageElement}</div>
             <div>{spinnerElement}</div>
             <div className={styles.TableContainer}>
+              {tokenStatsElement}
               {viewElement}
             </div>
           </div>
