@@ -6,6 +6,11 @@ import styles from './TokenStats.css';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 import {BarChart, Bar, XAxis, YAxis, Tooltip, Rectangle} from 'recharts';
 
+import { format } from "d3-format";
+
+const dollarFormat = format(".0f");
+const tokenFormat = format(".0s");
+
 class TokenStats extends Component {
 
   constructor(props) {
@@ -51,6 +56,7 @@ class TokenStats extends Component {
       for(let token in response) {
         let tokenPriceUSD = response[token].USD;
         tokenVolumeInUSD.push({name: token,
+                               tokenVolume: tokenVolume[token],
                                Volume: tokenVolume[token]*tokenPriceUSD});
       }
       this.setState({
@@ -89,11 +95,9 @@ class TokenStats extends Component {
                       .sort((a,b)=> {return b.Volume - a.Volume})
                       .slice(0,5); // determine how many should be displayed
 
-    var bottomOffset = 65;
-    if (this.state.containerWidth > 321) {
-      bottomOffset = 55;
-    } else if (this.state.containerWidth > 600) {
-      bottomOffset = 30;
+    var bottomOffset = 105;
+    if (this.state.containerWidth > 600) {
+      bottomOffset = 0;
     }
     var height = this.state.containerHeight - bottomOffset;
 
@@ -106,11 +110,11 @@ class TokenStats extends Component {
           width={this.state.containerWidth} 
           height={height} 
           data={displayData}
-          margin={{top: 50, right: 30, left: 20, bottom: 10}}>
+          margin={{top: 10, right: 30, left: 20, bottom: 0}}>
                   
           <XAxis dataKey="name"/>
           <YAxis unit='$'/>
-          <Tooltip/>
+          <Tooltip content={<CustomTooltip/>}/>
           <Bar shape={CustomBar} dataKey="Volume" />
         </BarChart>
       </div>
@@ -156,4 +160,20 @@ const CustomBar = (props) => {
   const {index} = props;
   let fill = shadeColor('#0090EA', index*10);
   return <Rectangle {...props} fill={fill}/>
+};
+
+const CustomTooltip = (props) => {
+  const { active } = props;
+  if (active) {
+    const { label, payload } = props;
+    return (
+      <div className={styles.customTooltip}>
+        <p className="label">{`${label}`}</p>
+        <p className="volume">{`${dollarFormat(payload[0].payload.Volume)} $`}</p>
+        <p className="tokenVolume">{`${tokenFormat(payload[0].payload.tokenVolume)} ${label}`}</p>
+      </div>
+    );
+  }
+
+  return null;
 };
