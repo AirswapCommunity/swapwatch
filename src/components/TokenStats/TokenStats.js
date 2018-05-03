@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { withStyles } from 'material-ui/styles';
 import styles from './TokenStats.css';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
-import {BarChart, Bar, XAxis, YAxis, Tooltip} from 'recharts';
+import {BarChart, Bar, XAxis, YAxis, Tooltip, Rectangle} from 'recharts';
 
 class TokenStats extends Component {
 
@@ -87,7 +87,7 @@ class TokenStats extends Component {
   createChart = () => {
     let displayData = this.state.tokenVolumeInUSD
                       .sort((a,b)=> {return b.Volume - a.Volume})
-                      .slice(0,7);
+                      .slice(0,5); // determine how many should be displayed
 
     var bottomOffset = 65;
     if (this.state.containerWidth > 321) {
@@ -111,7 +111,7 @@ class TokenStats extends Component {
           <XAxis dataKey="name"/>
           <YAxis unit='$'/>
           <Tooltip/>
-          <Bar dataKey="Volume" fill="#92c5de" />
+          <Bar shape={CustomBar} dataKey="Volume" />
         </BarChart>
       </div>
     )
@@ -128,9 +128,32 @@ class TokenStats extends Component {
     </div>);
   }
 }
-// TokenStats.propTypes = {
-//   width: PropTypes.number.isRequired,
-// };
 
-// TokenStats = fitWidth(TokenStats);
 export default withStyles(styles)(TokenStats);
+
+function shadeColor(color, percent) {
+
+    var R = parseInt(color.substring(1,3), 16);
+    var G = parseInt(color.substring(3,5), 16);
+    var B = parseInt(color.substring(5,7), 16);
+
+    R = parseInt(R * (100 + percent) / 100, 10);
+    G = parseInt(G * (100 + percent) / 100, 10);
+    B = parseInt(B * (100 + percent) / 100, 10);
+
+    R = (R<255)?R:255;  
+    G = (G<255)?G:255;  
+    B = (B<255)?B:255;  
+
+    var RR = ((R.toString(16).length===1)?"0"+R.toString(16):R.toString(16));
+    var GG = ((G.toString(16).length===1)?"0"+G.toString(16):G.toString(16));
+    var BB = ((B.toString(16).length===1)?"0"+B.toString(16):B.toString(16));
+
+    return "#"+RR+GG+BB;
+}
+
+const CustomBar = (props) => {
+  const {index} = props;
+  let fill = shadeColor('#0090EA', index*10);
+  return <Rectangle {...props} fill={fill}/>
+};
