@@ -9,6 +9,11 @@
   overflow: hidden;
 }
 
+.UpperText {
+  text-align: center;
+  font-size: 1.5em;
+}
+
 .TokenStatsContainer {
   text-align: center;
   width: 100%;
