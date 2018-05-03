@@ -1,0 +1,21 @@
+:global(.-header) {
+  background-color: #008eff;
+  color: white;   
+  /* font-weight: bold; */
+}
+
+:local(.PageContainer) {
+  composes: Container from global;
+  overflow: hidden;
+}
+
+.UpperText {
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.TokenStatsContainer {
+  text-align: center;
+  width: 100%;
+  height: 95%;
+}
