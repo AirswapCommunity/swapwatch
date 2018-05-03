@@ -63,6 +63,8 @@ class Chart extends React.Component {
 
             const date = this.chart.xScale.invert(coords[0]);
 
+            let formatNumber = format(".5f");
+
             let bisectDate = bisector(function (d) { return new Date(d.date); }).left;
 
             const sortedData = this.props.data.slice(0);
@@ -98,6 +100,15 @@ class Chart extends React.Component {
             this.chart.cursorGroup.select(".y-hover-line")
                 .attr("y1", coords[1])
                 .attr("y2", coords[1]);
+
+            // Y Indicators
+            select(this.node)
+                .select('.yIndicators')
+                .attr('transform', `translate(0, ${coords[1] - this.chart.indicatorHeight / 2})`);
+
+            select(this.node)
+                .selectAll('.indicatorLabel')
+                .text(formatNumber(this.chart.yScale.invert(coords[1])));
 
             // Tooltip
             let xOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + (this.chart.candleWidth / 2);
@@ -144,7 +155,6 @@ class Chart extends React.Component {
                 .attr('transform', `rotate(${rotate}, ${this.chart.tooltipWidth / 2}, ${this.chart.tooltipHeight / 2}) translate(${-arrowOffset}, 0)`);
 
             // Tooltip data
-            let formatNumber = format(".5f");
 
             let tooltipData = {
                 date: closest.date.toLocaleDateString({}, { year: 'numeric', month: 'long', day: 'numeric' }),
@@ -297,36 +307,61 @@ class Chart extends React.Component {
             .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
 
         // Bollinger Bands
-        const bollingerGroup = select(node)
-            .append('g')
-            .attr('transform', `translate(${chartOffset}, 0)`)
+        if (this.props.indicator.BollingerBand || !this.props.indicator) {
+            const bollingerGroup = select(node)
+                .append('g')
+                .attr('transform', `translate(${chartOffset}, 0)`)
 
-        // SMA Line
-        const smaLine = line()
-            .x(d => xScale(d.date))
-            .y(d => yScale(d.sma));
+            // SMA Line
+            const smaLine = line()
+                .x(d => xScale(d.date))
+                .y(d => yScale(d.sma));
 
-        bollingerGroup
-            .append('path')
-            .datum(bb)
-            .attr('class', 'sma')
-            .attr('fill', 'none')
-            .attr('stroke', '#000')
-            .attr('d', smaLine);
+            bollingerGroup
+                .append('path')
+                .datum(bb)
+                .attr('class', 'sma')
+                .attr('fill', 'none')
+                .attr('stroke', '#000')
+                .attr('d', smaLine);
 
-        // Std Deviation and Fill
-        const bbArea = area()
-            .x(d => xScale(d.date))
-            .y0(d => yScale(d.upper))
-            .y1(d => yScale(d.lower));
+            // Std Deviation and Fill
+            const bbArea = area()
+                .x(d => xScale(d.date))
+                .y0(d => yScale(d.upper))
+                .y1(d => yScale(d.lower));
 
-        bollingerGroup
-            .append('path')
-            .datum(bb)
-            .attr('class', 'bbArea')
-            .attr('fill', 'rgba(0, 142, 255, 0.1)')
-            .attr('stroke', '#008eff')
-            .attr('d', bbArea);
+            bollingerGroup
+                .append('path')
+                .datum(bb)
+                .attr('class', 'bbArea')
+                .attr('fill', 'rgba(0, 142, 255, 0.1)')
+                .attr('stroke', '#008eff')
+                .attr('stroke-width', '0')
+                .attr('d', bbArea);
+
+            const upperDeviation = line()
+                .x(d => xScale(d.date))
+                .y(d => yScale(d.upper));
+
+            bollingerGroup
+                .append('path')
+                .datum(bb)
+                .attr('fill', 'none')
+                .attr('stroke', '#008eff')
+                .attr('d', upperDeviation);
+
+            const lowerDeviation = line()
+                .x(d => xScale(d.date))
+                .y(d => yScale(d.lower));
+
+            bollingerGroup
+                .append('path')
+                .datum(bb)
+                .attr('fill', 'none')
+                .attr('stroke', '#008eff')
+                .attr('d', lowerDeviation);
+        }
 
         // Tooltip group/setup
         select(node)
@@ -408,6 +443,47 @@ class Chart extends React.Component {
             .attr('fill', 'black');
         // .attr('fill-opacity', '0.75');
 
+        const yIndicators = select(node)
+            .append('g')
+            .attr('class', 'yIndicators');
+
+        // Left Indicator
+        yIndicators
+            .append('rect')
+            .attr('fill', 'black')
+            .attr('width', yAxisOffsetLeft)
+            .attr('height', '16');
+        yIndicators.append('path')
+            .attr('d', `m ${yAxisOffsetLeft},0 l 10,8 l -10,8`)
+            .attr('fill', 'black');
+        yIndicators
+            .append('text')
+            .attr('class', 'indicatorLabel')
+            .attr('width', yAxisOffsetLeft)
+            .attr('y', '11')
+            .attr('font-size', '8pt')
+            .attr('fill', 'white')
+            .attr('transform', 'translate(2, 0)');
+
+        // Right Indicator
+        yIndicators
+            .append('rect')
+            .attr('fill', 'black')
+            .attr('width', yAxisOffsetLeft)
+            .attr('height', '16')
+            .attr('transform', `translate(${this.maxWidth - yAxisOffsetRight}, 0)`);
+        yIndicators.append('path')
+            .attr('d', `m ${this.maxWidth - yAxisOffsetRight},0 l -10,8 l 10,8`)
+            .attr('fill', 'black');
+        yIndicators
+            .append('text')
+            .attr('class', 'indicatorLabel')
+            .attr('width', yAxisOffsetRight)
+            .attr('font-size', '8pt')
+            .attr('text-anchor', 'right')
+            .attr('fill', 'white')
+            .attr('transform', `translate(${this.maxWidth - yAxisOffsetRight - 2}, 11)`);
+
         this.chart = {
             yScale,
             xScale,
@@ -420,7 +496,8 @@ class Chart extends React.Component {
             tooltipWidth: 180,
             tooltipHeight: 200,
             tooltipArrowHeight: 10,
-            candleWidth
+            candleWidth,
+            indicatorHeight: 16
         }
     }
 
