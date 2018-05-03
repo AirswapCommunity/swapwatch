@@ -307,7 +307,7 @@ class Markets extends React.Component {
       if (this.state.selectedToken1 && this.state.selectedToken2) {
         statusMsg = 'No data found for the selected token pair';
       } else {
-        statusMsg = 'Please select a token pair';
+        statusMsg = null//'Please select a token pair';
       }
     }
     this.setState({
@@ -367,7 +367,9 @@ class Markets extends React.Component {
       token2={this.state.selectedToken2}
     />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
-    var tokenStatsElement = this.state.pairedTx ? <TokenStats txList={this.state.pairedTx} /> : null;
+    var tokenStatsElement = ((this.state.pairedTx && !this.state.txList) ? 
+                             <TokenStats txList={this.state.pairedTx} /> : 
+                             null);
     
     var viewElement;
     if (!this.state.txList) viewElement = null;
@@ -428,9 +430,6 @@ class Markets extends React.Component {
                   {this.getToken2List()}
                 </AutoCompleteInput>
               </div>
-              <div className={styles.StatsButton}>
-                <i className="fa fa-pie-chart fa-2x"></i>
-              </div>
             </div>
             <div className={styles.TabsBarContainer}>
               {tabsBarElement}
@@ -440,8 +439,8 @@ class Markets extends React.Component {
             </div>
             <div>{statusMessageElement}</div>
             <div>{spinnerElement}</div>
-            <div>{tokenStatsElement}</div>
             <div className={styles.TableContainer}>
+              {tokenStatsElement}
               {viewElement}
             </div>
           </div>
