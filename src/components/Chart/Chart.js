@@ -363,6 +363,28 @@ class Chart extends React.Component {
                 .attr('d', lowerDeviation);
         }
 
+        const volumes = data.map(d => d.volume);
+        const volumeScale = scaleLinear()
+            .domain([min(volumes), max(volumes)])
+            .range([chartHeight, chartHeight - 100]);
+
+        // Volume
+        const volumeGroup = select(node)
+            .append('g')
+            .attr('transform', `translate(${chartOffset}, 0)`);
+
+        const volumeLine = line()
+            .x(d => xScale(d.date))
+            .y(d => volumeScale(d.volume));
+
+        volumeGroup
+            .append('path')
+            .datum(data)
+            .attr('class', 'volume')
+            .attr('fill', 'none')
+            .attr('stroke', '#000')
+            .attr('d', volumeLine);
+
         // Tooltip group/setup
         select(node)
             .append("rect")
