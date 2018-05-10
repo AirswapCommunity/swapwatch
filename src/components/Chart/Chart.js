@@ -155,7 +155,6 @@ class Chart extends React.Component {
                 .attr('transform', `rotate(${rotate}, ${this.chart.tooltipWidth / 2}, ${this.chart.tooltipHeight / 2}) translate(${-arrowOffset}, 0)`);
 
             // Tooltip data
-
             let tooltipData = {
                 date: closest.date.toLocaleDateString({}, { year: 'numeric', month: 'long', day: 'numeric' }),
                 open: closest.open,
@@ -181,6 +180,43 @@ class Chart extends React.Component {
             rows.append('div')
                 .attr('class', d => d[0] === 'date' ? 'chartTooltipValueCentered' : 'chartTooltipValue')
                 .text(d => { return isNaN(d[1]) ? d[1] : formatNumber(d[1]); });
+
+            // Volume Tooltip data
+            select('.volumeTooltip').selectAll('*').remove();
+
+            const formatVolume = format(".2f");
+
+            let volumeTipWidth = 0;
+
+            select('.volumeTooltip')
+                .append('text')
+                .attr('fill', 'black')
+                .attr('width', 100)
+                .attr('font-size', '8pt')
+                .attr('fill', 'white')
+                .text(formatVolume(closest.volume))
+                .each(function (d, i) {
+                    volumeTipWidth = this.getComputedTextLength()
+                    this.remove() // remove them just after displaying them
+                })
+
+            select('.volumeTooltip')
+                .append('rect')
+                .attr('fill', 'black')
+                .attr('width', volumeTipWidth + 10)
+                .attr('height', '16')
+                .attr('transform',
+                    `translate(${this.chart.xScale(closest.date) + (volumeTipWidth / 2)}, ${this.chart.volumeScale(closest.volume)})`);
+
+            select('.volumeTooltip')
+                .append('text')
+                .attr('fill', 'black')
+                .attr('width', volumeTipWidth)
+                .attr('font-size', '8pt')
+                .attr('fill', 'white')
+                .text(formatVolume(closest.volume))
+                .attr('transform',
+                    `translate(${this.chart.xScale(closest.date) + (volumeTipWidth / 2) + 5}, ${this.chart.volumeScale(closest.volume) + 12})`);
         }
     }
 
@@ -364,26 +400,42 @@ class Chart extends React.Component {
         }
 
         const volumes = data.map(d => d.volume);
+
         const volumeScale = scaleLinear()
             .domain([min(volumes), max(volumes)])
             .range([chartHeight, chartHeight - 100]);
 
-        // Volume
-        const volumeGroup = select(node)
-            .append('g')
-            .attr('transform', `translate(${chartOffset}, 0)`);
+        if (this.props.indicator.Volume || !this.props.indicator) {
+            // Volume
+            const volumeGroup = select(node)
+                .append('g')
+                .attr('transform', `translate(${chartOffset}, 0)`);
 
-        const volumeLine = line()
-            .x(d => xScale(d.date))
-            .y(d => volumeScale(d.volume));
+            const volumeLine = line()
+                .x(d => xScale(d.date))
+                .y(d => volumeScale(d.volume));
 
-        volumeGroup
-            .append('path')
-            .datum(data)
-            .attr('class', 'volume')
-            .attr('fill', 'none')
-            .attr('stroke', '#000')
-            .attr('d', volumeLine);
+            const volumeArea = area()
+                .x(d => xScale(d.date))
+                .y0(d => volumeScale(d.volume))
+                .y1(d => volumeScale(0));
+
+            volumeGroup
+                .append('path')
+                .datum(data)
+                .attr('class', 'volumeArea')
+                .attr('fill', 'rgba(0, 0, 0, 0.1)')
+                .attr('stroke-width', '0')
+                .attr('d', volumeArea);
+
+            volumeGroup
+                .append('path')
+                .datum(data)
+                .attr('class', 'volume')
+                .attr('fill', 'none')
+                .attr('stroke', '#000')
+                .attr('d', volumeLine);
+        }
 
         // Tooltip group/setup
         select(node)
@@ -417,6 +469,10 @@ class Chart extends React.Component {
 
         cursor.append("circle")
             .attr("r", 7.5);
+
+        const volumeTip = select(node)
+            .append('g')
+            .attr('class', 'volumeTooltip');
 
         // Drop Shadow
         const filter = select(node)
@@ -465,6 +521,7 @@ class Chart extends React.Component {
             .attr('fill', 'black');
         // .attr('fill-opacity', '0.75');
 
+        // Y-Axis Inidicators
         const yIndicators = select(node)
             .append('g')
             .attr('class', 'yIndicators');
@@ -519,7 +576,8 @@ class Chart extends React.Component {
             tooltipHeight: 200,
             tooltipArrowHeight: 10,
             candleWidth,
-            indicatorHeight: 16
+            indicatorHeight: 16,
+            volumeScale
         }
     }
 
