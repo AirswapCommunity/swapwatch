@@ -25,7 +25,8 @@
 
   .ChartContainer {
       position: relative;
-  }
+      pointer-events: none;
+    }
 
   .TooltipHeader {
     text-align: center;
@@ -38,20 +39,24 @@
 
   :global(.chartTooltipRowContainer) {
     display: flow-root;
+    pointer-events: none;
     margin: 4px 10px;
   }
 
   :global(.chartTooltipLabel) {
     float:left;
     text-transform: capitalize;
+    pointer-events: none;
   }
 
   :global(.chartTooltipValue) {
       float:right;
-  }
+      pointer-events: none;
+    }
 
   :global(.chartTooltipValueCentered) {
     text-align: center;
     margin-bottom: 10px;
+    pointer-events: none;
   }
 

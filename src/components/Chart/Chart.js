@@ -444,8 +444,20 @@ class Chart extends React.Component {
             .attr("style", "fill: none; pointer-events:all")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
-            .on("mouseover", function () { this.chart.cursorGroup.style("display", null); }.bind(this))
-            // .on("mouseout", function () { this.chart.cursorGroup.style("display", "none"); }.bind(this))
+            .on("mouseover", function () { 
+                this.chart.cursorGroup.style("display", null); 
+                select(this.tooltipDiv).style("display", null);
+                this.chart.yIndicators.style("display", null);
+                this.chart.volumeTip.style("display", null);
+                this.chart.tooltip.style("display", null); 
+            }.bind(this))
+            .on("mouseout", function () { 
+                this.chart.cursorGroup.style("display", "none"); 
+                this.chart.tooltip.style("display", "none"); 
+                select(this.tooltipDiv).style("display", "none");
+                this.chart.yIndicators.style("display", "none");
+                this.chart.volumeTip.style("display", "none");
+            }.bind(this))
             .on("mousemove", this.onMouseMove.bind(this));
 
         const cursor = select(node)
@@ -472,7 +484,8 @@ class Chart extends React.Component {
 
         const volumeTip = select(node)
             .append('g')
-            .attr('class', 'volumeTooltip');
+            .attr('class', 'volumeTooltip')
+            .style("display", "none");
 
         // Drop Shadow
         const filter = select(node)
@@ -502,12 +515,11 @@ class Chart extends React.Component {
 
         const tooltip = cursor.append("g")
             .attr("class", "tooltip")
-            .attr('style', 'pointer-events: none');
+            .attr('style', 'pointer-events: none')
+            .style("display", "none");
 
         tooltip.append('rect')
             .attr('class', 'contentarea')
-            // .attr('rx', '20')
-            // .attr('ry', '20')
             .attr('width', '180')
             .attr('height', '200')
             .attr('fill', 'black')
@@ -524,7 +536,8 @@ class Chart extends React.Component {
         // Y-Axis Inidicators
         const yIndicators = select(node)
             .append('g')
-            .attr('class', 'yIndicators');
+            .attr('class', 'yIndicators')
+            .style("display", "none");
 
         // Left Indicator
         yIndicators
@@ -577,7 +590,10 @@ class Chart extends React.Component {
             tooltipArrowHeight: 10,
             candleWidth,
             indicatorHeight: 16,
-            volumeScale
+            volumeScale,
+            yIndicators,
+            volumeTip,
+            tooltip
         }
     }
 
