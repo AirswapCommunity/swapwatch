@@ -9,7 +9,7 @@ import {BarChart, Bar, XAxis, YAxis, Tooltip, Rectangle} from 'recharts';
 import { format } from "d3-format";
 
 const dollarFormat = format(".0f");
-const tokenFormat = format(".0s");
+const tokenFormat = format(".4s");
 
 class TokenStats extends Component {
 
