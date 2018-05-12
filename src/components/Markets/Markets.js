@@ -154,8 +154,8 @@ class Markets extends React.Component {
           trade["makerSymbol"] = makerProps.symbol;
           trade["takerSymbol"] = takerProps.symbol;
 
-          trade.makerAmount /= 10 ** makerProps.decimal;
-          trade.takerAmount /= 10 ** takerProps.decimal;
+          trade.makerAmount /= 10 ** makerProps.decimals;
+          trade.takerAmount /= 10 ** takerProps.decimals;
 
           trade["price"] = trade.takerAmount / trade.makerAmount;
 
