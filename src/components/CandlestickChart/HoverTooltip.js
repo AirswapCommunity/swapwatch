@@ -180,22 +180,21 @@ function tooltipCanvas({ fontFamily, fontSize, fontFill, token1, token2 },
   ctx.strokeStyle = '#202020';
   let imgToken1 = new Image();
   let imgToken2 = new Image();
-  imgToken1.src = `/tokens/${token1.logo}`;
-  imgToken2.src = `/tokens/${token2.logo}`;
-  
+  imgToken1.src = `${token1.logo}`;
+  imgToken2.src = `${token2.logo}`;
   let imgSpacing = bgSize.width - 2*28 - 2*X; // 28 img width, left right margin
   let widthIn = ctx.measureText('in').width;
-  
-  if(token1.logo !== "")
-    ctx.drawImage(imgToken1, X, Y);
+  if(imgToken1.width > 0)
+    ctx.drawImage(imgToken1, X, Y, 28*imgToken1.width/imgToken1.height, 28);
   else
     ctx.fillText(token1.symbol, X, Y+(28+fontSize)/2);
-
-  if(token2.logo !== "")
-    ctx.drawImage(imgToken2, X + 28 + imgSpacing, Y);
+  
+  if(imgToken2.width > 0)
+    ctx.drawImage(imgToken2, X + 28 + imgSpacing, Y, 
+                  28*imgToken2.width/imgToken2.height, 28);
   else
     ctx.fillText(token2.symbol, X + 10 + imgSpacing, Y+(28+fontSize)/2);
-
+  
   ctx.fillText('in', X + 28 + (imgSpacing-widthIn)/2, Y + (28+fontSize)/2);
 
   const upperLineHeight = Y + 28 + 7

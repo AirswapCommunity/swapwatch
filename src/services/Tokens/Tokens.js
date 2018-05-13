@@ -93,6 +93,14 @@ const EthereumTokens = [
     "coinMarketCap": "https://coinmarketcap.com/currencies/aelf/"
   },
   {
+    "address": "0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359",
+    "name": "Dai Stablecoin v1.0",
+    "symbol": "DAI",
+    "url": "https://makerdao.com/",
+    "decimals": "18",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/dai/"
+  },
+  {
     "address": "0xe0b7927c4af23765cb51314a0e0521a9645f0e2a",
     "name": "DigixDAO",
     "symbol": "DGD",
@@ -116,7 +124,7 @@ const EthereumTokens = [
   },
   {
     "address": "0x0000000000000000000000000000000000000000",
-    "name": "ETH",
+    "name": "Ether",
     "marketplaceHide": true,
     "symbol": "ETH",
     "faucet": "",
@@ -146,6 +154,14 @@ const EthereumTokens = [
       "trading"
     ],
     "coinMarketCap": "https://coinmarketcap.com/currencies/gnosis-gno/"
+  },
+  {
+    "address": "0x12b19d3e2ccc14da04fae33e63652ce469b3f2fd",
+    "name": "Grid",
+    "symbol": "GRID",
+    "url": "http://gridplus.io/",
+    "decimals": "12",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/grid/"
   },
   {
     "address": "0x888666ca69e0f178ded6d75b5726cee99a87d698",
@@ -609,21 +625,28 @@ var getTokenByAddress = (address) => {
     return undefined;
 }
 
-var addTokenByAddress = (address) => {
+var addToken = (token) => {
+  addAndUpdateTokenLists(token);
+  console.log('Added ' + token.name + ' to Token list.');
+}
+
+var addTokenByAddressFromEthplorer = (address) => {
     return fetch(`https://api.ethplorer.io/getTokenInfo/`+address+
           `?apiKey=freekey`)
     .then(res => res.json())
     .then(response => {
-        addAndUpdateTokenLists({
-            "name": response.name,
-            "symbol": response.symbol,
-            "address": address,
-            "logo": "",
-            "decimal": parseInt(response.decimals, 10)
-        })
-        console.log('Added ' + response.name + ' to Token list using data from Ethplorer.');
+        console.log('Fetched data of ' + response.name + ' from Ethplorer.');
+        let newToken = {
+          "name": response.name,
+          "symbol": response.symbol,
+          "address": address,
+          "logo": "",
+          "decimal": parseInt(response.decimals, 10)
+        }
+        addToken(newToken)
     })
 }
+
 
 var addAndUpdateTokenLists = (newToken) => {
     EthereumTokensSA.push(newToken);
@@ -644,9 +667,13 @@ var addAndUpdateTokenLists = (newToken) => {
 
 }
 
+var ERC20ABI = [{"constant": true, "inputs": [], "name": "name", "outputs": [ { "name": "", "type": "string"}],"payable": false,"type": "function"  },  {"constant": false,"inputs": [{ "name": "_spender", "type": "address"},{ "name": "_value", "type": "uint256"}],"name": "approve","outputs": [{ "name": "success", "type": "bool"}],"payable": false,"type": "function"  },  {"constant": true,"inputs": [],"name": "totalSupply","outputs": [{ "name": "", "type": "uint256"}],"payable": false,"type": "function"  },  {"constant": false,"inputs": [{ "name": "_from", "type": "address"},{ "name": "_to", "type": "address"},{ "name": "_value", "type": "uint256"}],"name": "transferFrom","outputs": [{ "name": "success", "type": "bool"}],"payable": false,"type": "function"  },  {"constant": true,"inputs": [],"name": "decimals","outputs": [{ "name": "", "type": "uint8"}],"payable": false,"type": "function"  },  {"constant": true,"inputs": [],"name": "version","outputs": [{ "name": "", "type": "string"}],"payable": false,"type": "function"  },  {"constant": true,"inputs": [{ "name": "_owner", "type": "address"}],"name": "balanceOf","outputs": [{ "name": "balance", "type": "uint256"}],"payable": false,"type": "function"  },  {"constant": true,"inputs": [],"name": "symbol","outputs": [{ "name": "", "type": "string"}],"payable": false,"type": "function"  },  {"constant": false,"inputs": [{ "name": "_to", "type": "address"},{ "name": "_value", "type": "uint256"}],"name": "transfer","outputs": [{ "name": "success", "type": "bool"}],"payable": false,"type": "function"  },  {"constant": false,"inputs": [{ "name": "_spender", "type": "address"},{ "name": "_value", "type": "uint256"},{ "name": "_extraData", "type": "bytes"}],"name": "approveAndCall","outputs": [{ "name": "success", "type": "bool"}],"payable": false,"type": "function"  },  {"constant": true,"inputs": [{ "name": "_owner", "type": "address"},{ "name": "_spender", "type": "address"}],"name": "allowance","outputs": [{ "name": "remaining", "type": "uint256"}],"payable": false,"type": "function"  },  {"inputs": [{ "name": "_initialAmount", "type": "uint256"},{ "name": "_tokenName", "type": "string"},{ "name": "_decimalUnits", "type": "uint8"},{ "name": "_tokenSymbol", "type": "string"}],"type": "constructor"  },  {"payable": false,"type": "fallback"  },  {"anonymous": false,"inputs": [{ "indexed": true, "name": "_from", "type": "address"},{ "indexed": true, "name": "_to", "type": "address"},{ "indexed": false, "name": "_value", "type": "uint256"}],"name": "Transfer","type": "event"  },  {"anonymous": false,"inputs": [{ "indexed": true, "name": "_owner", "type": "address"},{ "indexed": true, "name": "_spender", "type": "address"},{ "indexed": false, "name": "_value", "type": "uint256"}],"name": "Approval","type": "event"  },]
+
 module.exports.EthereumTokens = {
     AllTokens: EthereumTokens,
     getTokenByName,
     getTokenByAddress,
-    addTokenByAddress
+    addToken,
+    addTokenByAddressFromEthplorer,
+    ERC20ABI
 }
