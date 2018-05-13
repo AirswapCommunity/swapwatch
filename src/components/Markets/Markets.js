@@ -1,5 +1,6 @@
 import React from "react";
 import * as d3 from "d3";
+import * as Web3 from 'web3';
 import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
@@ -58,6 +59,7 @@ class Markets extends React.Component {
     let trades = [];
     let wethAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
     let ethAddress = '0x0000000000000000000000000000000000000000';
+    let web3 = new Web3('https://mainnet.infura.io/506w9CbDQR8fULSDR7H0');
     // Step 1: Read all transactions and do some first transformations
     for (let txData of rawTxList) {
       // from AirSwapDEX contract:
@@ -95,91 +97,118 @@ class Markets extends React.Component {
     // get their information from a public library
     let promiseListTokensLoaded = [];
     let loadedToken = [];
-    for (let trade of trades) {
-      if (!loadedToken.includes(trade.makerToken)) {
-        loadedToken.push(trade.makerToken);
-        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-        if (!makerProps) {
+    let checkIfTokenIsInLocalList = (address) => {
+      if (!loadedToken.includes(address)) {
+        loadedToken.push(address);
+        let tokenProps = EthereumTokens.getTokenByAddress(address);
+        
+        if (!tokenProps) {
+          //if tokenProps is undefined, the token info is not in our list
+          //use web3 to get contract details
+          let tokenContract = new web3.eth.Contract(EthereumTokens.ERC20ABI, 
+                                                    address);
           promiseListTokensLoaded.push(
-            EthereumTokens.addTokenByAddress(trade.makerToken));
-        }
-      }
-
-      if (!loadedToken.includes(trade.takerToken)) {
-        loadedToken.push(trade.takerToken);
-        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
-        if (!takerProps) {
-          promiseListTokensLoaded.push(
-            EthereumTokens.addTokenByAddress(trade.takerToken));
+            new Promise((resolve, reject) => {
+              let tokenInfoPromise = []
+              tokenInfoPromise.push(tokenContract.methods.name().call());
+              tokenInfoPromise.push(tokenContract.methods.symbol().call());
+              tokenInfoPromise.push(tokenContract.methods.decimals().call());
+              
+              Promise.all(tokenInfoPromise)
+              .then((tokenDetails) => {
+                let newToken = {
+                  "address": address,
+                  "name": tokenDetails[0],
+                  "symbol": tokenDetails[1],
+                  "decimals": parseInt(tokenDetails[2], 10),
+                  "logo": "",
+                }
+                EthereumTokens.addToken(newToken);
+                resolve();
+              })
+              .catch((error) => {
+                console.log('Failed to fetch info of ' + address + 
+                            ' from contract. Falling back to Ethplorer.');
+                resolve(EthereumTokens.addTokenByAddressFromEthplorer(address));
+              })
+            })
+          );
         }
       }
     }
 
-    // Once all tokens have been checked to be available. Add their
+    for (let trade of trades) {
+      checkIfTokenIsInLocalList(trade.makerToken);
+      checkIfTokenIsInLocalList(trade.takerToken);
+    }
+
+    // Step 3: Once all tokens have been checked to be available. Add their
     // information to the transactions
+
     Promise.all(promiseListTokensLoaded)
-      .then(() => {
-        let tokenInList = [];
-        let TokenList = [];
-        let tokenPairInList = {};
-        let TokenPairList = {};
+    .then(() => {
 
-        for (let trade of trades) {
-          let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-          let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+      let tokenInList = [];
+      let TokenList = [];
+      let tokenPairInList = {};
+      let TokenPairList = {};
 
-          if (!tokenInList.includes(makerProps.name)) {
-            tokenInList.push(makerProps.name);
-            TokenList.push(makerProps);
-
-            tokenPairInList[makerProps.name] = [];
-            TokenPairList[makerProps.name] = [];
-          }
-          if (!tokenPairInList[makerProps.name].includes(takerProps.name)) {
-            tokenPairInList[makerProps.name].push(takerProps.name);
-            TokenPairList[makerProps.name].push(takerProps);
-          }
-          if (!tokenInList.includes(takerProps.name)) {
-            tokenInList.push(takerProps.name);
-            TokenList.push(takerProps);
-
-            tokenPairInList[takerProps.name] = [];
-            TokenPairList[takerProps.name] = [];
-          }
-          if (!tokenPairInList[takerProps.name].includes(makerProps.name)) {
-            tokenPairInList[takerProps.name].push(makerProps.name);
-            TokenPairList[takerProps.name].push(makerProps);
-          }
-
-          trade["makerSymbol"] = makerProps.symbol;
-          trade["takerSymbol"] = takerProps.symbol;
-
-          trade.makerAmount /= 10 ** makerProps.decimal;
-          trade.takerAmount /= 10 ** takerProps.decimal;
-
-          trade["price"] = trade.takerAmount / trade.makerAmount;
+      let addTokenToList = (tokenProps) => {
+        tokenProps.logo = (tokenProps.address !== ethAddress) ? 
+          ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/'+
+           tokenProps.address+'.png') : 
+          ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/'+
+           'ethereum_1.png');
 
 
-          if (!newPairedTx[trade.makerToken]) {
-            newPairedTx[trade.makerToken] = {};
-          }
+        tokenInList.push(tokenProps.name);
+        TokenList.push(tokenProps);
 
-          if (!newPairedTx[trade.makerToken][trade.takerToken]) {
-            newPairedTx[trade.makerToken][trade.takerToken] = [];
-          }
-
-          newPairedTx[trade.makerToken][trade.takerToken].push(trade);
+        tokenPairInList[tokenProps.name] = [];
+        TokenPairList[tokenProps.name] = [];
+      }
+      for (let trade of trades) {
+        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
+      
+        if (!tokenInList.includes(makerProps.name)) addTokenToList(makerProps);
+        if (!tokenPairInList[makerProps.name].includes(takerProps.name)) {
+          tokenPairInList[makerProps.name].push(takerProps.name);
+          TokenPairList[makerProps.name].push(takerProps);
         }
-        let volume = Stats.getEthVolume(trades)
 
-        this.setState({
-          pairedTx: newPairedTx,
-          statusMessage: null,
-          TokenList: TokenList,
-          TokenPairList: TokenPairList,
-          totalVolume: volume,
-        }, this.checkStatus)
-      })
+        if (!tokenInList.includes(takerProps.name)) addTokenToList(takerProps);
+        if (!tokenPairInList[takerProps.name].includes(makerProps.name)) {
+          tokenPairInList[takerProps.name].push(makerProps.name);
+          TokenPairList[takerProps.name].push(makerProps);
+        }
+
+        trade["makerSymbol"] = makerProps.symbol;
+        trade["takerSymbol"] = takerProps.symbol;
+
+        trade.makerAmount /= 10 ** makerProps.decimals;
+        trade.takerAmount /= 10 ** takerProps.decimals;
+
+        trade["price"] = trade.takerAmount / trade.makerAmount;
+
+
+        if (!newPairedTx[trade.makerToken]) newPairedTx[trade.makerToken] = {};
+
+        if (!newPairedTx[trade.makerToken][trade.takerToken])
+          newPairedTx[trade.makerToken][trade.takerToken] = [];
+
+        newPairedTx[trade.makerToken][trade.takerToken].push(trade);
+      }
+      let volume = Stats.getEthVolume(trades)
+
+      this.setState({
+        pairedTx: newPairedTx,
+        statusMessage: null,
+        TokenList: TokenList,
+        TokenPairList: TokenPairList,
+        totalVolume: volume,
+      }, this.checkStatus)
+    })
   }
 
   combineMarkets = (token1address, token2address) => {

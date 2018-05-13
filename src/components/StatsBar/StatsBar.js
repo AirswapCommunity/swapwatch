@@ -3,7 +3,7 @@ import styles from "./StatsBar.css";
 import { withStyles } from 'material-ui/styles';
 import { format } from "d3-format";
 
-const numberFormat = format(".2s");
+const numberFormat = format(".4s");
 
 class StatsBar extends Component {
   render() {

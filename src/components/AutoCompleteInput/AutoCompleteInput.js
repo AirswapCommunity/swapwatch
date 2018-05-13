@@ -161,7 +161,7 @@ class AutoCompleteInput extends Component {
                     var element = displayValue;
 
                     if (this.props.imageField) {
-                        var path = `/tokens/${item[this.props.imageField]}`;
+                        var path = `${item[this.props.imageField]}`;
                         element = (<div className={cssStyles.ComplexItemWrapper}>
                             <img src={path} 
                                  alt=""
@@ -201,10 +201,10 @@ class AutoCompleteInput extends Component {
         var adorner = null;
 
         if (this.props.imageField && this.state.selectedItem) {
-            var path = `/tokens/${this.state.selectedItem[this.props.imageField]}`;
+            var path = `${this.state.selectedItem[this.props.imageField]}`;
 
             adorner = <InputAdornment position="start">
-                <img src={path} alt="" style={{ width: '24px' }} />
+                <img src={path} alt="" style={{ height: '28px' }} />
             </InputAdornment>;
         }
 
