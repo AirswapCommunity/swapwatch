@@ -5,7 +5,7 @@ import cssStyles from "./MyTrades.css";
 const MyTrades = props => (
     <Auxilary>
         <div className={cssStyles.Outer}>
-            <div className={cssStyles.PageContainer}>
+            <div>
                 <div className={cssStyles.MessageContainer}>
                     <p>Coming Soon</p>
                 </div>

@@ -448,7 +448,9 @@ class Chart extends React.Component {
                 this.chart.cursorGroup.style("display", null); 
                 select(this.tooltipDiv).style("display", null);
                 this.chart.yIndicators.style("display", null);
-                this.chart.volumeTip.style("display", null);
+                if (this.props.indicator.Volume || !this.props.indicator) {
+                    this.chart.volumeTip.style("display", null);
+                }
                 this.chart.tooltip.style("display", null); 
             }.bind(this))
             .on("mouseout", function () { 

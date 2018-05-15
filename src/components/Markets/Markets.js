@@ -4,7 +4,6 @@ import * as Web3 from 'web3';
 import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
-import CandlestickChart from "../CandlestickChart/CandlestickChart";
 import MindmapPlot from '../MindmapPlot/MindmapPlot';
 import TradingDataTable from "../TradingDataTable/TradingDataTable";
 import { timeParse } from "d3-time-format";
