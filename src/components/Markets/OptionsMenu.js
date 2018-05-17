@@ -25,7 +25,7 @@ class OptionsMenu extends React.Component {
     const {indicator} = this.props
 
     var checkBollingerBand = indicator.BollingerBand ? <i className="fa fa-check"></i> : null
-    var checkEMA = indicator.EMA ? <i className="fa fa-check"></i> : null
+    // var checkEMA = indicator.EMA ? <i className="fa fa-check"></i> : null
     var checkVolume = indicator.Volume ? <i className="fa fa-check"></i> : null
     
     return (
@@ -45,7 +45,7 @@ class OptionsMenu extends React.Component {
           onClose={this.handleClose}
         >
           <MenuItem onClick={()=>this.handleClose('BollingerBand')}>{checkBollingerBand} Bollinger Bands</MenuItem>
-          <MenuItem onClick={()=>this.handleClose('EMA')}>{checkEMA} EMA</MenuItem>
+          {/* <MenuItem onClick={()=>this.handleClose('EMA')}>{checkEMA} EMA</MenuItem> */}
           <MenuItem onClick={()=>this.handleClose('Volume')}>{checkVolume} Volume</MenuItem>
         </Menu>
       </div>

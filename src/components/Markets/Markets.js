@@ -4,10 +4,10 @@ import * as Web3 from 'web3';
 import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
-import CandlestickChart from "../CandlestickChart/CandlestickChart";
 import MindmapPlot from '../MindmapPlot/MindmapPlot';
 import TradingDataTable from "../TradingDataTable/TradingDataTable";
 import { timeParse } from "d3-time-format";
+import Chart from "../Chart/Chart";
 
 import { AirSwap } from '../../services/AirSwap/AirSwap';
 import { Stats } from '../../services/Stats/Stats';
@@ -101,36 +101,36 @@ class Markets extends React.Component {
       if (!loadedToken.includes(address)) {
         loadedToken.push(address);
         let tokenProps = EthereumTokens.getTokenByAddress(address);
-        
+
         if (!tokenProps) {
           //if tokenProps is undefined, the token info is not in our list
           //use web3 to get contract details
-          let tokenContract = new web3.eth.Contract(EthereumTokens.ERC20ABI, 
-                                                    address);
+          let tokenContract = new web3.eth.Contract(EthereumTokens.ERC20ABI,
+            address);
           promiseListTokensLoaded.push(
             new Promise((resolve, reject) => {
               let tokenInfoPromise = []
               tokenInfoPromise.push(tokenContract.methods.name().call());
               tokenInfoPromise.push(tokenContract.methods.symbol().call());
               tokenInfoPromise.push(tokenContract.methods.decimals().call());
-              
+
               Promise.all(tokenInfoPromise)
-              .then((tokenDetails) => {
-                let newToken = {
-                  "address": address,
-                  "name": tokenDetails[0],
-                  "symbol": tokenDetails[1],
-                  "decimals": parseInt(tokenDetails[2], 10),
-                  "logo": "",
-                }
-                EthereumTokens.addToken(newToken);
-                resolve();
-              })
-              .catch((error) => {
-                console.log('Failed to fetch info of ' + address + 
-                            ' from contract. Falling back to Ethplorer.');
-                resolve(EthereumTokens.addTokenByAddressFromEthplorer(address));
-              })
+                .then((tokenDetails) => {
+                  let newToken = {
+                    "address": address,
+                    "name": tokenDetails[0],
+                    "symbol": tokenDetails[1],
+                    "decimals": parseInt(tokenDetails[2], 10),
+                    "logo": "",
+                  }
+                  EthereumTokens.addToken(newToken);
+                  resolve();
+                })
+                .catch((error) => {
+                  console.log('Failed to fetch info of ' + address +
+                    ' from contract. Falling back to Ethplorer.');
+                  resolve(EthereumTokens.addTokenByAddressFromEthplorer(address));
+                })
             })
           );
         }
@@ -146,69 +146,69 @@ class Markets extends React.Component {
     // information to the transactions
 
     Promise.all(promiseListTokensLoaded)
-    .then(() => {
+      .then(() => {
 
-      let tokenInList = [];
-      let TokenList = [];
-      let tokenPairInList = {};
-      let TokenPairList = {};
+        let tokenInList = [];
+        let TokenList = [];
+        let tokenPairInList = {};
+        let TokenPairList = {};
 
-      let addTokenToList = (tokenProps) => {
-        tokenProps.logo = (tokenProps.address !== ethAddress) ? 
-          ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/'+
-           tokenProps.address+'.png') : 
-          ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/'+
-           'ethereum_1.png');
+        let addTokenToList = (tokenProps) => {
+          tokenProps.logo = (tokenProps.address !== ethAddress) ?
+            ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/' +
+              tokenProps.address + '.png') :
+            ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/' +
+              'ethereum_1.png');
 
 
-        tokenInList.push(tokenProps.name);
-        TokenList.push(tokenProps);
+          tokenInList.push(tokenProps.name);
+          TokenList.push(tokenProps);
 
-        tokenPairInList[tokenProps.name] = [];
-        TokenPairList[tokenProps.name] = [];
-      }
-      for (let trade of trades) {
-        let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
-        let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
-      
-        if (!tokenInList.includes(makerProps.name)) addTokenToList(makerProps);
-        if (!tokenPairInList[makerProps.name].includes(takerProps.name)) {
-          tokenPairInList[makerProps.name].push(takerProps.name);
-          TokenPairList[makerProps.name].push(takerProps);
+          tokenPairInList[tokenProps.name] = [];
+          TokenPairList[tokenProps.name] = [];
         }
+        for (let trade of trades) {
+          let makerProps = EthereumTokens.getTokenByAddress(trade.makerToken);
+          let takerProps = EthereumTokens.getTokenByAddress(trade.takerToken);
 
-        if (!tokenInList.includes(takerProps.name)) addTokenToList(takerProps);
-        if (!tokenPairInList[takerProps.name].includes(makerProps.name)) {
-          tokenPairInList[takerProps.name].push(makerProps.name);
-          TokenPairList[takerProps.name].push(makerProps);
+          if (!tokenInList.includes(makerProps.name)) addTokenToList(makerProps);
+          if (!tokenPairInList[makerProps.name].includes(takerProps.name)) {
+            tokenPairInList[makerProps.name].push(takerProps.name);
+            TokenPairList[makerProps.name].push(takerProps);
+          }
+
+          if (!tokenInList.includes(takerProps.name)) addTokenToList(takerProps);
+          if (!tokenPairInList[takerProps.name].includes(makerProps.name)) {
+            tokenPairInList[takerProps.name].push(makerProps.name);
+            TokenPairList[takerProps.name].push(makerProps);
+          }
+
+          trade["makerSymbol"] = makerProps.symbol;
+          trade["takerSymbol"] = takerProps.symbol;
+
+          trade.makerAmount /= 10 ** makerProps.decimals;
+          trade.takerAmount /= 10 ** takerProps.decimals;
+
+          trade["price"] = trade.takerAmount / trade.makerAmount;
+
+
+          if (!newPairedTx[trade.makerToken]) newPairedTx[trade.makerToken] = {};
+
+          if (!newPairedTx[trade.makerToken][trade.takerToken])
+            newPairedTx[trade.makerToken][trade.takerToken] = [];
+
+          newPairedTx[trade.makerToken][trade.takerToken].push(trade);
         }
+        let volume = Stats.getEthVolume(trades)
 
-        trade["makerSymbol"] = makerProps.symbol;
-        trade["takerSymbol"] = takerProps.symbol;
-
-        trade.makerAmount /= 10 ** makerProps.decimals;
-        trade.takerAmount /= 10 ** takerProps.decimals;
-
-        trade["price"] = trade.takerAmount / trade.makerAmount;
-
-
-        if (!newPairedTx[trade.makerToken]) newPairedTx[trade.makerToken] = {};
-
-        if (!newPairedTx[trade.makerToken][trade.takerToken])
-          newPairedTx[trade.makerToken][trade.takerToken] = [];
-
-        newPairedTx[trade.makerToken][trade.takerToken].push(trade);
-      }
-      let volume = Stats.getEthVolume(trades)
-
-      this.setState({
-        pairedTx: newPairedTx,
-        statusMessage: null,
-        TokenList: TokenList,
-        TokenPairList: TokenPairList,
-        totalVolume: volume,
-      }, this.checkStatus)
-    })
+        this.setState({
+          pairedTx: newPairedTx,
+          statusMessage: null,
+          TokenList: TokenList,
+          TokenPairList: TokenPairList,
+          totalVolume: volume,
+        }, this.checkStatus)
+      })
   }
 
   combineMarkets = (token1address, token2address) => {
@@ -385,22 +385,22 @@ class Markets extends React.Component {
       toggleState={this.toggleViewElement}
     /> : null;
 
-    var candlestickElement = <CandlestickChart
+    let candlestickElement = <Chart
       data={this.state.ohlcData}
-      token1={this.state.selectedToken1}
-      token2={this.state.selectedToken2}
-      indicator={this.state.indicator}
-    />;
+      makerToken={this.state.selectedToken1}
+      takerToken={this.state.selectedToken2}
+      indicator={this.state.indicator} />;
+
     var mindmapElement = <MindmapPlot
       txList={this.state.txList}
       token1={this.state.selectedToken1}
       token2={this.state.selectedToken2}
     />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
-    var tokenStatsElement = ((this.state.pairedTx && !this.state.txList) ? 
-                             <TokenStats txList={this.state.pairedTx} /> : 
-                             null);
-    
+    var tokenStatsElement = ((this.state.pairedTx && !this.state.txList) ?
+      <TokenStats txList={this.state.pairedTx} /> :
+      null);
+
     var viewElement;
     if (!this.state.txList) viewElement = null;
     else {
@@ -426,53 +426,51 @@ class Markets extends React.Component {
       /> : null;
 
     var statusMessageElement = (this.state.statusMessage) ? <div className={styles.TableMessageContainer}>{this.state.statusMessage}</div> : null;
-    var spinnerElement = !this.state.hasLoadedData ? <div style={{textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
+    var spinnerElement = !this.state.hasLoadedData ? <div style={{ textAlign: "center", marginTop: '20px', color: 'rgba(0,0,0,0.6)' }}><i className="fa fa-spinner fa-spin fa-3x"></i></div> : null;
 
     return (
       <Auxilary>
         <StatsBar totalVolume={this.state.totalVolume} />
         <div className={styles.Outer}>
-          <div className={styles.PageContainer}>
-            <div>
-              <div className={styles.AutoCompleteContainer}>
-                <AutoCompleteInput placeholder="Maker Token"
-                  displayField='name'
-                  imageField='logo'
-                  secondaryField='symbol'
-                  disabled={!this.state.hasLoadedData}
-                  itemSelected={this.handleToken1Selected}
-                  excludeItem={this.state.selectedToken2}
-                  cleared={this.handleToken1Selected}
-                  zIndex='20'>
-                  {this.getToken1List()}
-                </AutoCompleteInput>
-              </div>
-              <div className={styles.AutoCompleteContainerRight}>
-                <AutoCompleteInput placeholder="Taker Token"
-                  displayField='name'
-                  imageField='logo'
-                  secondaryField='symbol'
-                  disabled={!this.state.hasLoadedData}
-                  excludeItem={this.state.selectedToken1}
-                  itemSelected={this.handleToken2Selected}
-                  cleared={this.handleToken2Selected}
-                  zIndex='10'>
-                  {this.getToken2List()}
-                </AutoCompleteInput>
-              </div>
+          <div>
+            <div className={styles.AutoCompleteContainer}>
+              <AutoCompleteInput placeholder="Maker Token"
+                displayField='name'
+                imageField='logo'
+                secondaryField='symbol'
+                disabled={!this.state.hasLoadedData}
+                itemSelected={this.handleToken1Selected}
+                excludeItem={this.state.selectedToken2}
+                cleared={this.handleToken1Selected}
+                zIndex='20'>
+                {this.getToken1List()}
+              </AutoCompleteInput>
             </div>
-            <div className={styles.TabsBarContainer}>
-              {tabsBarElement}
+            <div className={styles.AutoCompleteContainerRight}>
+              <AutoCompleteInput placeholder="Taker Token"
+                displayField='name'
+                imageField='logo'
+                secondaryField='symbol'
+                disabled={!this.state.hasLoadedData}
+                excludeItem={this.state.selectedToken1}
+                itemSelected={this.handleToken2Selected}
+                cleared={this.handleToken2Selected}
+                zIndex='10'>
+                {this.getToken2List()}
+              </AutoCompleteInput>
             </div>
-            <div className={styles.MenuContainer}>
-              {menuElement}
-            </div>
-            <div>{statusMessageElement}</div>
-            <div>{spinnerElement}</div>
-            <div className={styles.TableContainer}>
-              {tokenStatsElement}
-              {viewElement}
-            </div>
+          </div>
+          <div className={styles.TabsBarContainer}>
+            {tabsBarElement}
+          </div>
+          <div className={styles.MenuContainer}>
+            {menuElement}
+          </div>
+          <div>{statusMessageElement}</div>
+          <div>{spinnerElement}</div>
+          <div className={styles.TableContainer}>
+            {tokenStatsElement}
+            {viewElement}
           </div>
         </div>
       </Auxilary>

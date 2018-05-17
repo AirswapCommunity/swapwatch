@@ -1,0 +1,65 @@
+/* svg {
+    border: 1px solid black;
+    border-bottom: 0;
+    border-top: 0;
+  } */
+
+  text {
+      font-family: 'Open Sans';
+      font-weight: 700;
+  }
+
+  .TooltipDiv {
+    position: absolute;
+    width: 152px;
+    height: 172px;
+    padding: 10px;
+    font-family: 'Open Sans';
+    font-size: 11pt;
+    color: whitesmoke;
+    /* background: rgba(0, 0, 0, 0.5); */
+    pointer-events: none;
+    display: list-item;
+    margin: 4px;
+  }
+
+  .ChartContainer {
+      position: relative;
+      pointer-events: none;
+    }
+
+  .TooltipHeader {
+    text-align: center;
+    margin: 0px 0px 10px 0px;
+    position: relative;
+    display: inline;
+
+  }
+
+  /* .TokenLogo {
+    margin: 0px 15px;
+  } */
+
+  :global(.chartTooltipRowContainer) {
+    display: flow-root;
+    pointer-events: none;
+    margin: 4px 10px;
+  }
+
+  :global(.chartTooltipLabel) {
+    float:left;
+    text-transform: capitalize;
+    pointer-events: none;
+  }
+
+  :global(.chartTooltipValue) {
+      float:right;
+      pointer-events: none;
+    }
+
+  :global(.chartTooltipValueCentered) {
+    text-align: center;
+    margin-bottom: 10px;
+    pointer-events: none;
+  }
+

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import ReactDOM from 'react-dom';
-
+import { fitDimensions } from "react-stockcharts/lib/helper";
 import { withStyles } from 'material-ui/styles';
 import styles from './TokenStats.css';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
@@ -19,14 +18,15 @@ class TokenStats extends Component {
     this.state = {
       tokenVolume: null,
       tokenVolumeInUSD: null,
-      containerHeight: 100,
-      containerWidth: 100,
     };
+
+    this.maxHeight = props.height;
+    this.maxWidth = props.width;
+    this.marginBottom = 220;
+    this.bottomOffset = 20;
   }
 
   componentWillMount() {
-    window.addEventListener('resize', this.handleWindowSizeChange);
-
     let txList = this.props.txList;
     let stringOfTokens = ''
     let tokenVolume = {};
@@ -66,28 +66,13 @@ class TokenStats extends Component {
     })
   };
 
-  componentDidMount() {
-    this.handleWindowSizeChange();
+  componentDidUpdate() {
+    this.maxHeight = this.props.height;
+    this.maxWidth = this.props.width - 10;
   }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleWindowSizeChange);
-  }
-
 
   setRef = (el) => {
     this.container = el;
-  };
-
-  handleWindowSizeChange = () => {
-    var height = ReactDOM.findDOMNode(this.container).clientHeight;
-    var width = ReactDOM.findDOMNode(this.container).clientWidth;
-    if (width > 0) {
-      this.setState({
-        containerHeight: height,
-        containerWidth: width
-      })
-    }
   };
 
   createChart = () => {
@@ -95,11 +80,7 @@ class TokenStats extends Component {
                       .sort((a,b)=> {return b.Volume - a.Volume})
                       .slice(0,5); // determine how many should be displayed
 
-    var bottomOffset = 105;
-    if (this.state.containerWidth > 600) {
-      bottomOffset = 0;
-    }
-    var height = this.state.containerHeight - bottomOffset;
+    var height = this.maxHeight - this.marginBottom;
 
     if (height - 60 < 0) {
       height = 60;
@@ -107,7 +88,7 @@ class TokenStats extends Component {
     return (
       <div>
         <BarChart 
-          width={this.state.containerWidth} 
+          width={this.props.width} 
           height={height} 
           data={displayData}
           margin={{top: 10, right: 30, left: 20, bottom: 0}}>
@@ -133,7 +114,7 @@ class TokenStats extends Component {
   }
 }
 
-export default withStyles(styles)(TokenStats);
+export default fitDimensions(withStyles(styles)(TokenStats));
 
 function shadeColor(color, percent) {
 

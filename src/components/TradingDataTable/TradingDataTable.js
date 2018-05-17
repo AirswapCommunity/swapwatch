@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import ReactDOM from 'react-dom';
 import { withStyles } from 'material-ui/styles';
 import ReactTable from 'react-table';
 import cssStyles from './TradingDataTable.css';
+import { fitDimensions } from "react-stockcharts/lib/helper";
 
 const styles = theme => ({
 });
@@ -16,10 +16,13 @@ class TradingDataTable extends Component {
         id: 'date',
         desc: true,
         pageSize: 25,
-      }],
-      containerHeight: 100,
-      containerWidth: 100,
+      }]
     };
+
+    this.maxHeight = props.height;
+    this.maxWidth = props.width;
+    this.marginBottom = 220;
+    this.bottomOffset = 20;
   }
 
   componentWillMount() {
@@ -34,41 +37,42 @@ class TradingDataTable extends Component {
     window.removeEventListener('resize', this.handleWindowSizeChange);
   }
 
+  componentDidUpdate() {
+    this.maxHeight = this.props.height;
+    this.maxWidth = this.props.width;
+  }
+
   setRef = (el) => {
     this.container = el;
   }
 
   handleWindowSizeChange = () => {
-    var height = ReactDOM.findDOMNode(this.container).clientHeight;
-    var width = ReactDOM.findDOMNode(this.container).clientWidth;
-    this.setState({ containerHeight: height,
-                    containerWidth: width })
+    clearTimeout(this.refreshTimeout);
+    this.refreshTimeout = setTimeout(() => this.forceUpdate(), 500);
   };
-
 
   handleSortChanged = (newSort, column, shiftKey) => {
     this.setState({ sort: newSort });
   };
 
   getTable = () => {
-    if(this.state.containerHeight < 150) {
+    if (this.props.height < 150) {
       return null
     } else {
-      var offset = 75;
+      // var offset = 75;
       var fontSize = '.75em';
 
-      if (this.state.containerWidth > 600) {
-        offset = 20;
+      if (this.props.width > 600) {
+        // offset = 20;
         fontSize = '1em';
-      } else if (this.state.containerWidth > 320) {
-        offset = 70;
+      } else if (this.props.width > 320) {
+        // offset = 70;
       }
 
-      let tableHeight = this.state.containerHeight - ((this.state.containerHeight-700)*30/(150-700) + offset);//50
       return (
         <ReactTable
           data={this.props.txList}
-          style={{height:tableHeight, marginBottom: '10px', fontSize: fontSize}}
+          style={{ height: this.maxHeight - this.marginBottom, width: this.maxWidth, fontSize: fontSize }}
           columns={[
             {
               Header: "Date",
@@ -137,8 +141,8 @@ class TradingDataTable extends Component {
       this.getTable()) : null;
 
     return (
-      <div className={cssStyles.TableContainer} 
-           ref={this.setRef}>
+      <div className={cssStyles.TableContainer}
+        ref={this.setRef} style={{ width: this.maxWidth, height: this.maxHeight - this.marginBottom }}>
         {table}
       </div>
     );
@@ -146,4 +150,4 @@ class TradingDataTable extends Component {
 }
 
 
-export default withStyles(styles)(TradingDataTable);
+export default fitDimensions(withStyles(styles)(TradingDataTable));

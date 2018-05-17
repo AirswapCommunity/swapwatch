@@ -3,14 +3,3 @@
     color: white;   
     /* font-weight: bold; */
 }
-
-.Table {
-    width: 100%;
-    height: 100%;
-}
-
-.TableContainer {
-    display: flex;
-    width: 100%;
-    height: 95%;
-}

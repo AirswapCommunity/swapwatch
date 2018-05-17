@@ -4,7 +4,6 @@
 }
 
 :local(.PageContainer) {
-  composes: Container from global;
   text-align: center;
 }
 

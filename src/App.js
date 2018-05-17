@@ -15,18 +15,16 @@ class App extends Component {
       <Router>
         <div className={styles.App}>
           <Header />
-          <div className={styles.Background}>
-            <div className={styles.Container}>
-              <Navbar></Navbar>
-              <div style={{display: 'flex', height: '100vh'}}>
-                <Route exact path="/" component={PageShell(Markets)} />
-                <Route path="/MyTrades" component={PageShell(MyTrades, true)} />
-                <Route path="/About" component={PageShell(About,true)} />
-                <Route path="/Donate" component={PageShell(Donate,true)} />
-              </div>
+          <div className={styles.Container}>
+            <Navbar></Navbar>
+            <div style={{ display: 'flex', height: '100vh' }}>
+              <Route exact path="/" component={PageShell(Markets)} />
+              <Route path="/MyTrades" component={PageShell(MyTrades, true)} />
+              <Route path="/About" component={PageShell(About, true)} />
+              <Route path="/Donate" component={PageShell(Donate, true)} />
             </div>
-            <footer className={styles.Footer}>This site is not affiliated with AirSwap</footer>
           </div>
+          <footer className={styles.Footer}>This site is not affiliated with AirSwap</footer>
         </div>
       </Router>
     );
