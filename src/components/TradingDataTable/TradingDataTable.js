@@ -59,14 +59,14 @@ class TradingDataTable extends Component {
     if (this.props.height < 150) {
       return null
     } else {
-      var offset = 75;
+      // var offset = 75;
       var fontSize = '.75em';
 
       if (this.props.width > 600) {
-        offset = 20;
+        // offset = 20;
         fontSize = '1em';
       } else if (this.props.width > 320) {
-        offset = 70;
+        // offset = 70;
       }
 
       return (

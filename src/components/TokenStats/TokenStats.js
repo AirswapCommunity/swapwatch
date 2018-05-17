@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import ReactDOM from 'react-dom';
 import { fitDimensions } from "react-stockcharts/lib/helper";
 import { withStyles } from 'material-ui/styles';
 import styles from './TokenStats.css';
@@ -28,8 +27,6 @@ class TokenStats extends Component {
   }
 
   componentWillMount() {
-    window.addEventListener('resize', this.handleWindowSizeChange);
-
     let txList = this.props.txList;
     let stringOfTokens = ''
     let tokenVolume = {};
@@ -69,14 +66,6 @@ class TokenStats extends Component {
     })
   };
 
-  componentDidMount() {
-    this.handleWindowSizeChange();
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleWindowSizeChange);
-  }
-
   componentDidUpdate() {
     this.maxHeight = this.props.height;
     this.maxWidth = this.props.width - 10;
@@ -86,26 +75,11 @@ class TokenStats extends Component {
     this.container = el;
   };
 
-  handleWindowSizeChange = () => {
-    // var height = ReactDOM.findDOMNode(this.container).clientHeight;
-    // var width = ReactDOM.findDOMNode(this.container).clientWidth;
-    // if (width > 0) {
-    //   this.setState({
-    //     containerHeight: height,
-    //     containerWidth: width
-    //   })
-    // }
-  };
-
   createChart = () => {
     let displayData = this.state.tokenVolumeInUSD
                       .sort((a,b)=> {return b.Volume - a.Volume})
                       .slice(0,5); // determine how many should be displayed
 
-    // var bottomOffset = 105;
-    // if (this.state.containerWidth > 600) {
-    //   bottomOffset = 0;
-    // }
     var height = this.maxHeight - this.marginBottom;
 
     if (height - 60 < 0) {

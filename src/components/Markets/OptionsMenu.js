@@ -25,7 +25,7 @@ class OptionsMenu extends React.Component {
     const {indicator} = this.props
 
     var checkBollingerBand = indicator.BollingerBand ? <i className="fa fa-check"></i> : null
-    var checkEMA = indicator.EMA ? <i className="fa fa-check"></i> : null
+    // var checkEMA = indicator.EMA ? <i className="fa fa-check"></i> : null
     var checkVolume = indicator.Volume ? <i className="fa fa-check"></i> : null
     
     return (
