@@ -1,6 +1,6 @@
 import React from "react";
-import styles from "./Chart.css";
-
+import cssStyles from "./Chart.css";
+import { withStyles } from 'material-ui/styles';
 import { scaleLinear, scaleTime } from "d3-scale";
 import { max, min, bisector } from 'd3-array';
 import { select } from 'd3-selection';
@@ -8,6 +8,18 @@ import { fitDimensions } from "react-stockcharts/lib/helper";
 import { axisBottom, axisRight, axisLeft } from 'd3-axis';
 import { format, mouse, line, area } from 'd3';
 import { hexToRGBA } from "react-stockcharts/lib/utils";
+import Avatar from 'material-ui/Avatar';
+
+const styles = theme => ({
+    avatar: {
+        width: '32px',
+        height: '32px',
+        backgroundColor: 'white',
+        border: '1px solid #d0d0d0',
+        // display: 'inline',
+        // margin: '4px',
+    },
+});
 
 class Chart extends React.Component {
     constructor(props) {
@@ -163,12 +175,12 @@ class Chart extends React.Component {
                 close: closest.close
             };
 
-            select(this.tooltipDiv).selectAll('div').remove();
+            select(this.tooltipDiv).selectAll('.chartTooltipRowContainer').remove();
 
             const tooltip = select(this.tooltipDiv)
                 .style('left', `${xOffset + this.chart.axisLeftWidth + 10}px`)
                 .style('top', `${yOffset}px`)
-                .selectAll('div')
+                .selectAll('.chartTooltipRowContainer')
                 .data(Object.entries(tooltipData));
 
             let rows = tooltip.enter()
@@ -291,7 +303,7 @@ class Chart extends React.Component {
         const chartOffset = (yAxisOffsetLeft + 10);
 
         const candleMargin = 2;
-        let candleWidth = (chartWidth - (data.length * (candleMargin * 2))) / data.length;
+        let candleWidth = Math.min(32, (chartWidth - ((data.length + 1) * candleMargin)) / data.length);
 
         if (candleWidth < 1) {
             candleWidth = 1;
@@ -444,18 +456,19 @@ class Chart extends React.Component {
             .attr("style", "fill: none; pointer-events:all")
             .attr("width", chartWidth)
             .attr("height", chartHeight)
-            .on("mouseover", function () { 
-                this.chart.cursorGroup.style("display", null); 
+            .on("mouseover", function () {
+                this.chart.cursorGroup.style("display", null);
                 select(this.tooltipDiv).style("display", null);
                 this.chart.yIndicators.style("display", null);
                 if (this.props.indicator.Volume || !this.props.indicator) {
                     this.chart.volumeTip.style("display", null);
                 }
-                this.chart.tooltip.style("display", null); 
+                this.chart.tooltip.style("display", null);
+                this.onMouseMove();
             }.bind(this))
-            .on("mouseout", function () { 
-                this.chart.cursorGroup.style("display", "none"); 
-                this.chart.tooltip.style("display", "none"); 
+            .on("mouseout", function () {
+                this.chart.cursorGroup.style("display", "none");
+                this.chart.tooltip.style("display", "none");
                 select(this.tooltipDiv).style("display", "none");
                 this.chart.yIndicators.style("display", "none");
                 this.chart.volumeTip.style("display", "none");
@@ -600,23 +613,28 @@ class Chart extends React.Component {
     }
 
     render() {
-        var makerTokenLogo = `/tokens/${this.props.makerToken.logo}`;
-        var takerTokenLogo = `/tokens/${this.props.takerToken.logo}`;
+        console.log(this.props.makerToken.logo);
 
         return (
-            <div className={styles.ChartContainer}>
+            <div className={cssStyles.ChartContainer}>
                 <svg ref={node => this.node = node}
                     width={this.props.width} height={this.maxHeight - this.marginBottom}>
                 </svg>
-                <div className={styles.TooltipDiv} ref={node => this.tooltipDiv = node}>
-                    <p className={styles.TooltipHeader}>
-                        <img className={styles.TokenLogo} src={makerTokenLogo} alt='token logo' style={{ width: '24px' }} />
-                        <span>in</span>
-                        <img className={styles.TokenLogo} src={takerTokenLogo} alt='token logo' style={{ width: '24px' }} />
-                    </p>
+                <div className={cssStyles.TooltipDiv} ref={node => this.tooltipDiv = node}>
+                    <div style={{ display: 'flow-root', textAlign: 'center', marginBottom: '10px' }}>
+                        <Avatar className={this.props.classes.avatar}
+                            style={{ float: 'left', marginLeft: '20px' }}>
+                            <img className={cssStyles.TokenLogo} src={this.props.makerToken.logo} alt='token logo' style={{ width: 'auto', height: 'auto', maxHeight: '24px' }} />
+                        </Avatar>
+                        <span style={{ lineHeight: '32px' }}>in</span>
+                        <Avatar className={this.props.classes.avatar}
+                            style={{ float: 'right', marginRight: '20px' }}>
+                            <img className={cssStyles.TokenLogo} src={this.props.takerToken.logo} alt='token logo' style={{ width: 'auto', height: 'auto', maxHeight: '24px' }} />
+                        </Avatar>
+                    </div>
                 </div>
             </div>);
     }
 }
 
-export default fitDimensions(Chart);
+export default fitDimensions(withStyles(styles)(Chart));

@@ -31,11 +31,14 @@
   .TooltipHeader {
     text-align: center;
     margin: 0px 0px 10px 0px;
+    position: relative;
+    display: inline;
+
   }
 
-  .TokenLogo {
+  /* .TokenLogo {
     margin: 0px 15px;
-  }
+  } */
 
   :global(.chartTooltipRowContainer) {
     display: flow-root;
