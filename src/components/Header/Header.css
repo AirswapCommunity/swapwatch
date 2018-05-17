@@ -1,13 +1,13 @@
 .Header {
     padding: 15px 20px;
-    height: 50px;
+    height: 30px;
     background-color: white;
     /* box-shadow: 0 0 30px rgba(0,0,0,0.5); */
 }
 
 .LogoContainer {
     display: inline-flex;
-    height: 50px;
+    height: 30px;
     align-items: center;
     float: left;
 }
@@ -24,7 +24,7 @@
     font-weight: bold;
     font-size: 1em;
     letter-spacing: 2px;
-    line-height: 50px;
+    line-height: 30px;
     margin-top: 0;
 }
 
@@ -60,14 +60,14 @@
 
 @media only screen and (min-width: 383px) {
     .Link {
-        line-height: 50px;
+        line-height: 30px;
         margin-top: 0px;
     }
 }
 
 @media only screen and (min-width: 500px) {
     .LogoImage {
-        height: auto;
+        height: 32px;
         margin-right: 20px;
     }
 }
