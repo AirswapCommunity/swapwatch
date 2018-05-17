@@ -257,8 +257,6 @@ class Chart extends React.Component {
     createChart() {
         select(this.node).selectAll('*').remove();
 
-        console.log(this.props.makerToken);
-
         let chartHeight = this.maxHeight - this.marginBottom - this.bottomOffset;
         let formatNumber = format(".5f");
 
@@ -613,8 +611,6 @@ class Chart extends React.Component {
     }
 
     render() {
-        console.log(this.props.makerToken.logo);
-
         return (
             <div className={cssStyles.ChartContainer}>
                 <svg ref={node => this.node = node}
