@@ -153,7 +153,7 @@ var getLogs = (startBlock, endBlock) => {
   });
 }
 
-module.exports.AirSwap = {
+module.exports.AirSwapContract = {
   getTokenList,
   getLogs
 }

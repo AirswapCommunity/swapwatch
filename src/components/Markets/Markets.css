@@ -40,6 +40,17 @@
     display: none;
 }
 
+.AirSwapButton {
+    display: none !important;
+    margin-left: 10px !important;
+    margin-top: 13px !important;
+    margin-right: 10px !important; 
+    line-height: 1em !important;
+    font-size: x-small !important;
+    min-width: 50px !important;
+    min-height: 10px !important;
+}
+
 @media only screen and (min-width: 600px) {
     .AutoCompleteContainer {
         float: left;
@@ -57,6 +68,10 @@
         text-align: center;
     }
     
+    .AirSwapButton {
+        display: inline-block !important;
+    }
+
     .TabsBarContainer {
         padding-top: 10px;
         padding-bottom: 10px;
