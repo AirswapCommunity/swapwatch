@@ -14,10 +14,8 @@ const styles = theme => ({
     avatar: {
         width: '32px',
         height: '32px',
-        backgroundColor: 'white',
-        border: '1px solid #d0d0d0',
-        // display: 'inline',
-        // margin: '4px',
+        backgroundColor: 'whitesmoke',
+        border: '1px solid #404040',
     },
 });
 
@@ -123,14 +121,14 @@ class Chart extends React.Component {
                 .text(formatNumber(this.chart.yScale.invert(coords[1])));
 
             // Tooltip
-            let xOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + (this.chart.candleWidth / 2);
-            let arrowOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2)) + (this.chart.candleWidth / 2);
+            let xOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2));
+            let arrowOffset = (this.chart.xScale(closest.date) - (this.chart.tooltipWidth / 2));
 
             if (xOffset < 0) {
-                xOffset = 0;//-5;
-                // arrowOffset += 5;
+                xOffset = -5;
+                arrowOffset += 5;
             } else if (xOffset + this.chart.tooltipWidth > this.chart.width) {
-                xOffset = this.chart.width - this.chart.tooltipWidth + 10;
+                xOffset = this.chart.width - this.chart.tooltipWidth + 5;
                 arrowOffset = xOffset - arrowOffset;
             } else {
                 arrowOffset = 0;
@@ -218,7 +216,7 @@ class Chart extends React.Component {
                 .attr('width', volumeTipWidth + 10)
                 .attr('height', '16')
                 .attr('transform',
-                    `translate(${this.chart.xScale(closest.date) + (volumeTipWidth / 2)}, ${this.chart.volumeScale(closest.volume)})`);
+                    `translate(${this.chart.xScale(closest.date) + (volumeTipWidth - 5)}, ${this.chart.volumeScale(closest.volume) - 12})`);
 
             select('.volumeTooltip')
                 .append('text')
@@ -228,7 +226,7 @@ class Chart extends React.Component {
                 .attr('fill', 'white')
                 .text(formatVolume(closest.volume))
                 .attr('transform',
-                    `translate(${this.chart.xScale(closest.date) + (volumeTipWidth / 2) + 5}, ${this.chart.volumeScale(closest.volume) + 12})`);
+                    `translate(${this.chart.xScale(closest.date) + volumeTipWidth}, ${this.chart.volumeScale(closest.volume)})`);
         }
     }
 
@@ -332,8 +330,8 @@ class Chart extends React.Component {
             .enter()
             .append('line')
             .attr('class', 'wick')
-            .attr('x1', d => xScale(d.date) + candleWidth / 2)
-            .attr('x2', d => xScale(d.date) + candleWidth / 2)
+            .attr('x1', d => xScale(d.date))
+            .attr('x2', d => xScale(d.date))
             .attr('y2', d => yScale(d.high))
             .attr('y1', d => yScale(d.low))
             .attr('style', d => `stroke:${d.close < d.open ? '#f54748' : '#34f493'};stroke-width:2`);
@@ -347,7 +345,7 @@ class Chart extends React.Component {
             .attr('class', 'candle')
             .attr('width', candleWidth)
             .attr('height', d => Math.abs(yScale(d.open) - yScale(d.close)))
-            .attr('x', d => xScale(d.date))
+            .attr('x', d => xScale(d.date) - (candleWidth / 2))
             .attr('y', d => d.close < d.open ? yScale(d.open) : yScale(d.close))
             .attr('filter', 'url(#f1)')
             .attr('fill', d => d.close < d.open ? '#f54748' : '#34f493');
