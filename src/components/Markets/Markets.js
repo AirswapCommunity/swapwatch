@@ -8,8 +8,9 @@ import MindmapPlot from '../MindmapPlot/MindmapPlot';
 import TradingDataTable from "../TradingDataTable/TradingDataTable";
 import { timeParse } from "d3-time-format";
 import Chart from "../Chart/Chart";
+import Button from 'material-ui/Button'
 
-import { AirSwap } from '../../services/AirSwap/AirSwap';
+import { AirSwapContract } from '../../services/AirSwap/AirSwap';
 import { Stats } from '../../services/Stats/Stats';
 import { EthereumTokens } from '../../services/Tokens/Tokens';
 
@@ -318,7 +319,7 @@ class Markets extends React.Component {
 
 
   componentWillMount() {
-    AirSwap.getLogs()
+    AirSwapContract.getLogs()
       .then(x => {
         this.evalAirSwapDEXFilledEventLogs(x);
         // this.handleToken1Selected(data[0]);
@@ -380,6 +381,35 @@ class Markets extends React.Component {
       return this.state.TokenList;
   }
 
+  buy = () => {
+    window.AirSwap.Trader.render({
+      env: 'production',
+      mode: 'buy',
+      token: this.state.selectedToken1.address,
+      amount: 50000,
+      onCancel: function () {
+        console.info('Trade was canceled.');
+      },
+      onComplete: function (transactionId) {
+        console.info('Trade complete. Thank you, come again.');
+      }
+    }, 'body');
+  }
+
+  sell = () => {
+    window.AirSwap.Trader.render({
+      env: 'production',
+      mode: 'sell',
+      token: this.state.selectedToken1.address,
+      onCancel: function () {
+        console.info('Trade was canceled.');
+      },
+      onComplete: function (transactionId) {
+        console.info('Trade complete. Thank you, come again.');
+      }
+    }, 'body');
+  }
+
   render() {
     var tabsBarElement = this.state.txList ? <TabsBar
       toggleState={this.toggleViewElement}
@@ -418,6 +448,11 @@ class Markets extends React.Component {
           viewElement = null;
       }
     }
+
+    var marketplaceButtons = this.state.selectedToken1 ? (<div style={{ textAlign: 'center' }}>
+      <Button className={styles.AirSwapButton} onClick={this.buy} variant='raised' style={{ backgroundColor: '#34f493', color: 'white' }}>Buy</Button>
+      <Button className={styles.AirSwapButton} onClick={this.sell} variant='raised' style={{ backgroundColor: '#f54748', color: 'white' }}>Sell</Button>
+    </div>) : null;
 
     var menuElement = (viewElement &&
       this.state.viewElement === 'Candlestick') ? <OptionsMenu
@@ -459,6 +494,7 @@ class Markets extends React.Component {
                 {this.getToken2List()}
               </AutoCompleteInput>
             </div>
+            {marketplaceButtons}
           </div>
           <div className={styles.TabsBarContainer}>
             {tabsBarElement}
