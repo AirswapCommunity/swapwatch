@@ -17,7 +17,7 @@ import { EthereumTokens } from '../../services/Tokens/Tokens';
 import OptionsMenu from './OptionsMenu';
 import TabsBar from './TabsBar';
 import StatsBar from '../StatsBar/StatsBar';
-import TokenStats from '../TokenStats/TokenStats'
+import StatsOverview from '../StatsOverview/StatsOverview';
 
 
 class Markets extends React.Component {
@@ -428,7 +428,7 @@ class Markets extends React.Component {
     />;
     var txTableElement = <TradingDataTable txList={this.state.txList} />;
     var tokenStatsElement = ((this.state.pairedTx && !this.state.txList) ?
-      <TokenStats txList={this.state.pairedTx} /> :
+      <StatsOverview txList={this.state.pairedTx} /> :
       null);
 
     var viewElement;
