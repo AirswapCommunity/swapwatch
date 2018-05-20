@@ -33,6 +33,7 @@ class StatsHistogram extends Component {
           width={this.props.width}
           height={this.props.height}
           data={displayData}
+          margin={{ top: 0, right: 40, left: 20, bottom: 0 }}>
         >
           <XAxis dataKey="name" tickMargin={5} />
           <YAxis tickFormatter={formatCurrency} width={100} type='number' allowDataOverflow={false} />
