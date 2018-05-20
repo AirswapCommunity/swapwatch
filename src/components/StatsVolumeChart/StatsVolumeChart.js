@@ -3,7 +3,7 @@ import { fitDimensions } from "react-stockcharts/lib/helper";
 import { withStyles } from 'material-ui/styles';
 import styles from './StatsVolumeChart.css';
 import { format } from "d3-format";
-import { LineChart, Line, XAxis, YAxis, Tooltip, Label } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, Label } from 'recharts';
 
 const tokenFormat = format(".4s");
 
@@ -23,7 +23,7 @@ class StatsVolumeChart extends Component {
 
     return (
       <div>
-        <LineChart
+        <AreaChart
           width={this.props.width}
           height={this.props.height}
           data={displayData}
@@ -43,21 +43,23 @@ class StatsVolumeChart extends Component {
             />
           </YAxis>
           <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#d0d0d0', strokeWidth: 1, fill: '#f0f0f0' }} offset={-65}/>
-          <Line 
+          <Area 
             dataKey="Volume"
-            dot={false}
+            fillOpacity={0.25}
+            fill="#34b5f4"
+            stroke="#34b5f4"
           />
-        </LineChart>
+        </AreaChart>
       </div>
     )
   };
 
   render() {
-    let LineChartElement;
-    LineChartElement = this.props.tokenVolumeInfo ? this.createChart() : null;
+    let AreaChartElement;
+    AreaChartElement = this.props.tokenVolumeInfo ? this.createChart() : null;
     return (<div className={styles.StatsVolumeChartContainer}>
       <div className={styles.StatsVolumeChartContainer} ref={this.setRef}>
-        {LineChartElement}
+        {AreaChartElement}
       </div>
     </div>);
   }
