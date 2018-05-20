@@ -27,7 +27,7 @@ class StatsVolumeChart extends Component {
           width={this.props.width}
           height={this.props.height}
           data={displayData}
-          margin={{ top: 0, right: 40, left: 20, bottom: 200 }}>
+          margin={{ top: 10, right: 11, left: 11, bottom: 200 }}>
 
           <XAxis dataKey="day" tickMargin={5}>
             <Label 
