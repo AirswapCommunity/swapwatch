@@ -24,7 +24,7 @@ class App extends Component {
               <Route path="/Donate" component={PageShell(Donate, true)} />
             </div>
           </div>
-          <footer className={styles.Footer}>This site is not affiliated with AirSwap</footer>
+          {/* <footer className={styles.Footer}>This site is not affiliated with AirSwap</footer> */}
         </div>
       </Router>
     );

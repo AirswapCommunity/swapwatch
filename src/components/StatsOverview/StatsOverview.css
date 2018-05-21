@@ -1,0 +1,38 @@
+:global(.-header) {
+  background-color: #008eff;
+  color: white;   
+  /* font-weight: bold; */
+}
+
+.UpperText {
+  text-align: center;
+  font-size: 1.5em;
+}
+
+.StatsOverviewContainer {
+  text-align: center;
+  width: 100%;
+  height: 95%;
+}
+.HistogramContainer {    
+  /* display: inline-block !important; */
+  text-align: center;
+  width: 100%;
+  height: 50%;
+}
+.VolumeChartContainer {    
+  /* display: inline-block !important; */
+  text-align: center;
+  width: 100%;
+  height: 50%;
+}
+
+.customTooltip {
+  background-color: rgba(0, 0, 0, 0.75);
+  border-style: solid;
+  border-color: rgba(0,142,255,1);
+  border-width: 4px;
+  color: white;
+  text-align: center;
+  padding: 10px 20px;
+}
