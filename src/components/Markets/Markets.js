@@ -114,7 +114,7 @@ class Markets extends React.Component {
               tokenInfoPromise.push(tokenContract.methods.name().call());
               tokenInfoPromise.push(tokenContract.methods.symbol().call());
               tokenInfoPromise.push(tokenContract.methods.decimals().call());
-
+              
               Promise.all(tokenInfoPromise)
                 .then((tokenDetails) => {
                   let newToken = {
@@ -125,6 +125,7 @@ class Markets extends React.Component {
                     "logo": "",
                   }
                   EthereumTokens.addToken(newToken);
+                  console.log(newToken);
                   resolve();
                 })
                 .catch((error) => {
@@ -148,7 +149,6 @@ class Markets extends React.Component {
 
     Promise.all(promiseListTokensLoaded)
       .then(() => {
-
         let tokenInList = [];
         let TokenList = [];
         let tokenPairInList = {};

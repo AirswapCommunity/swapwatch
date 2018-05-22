@@ -59,6 +59,14 @@ const EthereumTokens = [
     "coinMarketCap": "https://coinmarketcap.com/currencies/blockmason/"
   },
   {
+    "address": "0x340d2bde5eb28c1eed91b2f790723e3b160613b7",
+    "name": "BLOCKv Token",
+    "symbol": "VEE",
+    "url": "https://blockv.io/",
+    "decimals": "18",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/blockv/"
+  },
+  {
     "address": "0x558ec3152e2eb2174905cd19aea4e34a23de9ad6",
     "name": "Bread",
     "symbol": "BRD",
@@ -123,6 +131,14 @@ const EthereumTokens = [
     "coinMarketCap": "https://coinmarketcap.com/currencies/eos/"
   },
   {
+    "address": "0x7e9e431a0b8c4d532c745b1043c7fa29a48d4fba",
+    "name": "eosDAC",
+    "symbol": "eosDAC",
+    "url": "https://eosdac.io/",
+    "decimals": "18",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/eosdac/"
+  },
+  {
     "address": "0x0000000000000000000000000000000000000000",
     "name": "Ether",
     "marketplaceHide": true,
@@ -131,6 +147,13 @@ const EthereumTokens = [
     "decimals": "18",
     "maxValue": 1000000,
     "coinMarketCap": "https://coinmarketcap.com/currencies/ethereum/"
+  },
+  {
+    "address": "0x5af2be193a6abca9c8817001f45744777db30756",
+    "name": "Ethos",
+    "symbol": "ETHOS",
+    "decimals": "8",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/ethos/"
   },
   {
     "address": "0x419d0d8bdd9af5e606ae2232ed285aff190e711b",
@@ -162,6 +185,14 @@ const EthereumTokens = [
     "url": "http://gridplus.io/",
     "decimals": "12",
     "coinMarketCap": "https://coinmarketcap.com/currencies/grid/"
+  },
+  {
+    "address": "0x6c6ee5e31d828de241282b9606c8e98ea48526e2",
+    "name": "Holo",
+    "symbol": "HOT",
+    "url": "http://holochain.org/",
+    "decimals": "18",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/holo/"
   },
   {
     "address": "0x888666ca69e0f178ded6d75b5726cee99a87d698",
@@ -241,6 +272,14 @@ const EthereumTokens = [
       "apps"
     ],
     "coinMarketCap": "https://coinmarketcap.com/currencies/rchain/"
+  },
+  {
+    "address": "0x408e41876cccdc0f92210600ef50372656052a38",
+    "name": "Republic Token",
+    "symbol": "REN",
+    "url": "https://www.republicprotocol.com/",
+    "decimals": "18",
+    "coinMarketCap": "https://coinmarketcap.com/currencies/republic-protocol/"
   },
   {
     "address": "0x744d70fdbe2ba4cf95131626614a1763df805b9e",
@@ -649,6 +688,7 @@ var addTokenByAddressFromEthplorer = (address) => {
 
 
 var addAndUpdateTokenLists = (newToken) => {
+    EthereumTokens.push(newToken);
     EthereumTokensSA.push(newToken);
     EthereumTokensSA.sort((a, b) => {
         let aLow = a.address.toLocaleLowerCase();

@@ -57,7 +57,9 @@ class StatsOverview extends Component {
     .then(response => {
       for (let token in response) {
         let tokenPriceUSD = response[token].USD;
-        
+        // console.log(token);
+        // console.log(EthereumTokens.AllTokens);
+        // console.log(EthereumTokens);
         tokenVolumeInfo.push({
           name: token,
           tokenVolume: tokenVolume[token],
