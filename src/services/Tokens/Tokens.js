@@ -67,6 +67,12 @@ const EthereumTokens = [
     "coinMarketCap": "https://coinmarketcap.com/currencies/blockv/"
   },
   {
+    "address": "0x107c4504cd79c5d2696ea0030a8dd4e92601b82e",
+    "name": "Bloom Token",
+    "symbol": "BLT",
+    "decimals": "18",
+  },
+  {
     "address": "0x558ec3152e2eb2174905cd19aea4e34a23de9ad6",
     "name": "Bread",
     "symbol": "BRD",
@@ -107,6 +113,18 @@ const EthereumTokens = [
     "url": "https://makerdao.com/",
     "decimals": "18",
     "coinMarketCap": "https://coinmarketcap.com/currencies/dai/"
+  },
+  {
+    "address": "0x151202c9c18e495656f372281f493eb7698961d5",
+    "name": "Debitum",
+    "symbol": "DEB",
+    "decimals": "18",
+  },
+  {
+    "address": "0x0f5d2fb29fb7d3cfee444a200298f468908cc942",
+    "name": "Decentraland MANA",
+    "symbol": "MANA",
+    "decimals": "18",
   },
   {
     "address": "0xe0b7927c4af23765cb51314a0e0521a9645f0e2a",
@@ -223,6 +241,18 @@ const EthereumTokens = [
       "trading"
     ],
     "coinMarketCap": "https://coinmarketcap.com/currencies/kyber-network/"
+  },
+  {
+    "address": "0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2",
+    "name": "Maker",
+    "symbol": "MKR",
+    "decimals": "18",
+  },
+  {
+    "address": "0x123ab195dd38b1b40510d467a6a359b201af056f",
+    "decimals": 8,
+    "name":"LGO Token",
+    "symbol":"LGO"
   },
   {
     "address": "0x957c30ab0426e0c93cd8241e2c60392d08c6ac8e",
@@ -680,7 +710,7 @@ var addTokenByAddressFromEthplorer = (address) => {
           "symbol": response.symbol,
           "address": address,
           "logo": "",
-          "decimal": parseInt(response.decimals, 10)
+          "decimals": parseInt(response.decimals, 10)
         }
         addToken(newToken)
     })
