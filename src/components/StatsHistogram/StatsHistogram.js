@@ -26,14 +26,13 @@ class StatsHistogram extends Component {
     let displayData = this.props.tokenVolumeInfo
       .sort((a, b) => { return b.VolumeToday - a.VolumeToday })
       .slice(0, 5); // determine how many should be displayed
-
     return (
       <div>
         <BarChart
           width={this.props.width}
           height={this.props.height}
           data={displayData}
-          margin={{ top: 20, right: 11, left: 11, bottom: 0 }}>
+          margin={{ top: 30, right: 11, left: 11, bottom: 0 }}>
         >
           <XAxis dataKey="name" tickMargin={5} />
           <YAxis tickFormatter={formatCurrency} width={100} type='number' allowDataOverflow={false} />
