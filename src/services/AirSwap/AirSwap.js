@@ -6,7 +6,7 @@ const AirSwapFilledEvent =
 const EtherscanAPIKey = 'VR4UPKI119TYM93ZV47GXTTGFSMRRDEVGZ';
 
 const cacheDelay = 60000;
-const blockHistory = 5838 * 120; // 120 days
+const blockHistory = 5838 * 30; // 120 days
 
 const TokenList = {
   tokens: [],
@@ -147,7 +147,7 @@ var getLogs = (startBlock, endBlock) => {
     } else {
       Logs.timestamp = Date.now();
       // store logs to local storage
-      localStorage.setItem('txLogs', JSON.stringify(Logs));
+      // localStorage.setItem('txLogs', JSON.stringify(Logs));
       return Logs.entries; 
     }
   });
