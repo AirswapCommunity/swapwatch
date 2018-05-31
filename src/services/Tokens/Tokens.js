@@ -73,6 +73,12 @@ const EthereumTokens = [
     "decimals": "18",
   },
   {
+    "address": "0xb8c77482e45f1f44de1745f52c74426c631bdd52",
+    "name": "BNB",
+    "symbol": "BNB",
+    "decimals": "18",
+  },
+  {
     "address": "0x558ec3152e2eb2174905cd19aea4e34a23de9ad6",
     "name": "Bread",
     "symbol": "BRD",
@@ -136,6 +142,12 @@ const EthereumTokens = [
       "dao"
     ],
     "coinMarketCap": "https://coinmarketcap.com/currencies/digixdao/"
+  },
+  {
+    "address": "0x0abdace70d3790235af448c88547603b945604ea",
+    "name": "district0x",
+    "symbol": "DNT",
+    "decimals": "18",
   },
   {
     "address": "0x86fa049857e0209aa7d9e616f7eb3b3b78ecfdb0",
@@ -266,6 +278,12 @@ const EthereumTokens = [
     "coinMarketCap": "https://coinmarketcap.com/currencies/modum/"
   },
   {
+    "address": "0x1776e1f26f98b1a5df9cd347953a26dd3cb46671",
+    "name": "Numeraire",
+    "symbol": "NMR",
+    "decimals": "18",
+  },
+  {
     "address": "0xd26114cd6ee289accf82350c8d8487fedb8a0c07",
     "name": "OmiseGO",
     "symbol": "OMG",
@@ -321,6 +339,12 @@ const EthereumTokens = [
       "social"
     ],
     "coinMarketCap": "https://coinmarketcap.com/currencies/status/"
+  },
+  {
+    "address": "0x42d6622dece394b54999fbd73d108123806f6a18",
+    "name": "SPANK",
+    "symbol": "SPANK",
+    "decimals": "18",
   },
   {
     "address": "0xd0a4b8946cb52f0661273bfbc6fd0e0c75fc6433",
