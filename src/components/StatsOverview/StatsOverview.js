@@ -21,6 +21,10 @@ class StatsOverview extends Component {
 
   componentWillMount() {
     let txList = this.props.txList;
+    
+    let stringsOfTokens = [];
+    let numOfTokens = 0;
+
     let stringOfTokens = ''
     let tokenVolume = {};
     let tokenVolumeInfo = [];
@@ -35,7 +39,16 @@ class StatsOverview extends Component {
       (tokenVolume[tokenProps.symbol] = []).length = numOfDays; 
       tokenVolume[tokenProps.symbol].fill(0);
       stringOfTokens = stringOfTokens + tokenProps.symbol + ','
+      numOfTokens += 1;
+
+      if(numOfTokens > 50) {
+        stringsOfTokens.push(stringOfTokens);
+        stringOfTokens = '';
+        numOfTokens=0;
+      }
     }
+    if(stringOfTokens !== '')
+      stringsOfTokens.push(stringOfTokens);
 
     // Get seperate token volumes within the last 24h
     for (let token in txList) {
@@ -51,25 +64,34 @@ class StatsOverview extends Component {
         }
       }
     }
-    fetch(`https://min-api.cryptocompare.com/data/pricemulti?` +
-    `fsyms=` + stringOfTokens + `&tsyms=USD`)
-    .then(res => res.json())
-    .then(response => {
-      for (let token in response) {
-        let tokenPriceUSD = response[token].USD;
-        // console.log(token);
-        // console.log(EthereumTokens.AllTokens);
-        // console.log(EthereumTokens);
-        tokenVolumeInfo.push({
-          name: token,
-          tokenVolume: tokenVolume[token],
-          Volume: tokenVolume[token].map(x => x * tokenPriceUSD),
-          tokenVolumeToday: tokenVolume[token][0],
-          VolumeToday: tokenVolume[token][0] * tokenPriceUSD,
-          logo: EthereumTokens.AllTokens.find(x => x.symbol === token).logo
-        });
-      }
-
+    let promiseList = []
+    for(let stringOfTokens of stringsOfTokens) {
+      promiseList.push(
+        fetch(`https://min-api.cryptocompare.com/data/pricemulti?` +
+        `fsyms=` + stringOfTokens + `&tsyms=USD`)
+        .then(res => res.json())
+        .then(response => {
+          if(response.Response !== 'Error') {
+            for (let token in response) {
+              let tokenPriceUSD = response[token].USD;
+              tokenVolumeInfo.push({
+                name: token,
+                tokenVolume: tokenVolume[token],
+                Volume: tokenVolume[token].map(x => x * tokenPriceUSD),
+                tokenVolumeToday: tokenVolume[token][0],
+                VolumeToday: tokenVolume[token][0] * tokenPriceUSD,
+                logo: EthereumTokens.AllTokens.find(x => x.symbol === token).logo
+              });
+            }
+          } else {
+            console.log("Error during fetching of cryptocompare (pricing) data.")
+          }
+        })
+      );
+    }
+    
+    Promise.all(promiseList)
+    .then(() => {
       this.setState({
         tokenVolume: tokenVolume,
         tokenVolumeInfo: tokenVolumeInfo

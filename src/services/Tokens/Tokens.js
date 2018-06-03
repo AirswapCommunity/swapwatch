@@ -144,6 +144,12 @@ const EthereumTokens = [
     "coinMarketCap": "https://coinmarketcap.com/currencies/digixdao/"
   },
   {
+    "address": "0x4f3afec4e5a3f2a6a1a411def7d7dfe50ee057bf",
+    "name": "Digix Gold Token",
+    "symbol": "DGX",
+    "decimals": "9",
+  },
+  {
     "address": "0x0abdace70d3790235af448c88547603b945604ea",
     "name": "district0x",
     "symbol": "DNT",
