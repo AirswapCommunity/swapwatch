@@ -31,7 +31,7 @@ class StatsOverview extends Component {
     let tokenVolumeInfo = [];
     let twentyFourHours = 24 * 60 * 60;
     let currentTime = Date.now() / 1000;
-    let numOfDays = 30;
+    let numOfDays = 14;
     let DaysAgo = currentTime - numOfDays*twentyFourHours;
     let ethAddress = '0x0000000000000000000000000000000000000000';
 
@@ -88,11 +88,6 @@ class StatsOverview extends Component {
         .then(response => {
           if(response.Response !== 'Error') {
             for (let token in response) {
-              const logo = (token.address !== ethAddress) ?
-                ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/' +
-                  token.address + '.png') :
-                ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/' +
-                  'ethereum_1.png');
               let tokenPriceUSD = response[token].USD;
               tokenVolumeInfo.push({
                 name: token,

@@ -61,7 +61,6 @@ class Markets extends React.Component {
     let trades = [];
     let wethAddress = '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2';
     let ethAddress = '0x0000000000000000000000000000000000000000';
-    let web3 = new Web3('https://mainnet.infura.io/506w9CbDQR8fULSDR7H0');
 
     // Step 1: Read all transactions and do some first transformations
     for (let txData of rawTxList) {
