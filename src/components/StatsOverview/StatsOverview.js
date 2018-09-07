@@ -6,7 +6,7 @@ import StatsHistogram from '../StatsHistogram/StatsHistogram';
 import StatsVolumeChart from '../StatsVolumeChart/StatsVolumeChart';
 // import StatsPieChart from '../StatsPieChart/StatsPieChart';
 // import StatsTreemap from '../StatsTreemap/StatsTreemap';
-import { EthereumTokens } from '../../services/Tokens/Tokens';
+// import { EthereumTokens } from '../../services/Tokens/Tokens';
 
 class StatsOverview extends Component {
 
@@ -21,32 +21,46 @@ class StatsOverview extends Component {
 
   componentWillMount() {
     let txList = this.props.txList;
-    
+    let tokens = this.props.tokens;
     let stringsOfTokens = [];
     let numOfTokens = 0;
 
     let stringOfTokens = ''
-    let tokenVolume = {};
+    let tokenVolume = {}; // histogram for all tokens
+    let tokenLogo = {};
     let tokenVolumeInfo = [];
     let twentyFourHours = 24 * 60 * 60;
     let currentTime = Date.now() / 1000;
     let numOfDays = 30;
     let DaysAgo = currentTime - numOfDays*twentyFourHours;
+    let ethAddress = '0x0000000000000000000000000000000000000000';
 
-    // Get list of all traded tokens
-    for (let token in txList) {
-      let tokenProps = EthereumTokens.getTokenByAddress(token);
-      (tokenVolume[tokenProps.symbol] = []).length = numOfDays; 
-      tokenVolume[tokenProps.symbol].fill(0);
-      stringOfTokens = stringOfTokens + tokenProps.symbol + ','
+    // prepare histograms
+    var addTokenToHistogram = (address, symbol) => {
+      (tokenVolume[symbol] = []).length = numOfDays;
+      tokenVolume[symbol].fill(0);
+      tokenLogo[symbol]  = tokens[address].logo;
+      stringOfTokens = stringOfTokens + symbol + ','
       numOfTokens += 1;
-
       if(numOfTokens > 50) {
         stringsOfTokens.push(stringOfTokens);
         stringOfTokens = '';
         numOfTokens=0;
       }
     }
+    for (let token in txList) {
+      for (let token2 in txList[token]) {
+        for (let trade of txList[token][token2]) {
+          if (!tokenVolume[trade.makerSymbol]) {
+            addTokenToHistogram(trade.makerToken, trade.makerSymbol)
+          }
+          if (!tokenVolume[trade.takerSymbol]) {
+            addTokenToHistogram(trade.takerToken, trade.takerSymbol)
+          }
+        }
+      }
+    }
+
     if(stringOfTokens !== '')
       stringsOfTokens.push(stringOfTokens);
 
@@ -64,6 +78,7 @@ class StatsOverview extends Component {
         }
       }
     }
+
     let promiseList = []
     for(let stringOfTokens of stringsOfTokens) {
       promiseList.push(
@@ -73,6 +88,11 @@ class StatsOverview extends Component {
         .then(response => {
           if(response.Response !== 'Error') {
             for (let token in response) {
+              const logo = (token.address !== ethAddress) ?
+                ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/' +
+                  token.address + '.png') :
+                ('https://raw.githubusercontent.com/TrustWallet/tokens/master/images/' +
+                  'ethereum_1.png');
               let tokenPriceUSD = response[token].USD;
               tokenVolumeInfo.push({
                 name: token,
@@ -80,7 +100,7 @@ class StatsOverview extends Component {
                 Volume: tokenVolume[token].map(x => x * tokenPriceUSD),
                 tokenVolumeToday: tokenVolume[token][0],
                 VolumeToday: tokenVolume[token][0] * tokenPriceUSD,
-                logo: EthereumTokens.AllTokens.find(x => x.symbol === token).logo
+                logo: tokenLogo[token]
               });
             }
           } else {
@@ -89,7 +109,7 @@ class StatsOverview extends Component {
         })
       );
     }
-    
+
     Promise.all(promiseList)
     .then(() => {
       this.setState({

@@ -6,7 +6,7 @@ const AirSwapFilledEvent =
 const EtherscanAPIKey = 'VR4UPKI119TYM93ZV47GXTTGFSMRRDEVGZ';
 
 const cacheDelay = 60000;
-const blockHistory = 5838 * 30; // 120 days
+const blockHistory = 5838 * 30;
 
 const TokenList = {
   tokens: [],
