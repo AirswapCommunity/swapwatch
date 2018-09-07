@@ -4,7 +4,7 @@
     display: block;
     width: 100%;
   }
-  
+
   .NavigationItem a {
     color: #8f5c2c;
     text-decoration: none;
@@ -12,14 +12,14 @@
     box-sizing: border-box;
     display: block;
   }
-  
+
   .NavigationItem a:active,
   .NavigationItem a.active,
   .NavigationItem a:hover {
     color: #40a4c8;
   } */
-  
-  
+
+
   /* @media (min-width: 500px) { */
     .NavigationItem {
       margin: 0;
@@ -28,7 +28,7 @@
       line-height: 40px;
       /* padding: 5px 20px; */
     }
-    
+
     .NavigationItem a {
       color: white;
       height: 100%;
@@ -39,7 +39,7 @@
       /* line-height: 50px; */
       padding: 0px 20px;
     }
-    
+
     .NavigationItem a:hover {
       border-bottom: 5px solid #008eff;
       background-color: #008eff;
