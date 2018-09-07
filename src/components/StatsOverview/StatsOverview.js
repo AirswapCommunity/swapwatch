@@ -33,7 +33,6 @@ class StatsOverview extends Component {
     let currentTime = Date.now() / 1000;
     let numOfDays = 14;
     let DaysAgo = currentTime - numOfDays*twentyFourHours;
-    let ethAddress = '0x0000000000000000000000000000000000000000';
 
     // prepare histograms
     var addTokenToHistogram = (address, symbol) => {

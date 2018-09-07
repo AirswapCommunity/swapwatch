@@ -1,6 +1,5 @@
 import React from "react";
 import * as d3 from "d3";
-import * as Web3 from 'web3';
 import styles from "./Markets.css";
 import Auxilary from "../../hoc/Auxilary";
 import AutoCompleteInput from "../AutoCompleteInput/AutoCompleteInput";
